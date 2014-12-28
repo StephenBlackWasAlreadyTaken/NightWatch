@@ -6,7 +6,7 @@
             android:key="bg_notifications"
             android:title="BG Alerts"
             android:summary="Alert when BG readings cross the threshold."
-            android:defaultValue="true" />
+            android:defaultValue="false" />
         <CheckBoxPreference
             android:dependency="bg_notifications"
             android:key="bg_vibrate"
