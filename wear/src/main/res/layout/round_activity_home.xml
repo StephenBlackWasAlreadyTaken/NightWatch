@@ -37,24 +37,6 @@
                 android:layout_height="50dp"
                 android:textColor="#FF0000"
                 android:layout_weight="0.40" />
-            <TextView
-                android:id="@+id/sgv"
-                android:textSize="45sp"
-                android:text="123"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:paddingLeft="30dp"
-                android:textColor="#FF0000"
-                android:layout_weight="0.20" />
-
-            <TextView
-                android:id="@+id/direction"
-                android:textSize="50sp"
-                android:text="\u2192"
-                android:layout_width="31dp"
-                android:layout_height="50dp"
-                android:textColor="#FF0000"
-                android:layout_weight="0.40" />
         </LinearLayout>
 
         <TextView
