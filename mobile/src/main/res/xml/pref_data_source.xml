@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="Data Source"
+            android:key="dataSource">
+
+        <EditTextPreference
+            android:key="dex_collection_method"
+            android:title="Nightscout URL"
+            android:summary="URL for your nightscout site"
+            android:defaultValue="https://{yoursite}.azurewebsites.net"/>
+        <!--<CheckBoxPreference-->
+            <!--android:key="run_service_in_foreground"-->
+            <!--android:title="Run Collection Service in foreground"-->
+            <!--android:summary="Running in foreground prevents android from killing the service to free up memory but it creates an annoying notification."-->
+            <!--android:defaultValue="false" />-->
+        <CheckBoxPreference
+            android:key="watch_sync"
+            android:title="Android Wear Integration"
+            android:summary="Send data to Android Wear Watchface."
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
