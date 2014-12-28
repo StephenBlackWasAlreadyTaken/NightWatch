@@ -25,7 +25,7 @@ Want to help, SUPER COOL! Put up a PR and clear description of what your goal wi
 
 # DOWNLOADS: v0.01
 * NightWatch App for Phone: [NightWatch v0.01 phone apk](http://bit.ly/16X34Vs)
-* NightWatch for Android Wear: [NightWatch v0.01 Watch Face apk](http://bit.ly/1wtZjLJ)
+* NightWatch for Android Wear: [NightWatch v0.02 Watch Face apk](http://bit.ly/1rt7Qms)
 
 (note, you need the phone one installed as well if you intend to use the android wear watchface!)
 
