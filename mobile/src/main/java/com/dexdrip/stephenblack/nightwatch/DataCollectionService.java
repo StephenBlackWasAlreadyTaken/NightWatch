@@ -39,7 +39,7 @@ public class DataCollectionService extends Service {
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pending);
 
-        doService();
+        if(endpoint_set) { doService(); }
         setAlarm();
         return START_STICKY;
     }
@@ -50,6 +50,7 @@ public class DataCollectionService extends Service {
             endpoint_set = false;
         } else {
             endpoint_set = true;
+            doService();
         }
     }
     public void listenForChangeInSettings() {
@@ -79,7 +80,7 @@ public class DataCollectionService extends Service {
     public long sleepTime() {
         Bg last_bg = Bg.last();
         if (last_bg != null) {
-            long possibleSleep = (long) ((1000 * 60 * 5) - ((new Date().getTime() - last_bg.datetime) % (1000 * 60 * 5)) + (1000 * 30));
+            long possibleSleep = (long) ((1000 * 60 * 5) - ((new Date().getTime() - last_bg.datetime) % (1000 * 60 * 5)) + (1000 * 35));
             if (possibleSleep > 0) {
                 return possibleSleep;
             } else {
@@ -102,12 +103,10 @@ public class DataCollectionService extends Service {
                 mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                 Notifications.notificationSetter(mContext);
                 return true;
-            } catch (RetrofitError e) {
-                Log.d("RetroFit ERROR: ", e.getLocalizedMessage());
-            } catch (InterruptedException exx) {
-            } catch (Exception ex) {
-                Log.d("ERROR: ", ex.getLocalizedMessage());
             }
+            catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
+            catch (InterruptedException exx) { Log.d("Interruption Error: ", "BOOOO"); }
+            catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
             return false;
         }
     }

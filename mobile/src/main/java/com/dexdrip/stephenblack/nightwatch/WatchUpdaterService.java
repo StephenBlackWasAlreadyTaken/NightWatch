@@ -29,9 +29,7 @@ public class WatchUpdaterService extends Service implements
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         listenForChangeInSettings();
         setSettings();
-        if(wear_integration) {
-            googleApiConnect();
-        }
+        if(wear_integration) { googleApiConnect(); }
     }
 
     public void listenForChangeInSettings() {
@@ -45,6 +43,7 @@ public class WatchUpdaterService extends Service implements
 
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
+        if(wear_integration) { googleApiConnect(); }
     }
 
     public void googleApiConnect() {
@@ -74,9 +73,8 @@ public class WatchUpdaterService extends Service implements
             }
 
             setAlarm();
-            return START_STICKY;
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -88,7 +86,7 @@ public class WatchUpdaterService extends Service implements
 
         Bg last_bg = Bg.last();
         if (last_bg != null) {
-            new SendToDataLayerThread(WEARABLE_DATA_PATH, last_bg.dataMap(), googleApiClient).start();
+            new SendToDataLayerThread(WEARABLE_DATA_PATH, last_bg.dataMap(mPrefs), googleApiClient).start();
         }
     }
 

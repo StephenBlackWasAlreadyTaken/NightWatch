@@ -40,10 +40,7 @@ public class Rest {
                 returnedBg.save();
             }
             Log.d("REST CALL SUCCESS: ", "HORRAY");
-        } catch (RetrofitError e) {
-
-            Log.d("REST CALL ERROR: ", e.getLocalizedMessage());
-        }
+        } catch (Exception e) { Log.d("REST CALL ERROR: ", "BOOOO"); }
     }
 
     private PebbleEndpointInterface pebbleEndpointInterface() {

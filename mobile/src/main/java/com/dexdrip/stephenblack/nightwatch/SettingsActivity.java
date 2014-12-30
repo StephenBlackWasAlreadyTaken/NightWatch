@@ -35,6 +35,7 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("lowValue"));
 //        bindPreferenceSummaryToValue(findPreference("bg_snooze"));
         bindPreferenceSummaryToValue(findPreference("dex_collection_method"));
+        bindPreferenceSummaryToValue(findPreference("units"));
     }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {

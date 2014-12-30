@@ -175,6 +175,7 @@ public class Home extends Activity {
         if (lastBgreading != null) {
             double estimate =0;
             if ((new Date().getTime()) - (60000 * 11) - lastBgreading.datetime > 0) {
+                notificationText.setTextColor(Color.parseColor("#C30909"));
                 notificationText.setText("Signal Missed");
                 estimate = lastBgreading.sgv_int();
                 currentBgValueText.setText(df.format(estimate));
@@ -183,6 +184,8 @@ public class Home extends Activity {
                 if (lastBgreading != null) {
                     estimate = lastBgreading.sgv_int();
                     currentBgValueText.setText(df.format(estimate) + " " + lastBgreading.slopeArrow());
+                    notificationText.setTextColor(Color.parseColor("#ffffff"));
+                    notificationText.setText(lastBgreading.readingAge());
                 }
             }
             if(estimate <= bgGraphBuilder.lowMark) {

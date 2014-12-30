@@ -109,15 +109,15 @@ public class BgGraphBuilder {
 
     private void addBgReadingValues() {
         for (Bg bgReading : bgReadings) {
-            if (bgReading.sgv_int() >= 500) {
-                highValues.add(new PointValue((float)bgReading.datetime, 500));
+            if (bgReading.sgv_int() >= 400) {
+                highValues.add(new PointValue((float)bgReading.datetime, 400));
             } else if (bgReading.sgv_int() >= highMark) {
                 highValues.add(new PointValue((float)bgReading.datetime, (float)bgReading.sgv_int()));
             } else if (bgReading.sgv_int() >= lowMark) {
                 inRangeValues.add(new PointValue((float) bgReading.datetime, (float) bgReading.sgv_int()));
             } else if (bgReading.sgv_int() >= 40) {
                 lowValues.add(new PointValue((float) bgReading.datetime, (float) bgReading.sgv_int()));
-            } else {
+            } else if (bgReading.sgv_int() >= 10) {
                 lowValues.add(new PointValue((float)bgReading.datetime, 40));
             }
         }

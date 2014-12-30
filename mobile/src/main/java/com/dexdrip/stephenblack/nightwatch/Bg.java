@@ -1,5 +1,6 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import android.content.SharedPreferences;
 import android.provider.BaseColumns;
 
 import com.activeandroid.Model;
@@ -44,19 +45,50 @@ public class Bg extends Model {
     @Column(name = "battery")
     public String battery;
 
-    public int sgv_int() {
-        return Integer.parseInt(sgv);
+    public boolean sgvContainsWhiteSpace(){
+        if(sgv != null){
+            for(int i = 0; i < sgv.length(); i++){
+                if(Character.isWhitespace(sgv.charAt(i))){ return true; }
+            }
+        }
+        return false;
+    }
+
+    public int sgv_int() { //This is dumb but for some reason parseint wasnt working properly...
+        if (sgvContainsWhiteSpace()){
+            return 0;
+        } else if (sgv.startsWith("1") && sgv.length() <= 2) {
+            return 5;
+        } else {
+            return Integer.parseInt(sgv);
+        }
     }
 
     public String sgv_string() {
         int asInt = sgv_int();
-        if (asInt >= 500) {
+        if (asInt >= 400) {
             return "High";
-        } else if (asInt <= 40) {
+        } else if (asInt >= 40) {
+            return sgv;
+        } else if (asInt >= 11) {
             return "Low";
         } else {
-            return sgv;
+            return "???";
         }
+    }
+
+    public String deltaString(SharedPreferences prefs) {
+        String unit = prefs.getString("units", "mgdl");
+        String unitPretty = "mg/dL";
+        if (unit.compareTo("mmol") == 0) {
+            unitPretty = "mmol";
+        }
+        if(bgdelta < 0) {
+            return bgdelta + " " + unitPretty;
+        } else {
+            return "+" + bgdelta + " " + unitPretty;
+        }
+
     }
 
     public int battery_int() {
@@ -64,7 +96,7 @@ public class Bg extends Model {
     }
 
     public String slopeArrow() {
-        String arrow = "";
+        String arrow = "--";
         if (direction.compareTo("DoubleDown") == 0) {
             arrow = "\u21ca";
         } else if (direction.compareTo("SingleDown") == 0) {
@@ -84,24 +116,57 @@ public class Bg extends Model {
     }
 
     public String readingAge() {
-        double timeSince = new Date().getTime() - datetime;
-        int minutesAgo = (int) Math.floor(timeSince/(1000*60));
-        if (minutesAgo == 0) {
-            return "Now";
+        int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
+        if (minutesAgo == 1) {
+            return minutesAgo + " Minute ago";
         }
         return minutesAgo + " Minutes ago";
     }
 
-    public DataMap dataMap() {
+    public double timeSince() {
+        return new Date().getTime() - datetime;
+    }
+
+    public DataMap dataMap(SharedPreferences prefs) {
         DataMap dataMap = new DataMap();
-        dataMap.putString("sgv", sgv);
         dataMap.putString("sgvString", sgv_string());
-        dataMap.putDouble("bgdelta", bgdelta);
-        dataMap.putDouble("trend", trend);
         dataMap.putString("slopeArrow", slopeArrow());
         dataMap.putString("readingAge", readingAge());
-        dataMap.putInt("battery_int", battery_int());
+        dataMap.putString("delta", deltaString(prefs));
+        dataMap.putString("battery", battery);
+        dataMap.putLong("sgvLevel", sgvLevel(prefs));
+        dataMap.putInt("batteryLevel", batteryLevel());
+        dataMap.putInt("ageLevel", ageLevel());
         return dataMap;
+    }
+
+    public long sgvLevel(SharedPreferences prefs) {
+        int highMark = Integer.parseInt(prefs.getString("highValue", "170"));
+        int lowMark = Integer.parseInt(prefs.getString("lowValue", "70"));
+        if(sgv_int() >= highMark) {
+            return 1;
+        } else if (sgv_int() >= lowMark) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+    public int batteryLevel() {
+        int bat = Integer.valueOf(battery.replaceAll("[^\\d.]", ""));
+        if(bat >= 30) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public int ageLevel() {
+        if(timeSince() <= (1000 * 60 * 12)) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     public static Bg last() {

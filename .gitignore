@@ -26,3 +26,4 @@ proguard/
 *.log
 *.DS_Store
 .idea/*
+mobile/manifest-merger-*

@@ -17,6 +17,12 @@ import com.google.android.gms.wearable.WearableListenerService;
 public class ListenerService extends WearableListenerService {
     private static final String WEARABLE_DATA_PATH = "/nightscout_watch_data";
 
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
+    
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
 

@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dexdrip.stephenblack.nightwatch" >
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.dexdrip.stephenblack.nightwatch" >
 
     <uses-feature android:name="android.hardware.type.watch" />
-    <uses-permission
-        android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
-    <uses-permission
-        android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault" >
+
         <activity
             android:name=".Home"
             android:allowEmbedded="true"
@@ -20,7 +18,39 @@
             <meta-data android:name="com.google.android.clockwork.home.preview" android:resource="@drawable/ic_launcher" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <category android:name="com.google.android.clockwork.home.category.HOME_BACKGROUND" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".HomeDark"
+            android:allowEmbedded="true"
+            android:label="NightWatch(Dark)" >
+            <meta-data android:name="com.google.android.clockwork.home.preview" android:resource="@drawable/ic_launcher" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.google.android.clockwork.home.category.HOME_BACKGROUND" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".LargeHomeDark"
+            android:allowEmbedded="true"
+            android:label="NightWatch(Large+Dark)" >
+            <meta-data android:name="com.google.android.clockwork.home.preview" android:resource="@drawable/ic_launcher" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.google.android.clockwork.home.category.HOME_BACKGROUND" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".LargeHome"
+            android:allowEmbedded="true"
+            android:label="NightWatch(Large)" >
+            <meta-data android:name="com.google.android.clockwork.home.preview" android:resource="@drawable/ic_launcher" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.google.android.clockwork.home.category.HOME_BACKGROUND" />
             </intent-filter>
         </activity>
@@ -30,6 +60,7 @@
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>
