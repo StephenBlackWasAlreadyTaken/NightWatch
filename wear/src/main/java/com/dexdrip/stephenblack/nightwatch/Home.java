@@ -24,6 +24,8 @@ import com.google.android.gms.wearable.DataMap;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import lecho.lib.hellocharts.util.Utils;
+
 public class Home extends BaseWatchFaceActivity {
 
     @Override
@@ -39,9 +41,9 @@ public class Home extends BaseWatchFaceActivity {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
-                mSgv.setTextColor(Color.YELLOW);
-                mDirection.setTextColor(Color.YELLOW);
-                mDelta.setTextColor(Color.YELLOW);
+                mSgv.setTextColor(Utils.COLOR_ORANGE);
+                mDirection.setTextColor(Utils.COLOR_ORANGE);
+                mDelta.setTextColor(Utils.COLOR_ORANGE);
             } else if (sgvLevel == 0) {
                 mSgv.setTextColor(Color.BLACK);
                 mDirection.setTextColor(Color.BLACK);
@@ -66,7 +68,7 @@ public class Home extends BaseWatchFaceActivity {
 
             mTime.setTextColor(Color.BLACK);
             if (chart != null) {
-                highColor = Color.YELLOW;
+                highColor = Utils.COLOR_ORANGE;
                 midColor = Color.BLUE;
                 lowColor = Color.RED;
                 singleLine = false;
