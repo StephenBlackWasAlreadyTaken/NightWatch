@@ -4,7 +4,7 @@ NightWatch
 A native android Nightscout client with alerts and google wear integration
 
 # DOWNLOAD: 
-* NightWatch v0.05 App for Phone & Watch: [NightWatch v0.06 apk](http://bit.ly/1BKC7jf)
+* NightWatch v0.06 App for Phone & Watch: [NightWatch v0.06 apk](http://bit.ly/1BKC7jf)
 
 ## New in this version
 * MMOL support
