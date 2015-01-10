@@ -9,6 +9,8 @@ A native android Nightscout client with alerts and google wear integration
 ## New in this version
 * MMOL support
 * BG on Watchfaces (on both light and dark standard watchfaces, not on the 'large' font watchfaces)
+* **NOTE** if you want the graph, dont choose the ones that say LARGE, they just have bigger numbers and no graphs
+* **Also note**, to save battery and storage on your watch the data for the graph is not persisted, changing watchfaces means a refresh of the graph
 
 ## Features
 * BG graph on watch!
