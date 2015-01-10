@@ -4,10 +4,14 @@ NightWatch
 A native android Nightscout client with alerts and google wear integration
 
 # DOWNLOAD: 
-* NightWatch v0.05 App for Phone & Watch: [NightWatch v0.05 apk](http://bit.ly/1JYPnVa)
+* NightWatch v0.05 App for Phone & Watch: [NightWatch v0.06 apk](http://bit.ly/1BKC7jf)
 
+## New in this version
+* MMOL support
+* BG on Watchfaces (on both light and dark standard watchfaces, not on the 'large' font watchfaces)
 
 ## Features
+* BG graph on watch!
 * Scrollable, zoomable graph of bg over last 24 hours
 * Retrieves Data from your existing NightScout site
 * Customizable High and Low levels for graphs
@@ -38,6 +42,6 @@ Want to help, SUPER COOL! Put up a PR and clear description of what your goal wi
 you should check out my main project, [DexDrip!!](http://stephenblackwasalreadytaken.github.io/DexDrip/)
 
 # Screen Shots
-![Imgur](http://i.imgur.com/PY4y8in.jpg)
+![Imgur](http://i.imgur.com/bdAuo1j.jpg)
 ![Imgur](http://i.imgur.com/P8TRhKJ.png)
 ![Imgur](http://i.imgur.com/pPY8I5S.png)
