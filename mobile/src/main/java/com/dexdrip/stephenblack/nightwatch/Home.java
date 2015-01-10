@@ -57,18 +57,18 @@ public class Home extends Activity {
     @Override
     protected void onResume(){
         super.onResume();
+        bgGraphBuilder = new BgGraphBuilder(this);
+        displayCurrentInfo();
         _broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
-                    updateCurrentBgInfo();
+                    displayCurrentInfo();
                 }
             }
         };
         registerReceiver(_broadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
         holdViewport.set(0, 0, 0, 0);
-        setupCharts();
-        updateCurrentBgInfo();
     }
 
     @Override
@@ -90,7 +90,6 @@ public class Home extends Activity {
     }
 
     public void setupCharts() {
-        bgGraphBuilder = new BgGraphBuilder(this);
         updateStuff = false;
         chart = (LineChartView) findViewById(R.id.chart);
         chart.setZoomType(ZoomType.HORIZONTAL);
@@ -154,17 +153,7 @@ public class Home extends Activity {
             unregisterReceiver(_broadcastReceiver);
     }
 
-    public void updateCurrentBgInfo() {
-        final TextView currentBgValueText = (TextView) findViewById(R.id.currentBgValueRealTime);
-        final TextView notificationText = (TextView)findViewById(R.id.notices);
-        notificationText.setText("");
-        displayCurrentInfo();
-    }
-
     public void displayCurrentInfo() {
-        DecimalFormat df = new DecimalFormat("#");
-        df.setMaximumFractionDigits(0);
-
         final TextView currentBgValueText = (TextView)findViewById(R.id.currentBgValueRealTime);
         final TextView notificationText = (TextView)findViewById(R.id.notices);
         if ((currentBgValueText.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) {
