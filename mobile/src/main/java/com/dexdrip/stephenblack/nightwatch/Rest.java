@@ -32,15 +32,20 @@ public class Rest {
 
     }
 
-    public void getBgData() {
+    public boolean getBgData() {
         try {
             PebbleEndpoint response = pebbleEndpointInterface().getPebbleInfo();
             Bg returnedBg = response.bgs.get(0);
             if (Bg.is_new(returnedBg)) {
                 returnedBg.save();
+                return true;
             }
             Log.d("REST CALL SUCCESS: ", "HORRAY");
-        } catch (Exception e) { Log.d("REST CALL ERROR: ", "BOOOO"); }
+        } catch (Exception e) {
+            Log.d("REST CALL ERROR: ", "BOOOO");
+            return false;
+        }
+        return false;
     }
 
     private PebbleEndpointInterface pebbleEndpointInterface() {

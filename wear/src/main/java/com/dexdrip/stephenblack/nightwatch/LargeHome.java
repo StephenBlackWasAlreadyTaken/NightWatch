@@ -15,7 +15,7 @@ public class LargeHome extends BaseWatchFaceActivity {
     @Override
     public void setColor() {
         if (screenAwake) {
-            mRelativeLayout.setBackgroundColor(Color.LTGRAY);
+            mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
                 mSgv.setTextColor(Color.YELLOW);
@@ -44,8 +44,6 @@ public class LargeHome extends BaseWatchFaceActivity {
             }
 
             mTime.setTextColor(Color.BLACK);
-            mBattery.setTextColor(Color.BLACK);
-
         } else {
             mRelativeLayout.setBackgroundColor(Color.BLACK);
             mLinearLayout.setBackgroundColor(Color.LTGRAY);
@@ -67,7 +65,6 @@ public class LargeHome extends BaseWatchFaceActivity {
             mTimestamp.setTextColor(Color.BLACK);
 
             mTime.setTextColor(Color.WHITE);
-            mBattery.setTextColor(Color.WHITE);
         }
     }
 }

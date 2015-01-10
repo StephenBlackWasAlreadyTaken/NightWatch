@@ -173,28 +173,23 @@ public class Home extends Activity {
         Bg lastBgreading = Bg.last();
 
         if (lastBgreading != null) {
-            double estimate =0;
-            if ((new Date().getTime()) - (60000 * 11) - lastBgreading.datetime > 0) {
+            notificationText.setText(lastBgreading.readingAge());
+            currentBgValueText.setText(bgGraphBuilder.unitized_string(lastBgreading.sgv_double()) + " " + lastBgreading.slopeArrow());
+            if ((new Date().getTime()) - (60000 * 16) - lastBgreading.datetime > 0) {
                 notificationText.setTextColor(Color.parseColor("#C30909"));
-                notificationText.setText("Signal Missed");
-                estimate = lastBgreading.sgv_int();
-                currentBgValueText.setText(df.format(estimate));
                 currentBgValueText.setPaintFlags(currentBgValueText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
-                if (lastBgreading != null) {
-                    estimate = lastBgreading.sgv_int();
-                    currentBgValueText.setText(df.format(estimate) + " " + lastBgreading.slopeArrow());
-                    notificationText.setTextColor(Color.parseColor("#ffffff"));
-                    notificationText.setText(lastBgreading.readingAge());
-                }
+                notificationText.setTextColor(Color.WHITE);
             }
-            if(estimate <= bgGraphBuilder.lowMark) {
+            double estimate = lastBgreading.sgv_double();
+            if(bgGraphBuilder.unitized(estimate) <= bgGraphBuilder.lowMark) {
                 currentBgValueText.setTextColor(Color.parseColor("#C30909"));
-            } else if(estimate >= bgGraphBuilder.highMark) {
+            } else if(bgGraphBuilder.unitized(estimate) >= bgGraphBuilder.highMark) {
                 currentBgValueText.setTextColor(Color.parseColor("#FFBB33"));
             } else {
                 currentBgValueText.setTextColor(Color.WHITE);
             }
+
         }
     setupCharts();
     }

@@ -43,13 +43,14 @@ public class Notifications {
     public static int calibrationNotificationId = 002;
     public static int doubleCalibrationNotificationId = 003;
     public static int extraCalibrationNotificationId = 004;
+    public static SharedPreferences prefs;
 
     public static int currentVolume;
     public static AudioManager manager;
 
     public static void setNotificationSettings(Context context) {
         mContext = context;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         bg_notifications = prefs.getBoolean("bg_notifications", true);
         bg_vibrate = prefs.getBoolean("bg_vibrate", true);
         bg_lights = prefs.getBoolean("bg_lights", true);
@@ -68,8 +69,8 @@ public class Notifications {
         Bg bgReading = Bg.last();
 
         if (bg_notifications) {
-            if (bgReading.sgv_int() >= high || bgReading.sgv_int() <= low) {
-                bgAlert(bgReading.sgv_string(), bgReading.slopeArrow());
+            if (bgReading.sgv_double() >= high || bgReading.sgv_double() <= low) {
+                bgAlert(bgReading.unitized_string(prefs), bgReading.slopeArrow());
             } else {
                 clearBgAlert();
             }

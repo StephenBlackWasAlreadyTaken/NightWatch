@@ -36,7 +36,7 @@ public class Home extends BaseWatchFaceActivity {
     @Override
     public void setColor() {
         if (screenAwake) {
-            mRelativeLayout.setBackgroundColor(Color.LTGRAY);
+            mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
                 mSgv.setTextColor(Color.YELLOW);
@@ -65,11 +65,17 @@ public class Home extends BaseWatchFaceActivity {
             }
 
             mTime.setTextColor(Color.BLACK);
-            mBattery.setTextColor(Color.BLACK);
-
+            if (chart != null) {
+                highColor = Color.YELLOW;
+                midColor = Color.BLUE;
+                lowColor = Color.RED;
+                singleLine = false;
+                pointSize = 2;
+                setupCharts();
+            }
         } else {
             mRelativeLayout.setBackgroundColor(Color.BLACK);
-            mLinearLayout.setBackgroundColor(Color.LTGRAY);
+            mLinearLayout.setBackgroundColor(Color.WHITE);
             if (sgvLevel == 1) {
                 mSgv.setTextColor(Color.YELLOW);
                 mDirection.setTextColor(Color.YELLOW);
@@ -88,7 +94,14 @@ public class Home extends BaseWatchFaceActivity {
             mTimestamp.setTextColor(Color.BLACK);
 
             mTime.setTextColor(Color.WHITE);
-            mBattery.setTextColor(Color.WHITE);
+            if (chart != null) {
+                highColor = Color.YELLOW;
+                midColor = Color.WHITE;
+                lowColor = Color.RED;
+                singleLine = true;
+                pointSize = 2;
+                setupCharts();
+            }
         }
     }
 }

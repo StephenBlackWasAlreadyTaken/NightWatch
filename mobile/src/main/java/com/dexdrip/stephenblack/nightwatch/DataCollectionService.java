@@ -80,7 +80,7 @@ public class DataCollectionService extends Service {
     public long sleepTime() {
         Bg last_bg = Bg.last();
         if (last_bg != null) {
-            long possibleSleep = (long) ((1000 * 60 * 5) - ((new Date().getTime() - last_bg.datetime) % (1000 * 60 * 5)) + (1000 * 35));
+            long possibleSleep = (long) ((1000 * 60 * 5) - ((new Date().getTime() - last_bg.datetime) % (1000 * 60 * 5)) + (1000 * 40));
             if (possibleSleep > 0) {
                 return possibleSleep;
             } else {
@@ -98,9 +98,9 @@ public class DataCollectionService extends Service {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                new Rest(mContext).getBgData();
+                boolean success = new Rest(mContext).getBgData();
                 Thread.sleep(5000);
-                mContext.startService(new Intent(mContext, WatchUpdaterService.class));
+                if (success) { mContext.startService(new Intent(mContext, WatchUpdaterService.class)); }
                 Notifications.notificationSetter(mContext);
                 return true;
             }

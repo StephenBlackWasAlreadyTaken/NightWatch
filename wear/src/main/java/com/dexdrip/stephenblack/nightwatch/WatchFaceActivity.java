@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
+import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.Display;
 
 public abstract class WatchFaceActivity extends Activity implements DisplayManager.DisplayListener {
