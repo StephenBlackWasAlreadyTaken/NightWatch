@@ -30,7 +30,7 @@ public class HomeDark extends BaseWatchFaceActivity {
     @Override
     public void setColor() {
         mRelativeLayout.setBackgroundColor(Color.BLACK);
-        mLinearLayout.setBackgroundColor(Color.LTGRAY);
+        mLinearLayout.setBackgroundColor(Color.WHITE);
         if (sgvLevel == 1) {
             mSgv.setTextColor(Color.YELLOW);
             mDirection.setTextColor(Color.YELLOW);

@@ -89,6 +89,7 @@
     <orderEntry type="library" exported="" name="play-services-wearable-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-6.5.87" level="project" />
+    <orderEntry type="library" exported="" name="hellocharts-library-1.1" level="project" />
   </component>
 </module>
 

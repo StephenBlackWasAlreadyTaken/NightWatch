@@ -9,14 +9,15 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:textAlignment="center">
+        android:textAlignment="center"
+        android:weightSum="1">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="112dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:paddingTop="22dp"
+            android:paddingTop="15dp"
             android:weightSum="1"
             android:layout_gravity="center_horizontal">
 
@@ -41,7 +42,7 @@
 
                 <TextView
                     android:id="@+id/direction"
-                    android:textSize="23sp"
+                    android:textSize="25sp"
                     android:textStyle="bold"
                     android:text="--"
                     android:layout_width="match_parent"
@@ -83,7 +84,7 @@
 
                 <TextView
                     android:id="@+id/timestamp"
-                    android:textSize="10sp"
+                    android:textSize="8sp"
                     android:text="-- Minutes ago"
                     android:layout_width="fill_parent"
                     android:textAlignment="center"
@@ -91,7 +92,7 @@
                     android:layout_height="wrap_content" />
                 <TextView
                     android:id="@+id/uploader_battery"
-                    android:textSize="10sp"
+                    android:textSize="8sp"
                     android:text="Uploader: ---%"
                     android:layout_width="fill_parent"
                     android:textAlignment="center"
@@ -105,7 +106,7 @@
 
         <TextView
             android:id="@+id/watch_time"
-            android:textSize="35sp"
+            android:textSize="30sp"
             android:text="12:00"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
@@ -113,20 +114,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:layout_gravity="center_horizontal|top" />
+            android:layout_gravity="center_horizontal" />
 
-        <TextView
-            android:id="@+id/watch_battery"
-            android:textSize="8sp"
-            android:text="100%"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:layout_alignRight="@id/watch_time"
-            android:layout_below="@+id/watch_time"
-            android:textAlignment="center"
-            android:layout_gravity="center_horizontal|top"
-            android:gravity="top" />
+        <lecho.lib.hellocharts.view.LineChartView
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="77dp"
+            android:layout_gravity="bottom"
+            android:gravity="center_horizontal|top" />
 
     </LinearLayout>
 

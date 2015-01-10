@@ -71,8 +71,6 @@ public class WatchUpdaterService extends Service implements
             } else {
                 googleApiClient.connect();
             }
-
-            setAlarm();
         }
         return START_STICKY;
     }
@@ -88,15 +86,6 @@ public class WatchUpdaterService extends Service implements
         if (last_bg != null) {
             new SendToDataLayerThread(WEARABLE_DATA_PATH, last_bg.dataMap(mPrefs), googleApiClient).start();
         }
-    }
-
-    public void setAlarm() {
-        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
-        alarm.set(
-                alarm.RTC_WAKEUP,
-                System.currentTimeMillis() + (1000 * 60),
-                PendingIntent.getService(this, 0, new Intent(this, WatchUpdaterService.class), 0)
-        );
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 import com.activeandroid.Model;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @Table(name = "Bg", id = BaseColumns._ID)
 public class Bg extends Model {
+    private SharedPreferences prefs;
 
     @Expose
     @Column(name = "sgv")
@@ -45,6 +48,44 @@ public class Bg extends Model {
     @Column(name = "battery")
     public String battery;
 
+
+    public String unitized_string() {
+        double value = sgv_double();
+        DecimalFormat df = new DecimalFormat("#");
+        if (value >= 400) {
+            return "HIGH";
+        } else if (value >= 40) {
+            if(doMgdl()) {
+                df.setMaximumFractionDigits(0);
+                return df.format(value);
+            } else {
+                df.setMaximumFractionDigits(1);
+                df.setMinimumFractionDigits(1);
+                return df.format(unitized(value));
+            }
+        } else if (value >= 11) {
+            return "LOW";
+        } else {
+            return "???";
+        }
+    }
+    public String unitized_string(SharedPreferences aPrefs) {
+        prefs = aPrefs;
+        return unitized_string();
+    }
+
+    public String unitizedDeltaString() {
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(1);
+        String delta_sign = "";
+        if (bgdelta > 0) { delta_sign = "+"; }
+       if(doMgdl()) {
+            return delta_sign + df.format(unitized(bgdelta)) + " mg/dl";
+        } else {
+            return delta_sign + df.format(unitized(bgdelta)) + " mmol";
+        }
+    }
+
     public boolean sgvContainsWhiteSpace(){
         if(sgv != null){
             for(int i = 0; i < sgv.length(); i++){
@@ -54,7 +95,7 @@ public class Bg extends Model {
         return false;
     }
 
-    public int sgv_int() { //This is dumb but for some reason parseint wasnt working properly...
+    public double sgv_double() { //This is dumb but for some reason parseint wasnt working properly...
         if (sgvContainsWhiteSpace()){
             return 0;
         } else if (sgv.startsWith("1") && sgv.length() <= 2) {
@@ -64,31 +105,18 @@ public class Bg extends Model {
         }
     }
 
-    public String sgv_string() {
-        int asInt = sgv_int();
-        if (asInt >= 400) {
-            return "High";
-        } else if (asInt >= 40) {
-            return sgv;
-        } else if (asInt >= 11) {
-            return "Low";
-        } else {
-            return "???";
-        }
+    public double mmolConvert(double mgdl) {
+        return mgdl / 18;
     }
 
-    public String deltaString(SharedPreferences prefs) {
-        String unit = prefs.getString("units", "mgdl");
-        String unitPretty = "mg/dL";
-        if (unit.compareTo("mmol") == 0) {
-            unitPretty = "mmol";
-        }
-        if(bgdelta < 0) {
-            return bgdelta + " " + unitPretty;
-        } else {
-            return "+" + bgdelta + " " + unitPretty;
-        }
 
+    public boolean doMgdl() {
+        String unit = prefs.getString("units", "mgdl");
+        if (unit.compareTo("mgdl") == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public int battery_int() {
@@ -127,28 +155,52 @@ public class Bg extends Model {
         return new Date().getTime() - datetime;
     }
 
-    public DataMap dataMap(SharedPreferences prefs) {
+    public DataMap dataMap(SharedPreferences sPrefs) {
+        prefs = sPrefs;
+
+        Double highMark = Double.parseDouble(prefs.getString("highValue", "170"));
+        Double lowMark = Double.parseDouble(prefs.getString("lowValue", "70"));
         DataMap dataMap = new DataMap();
-        dataMap.putString("sgvString", sgv_string());
+        dataMap.putString("sgvString", unitized_string());
         dataMap.putString("slopeArrow", slopeArrow());
-        dataMap.putString("readingAge", readingAge());
-        dataMap.putString("delta", deltaString(prefs));
+        dataMap.putDouble("timestamp", datetime);
+        dataMap.putString("delta", unitizedDeltaString());
         dataMap.putString("battery", battery);
         dataMap.putLong("sgvLevel", sgvLevel(prefs));
         dataMap.putInt("batteryLevel", batteryLevel());
-        dataMap.putInt("ageLevel", ageLevel());
+
+        dataMap.putDouble("sgvDouble", sgv_double());
+        dataMap.putDouble("high", inMgdl(highMark));
+        dataMap.putDouble("low", inMgdl(lowMark));
         return dataMap;
     }
 
+    public double inMgdl(double value) {
+        if (!doMgdl()) {
+            return value * 18;
+        } else {
+            return value;
+        }
+
+    }
+
     public long sgvLevel(SharedPreferences prefs) {
-        int highMark = Integer.parseInt(prefs.getString("highValue", "170"));
-        int lowMark = Integer.parseInt(prefs.getString("lowValue", "70"));
-        if(sgv_int() >= highMark) {
+        Double highMark = Double.parseDouble(prefs.getString("highValue", "170"));
+        Double lowMark = Double.parseDouble(prefs.getString("lowValue", "70"));
+        if(unitized(sgv_double()) >= highMark) {
             return 1;
-        } else if (sgv_int() >= lowMark) {
+        } else if (unitized(sgv_double()) >= lowMark) {
             return 0;
         } else {
             return -1;
+        }
+    }
+
+    public double unitized(double value) {
+        if(doMgdl()) {
+            return value;
+        } else {
+            return mmolConvert(value);
         }
     }
 
