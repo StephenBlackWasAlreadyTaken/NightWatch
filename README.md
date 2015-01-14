@@ -4,9 +4,12 @@ NightWatch
 A native android Nightscout client with alerts and google wear integration
 
 # DOWNLOAD: 
-* NightWatch v0.06 App for Phone & Watch: [NightWatch v0.06 apk](http://bit.ly/1A1SAew)
+* NightWatch v0.06.5 App for Phone & Watch: [NightWatch v0.06.5 apk](http://bit.ly/1xmX4dI)
 
 ## New in this version
+* Fixes a bug where graph would not update on mobile
+
+## Last version
 * MMOL support
 * BG on Watchfaces (on both light and dark standard watchfaces, not on the 'large' font watchfaces)
 * **NOTE** if you want the graph, dont choose the ones that say LARGE, they just have bigger numbers and no graphs
