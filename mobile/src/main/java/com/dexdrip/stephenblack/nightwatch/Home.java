@@ -49,20 +49,18 @@ public class Home extends Activity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_bg_notification, false);
 
-
         setContentView(R.layout.activity_home);
-
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        bgGraphBuilder = new BgGraphBuilder(this);
         displayCurrentInfo();
         _broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                    setupCharts();
                     displayCurrentInfo();
                 }
             }
@@ -77,6 +75,7 @@ public class Home extends Activity {
         inflater.inflate(R.menu.menu_home, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -90,6 +89,7 @@ public class Home extends Activity {
     }
 
     public void setupCharts() {
+        bgGraphBuilder = new BgGraphBuilder(this);
         updateStuff = false;
         chart = (LineChartView) findViewById(R.id.chart);
         chart.setZoomType(ZoomType.HORIZONTAL);
@@ -106,7 +106,6 @@ public class Home extends Activity {
         previewChart.setViewportChangeListener(new ViewportListener());
         chart.setViewportChangeListener(new ChartViewPortListener());
         setViewport();
-
     }
 
     private class ChartViewPortListener implements ViewportChangeListener {
@@ -135,7 +134,6 @@ public class Home extends Activity {
                 holdViewport.set(newViewport.left, newViewport.top, newViewport.right, newViewport.bottom);
             }
         }
-
     }
 
     public void setViewport() {
@@ -178,8 +176,6 @@ public class Home extends Activity {
             } else {
                 currentBgValueText.setTextColor(Color.WHITE);
             }
-
         }
-    setupCharts();
     }
 }
