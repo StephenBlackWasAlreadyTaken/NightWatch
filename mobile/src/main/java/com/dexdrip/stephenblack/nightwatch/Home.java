@@ -55,11 +55,14 @@ public class Home extends Activity {
     @Override
     protected void onResume(){
         super.onResume();
+        bgGraphBuilder = new BgGraphBuilder(getApplicationContext());
+        setupCharts();
         displayCurrentInfo();
         _broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                    bgGraphBuilder = new BgGraphBuilder(getApplicationContext());
                     setupCharts();
                     displayCurrentInfo();
                 }
@@ -89,7 +92,7 @@ public class Home extends Activity {
     }
 
     public void setupCharts() {
-        bgGraphBuilder = new BgGraphBuilder(this);
+
         updateStuff = false;
         chart = (LineChartView) findViewById(R.id.chart);
         chart.setZoomType(ZoomType.HORIZONTAL);
