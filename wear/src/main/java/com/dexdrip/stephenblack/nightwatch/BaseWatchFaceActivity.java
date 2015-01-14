@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -37,7 +38,6 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
     public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta;
     public RelativeLayout mRelativeLayout;
     public LinearLayout mLinearLayout;
-    public final String TIME_FORMAT_DISPLAYED = "h:mm";
     public long sgvLevel = 0;
     public int batteryLevel = 1;
     public int ageLevel = 1;
@@ -124,9 +124,8 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
     private BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver(){
         @Override
         public void onReceive(Context arg0, Intent intent) {
-            mTime.setText(
-                    new SimpleDateFormat(TIME_FORMAT_DISPLAYED)
-                            .format(Calendar.getInstance().getTime()));
+            final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFaceActivity.this);
+            mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
             mTimestamp.setText(readingAge());
             missedReadingAlert();
         }
