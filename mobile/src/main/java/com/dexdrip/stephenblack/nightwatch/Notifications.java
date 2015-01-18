@@ -69,7 +69,7 @@ public class Notifications {
         Bg bgReading = Bg.last();
 
         if (bg_notifications) {
-            if (bgReading.sgv_double() >= high || bgReading.sgv_double() <= low) {
+            if (bgGraphBuilder.unitized(bgReading.sgv_double()) >= high || bgGraphBuilder.unitized(bgReading.sgv_double()) <= low) {
                 bgAlert(bgReading.unitized_string(prefs), bgReading.slopeArrow());
             } else {
                 clearBgAlert();
