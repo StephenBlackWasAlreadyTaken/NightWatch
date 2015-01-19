@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <!-- To receive data from Dexdrip. -->
+    <uses-permission android:name="com.eveningoutpost.dexdrip.permissions.RECEIVE_BG_ESTIMATE"/>
+
     <application
         android:name="com.activeandroid.app.Application"
         android:allowBackup="true"
@@ -51,6 +54,19 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <receiver
+            android:name=".integration.DexDripDataReceiver"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="com.eveningoutpost.dexdrip.BgEstimate" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".integration.DexDripIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>
