@@ -27,25 +27,27 @@ public class DexDripIntentService extends IntentService {
 
         final String action = intent.getAction();
 
-        if (ACTION_NEW_DATA.equals(action)) {
-            final double bgEstimate = intent.getDoubleExtra(DexDripIntents.EXTRA_BG_ESTIMATE, 0);
-            if (bgEstimate == 0)
-                return;
+        try {
+            if (ACTION_NEW_DATA.equals(action)) {
+                final double bgEstimate = intent.getDoubleExtra(DexDripIntents.EXTRA_BG_ESTIMATE, 0);
+                if (bgEstimate == 0)
+                    return;
 
-            int battery = (int) (100 * intent.getIntExtra(DexDripIntents.EXTRA_SENSOR_BATTERY, 0) / 255f);
+                int battery = (int) (100 * intent.getIntExtra(DexDripIntents.EXTRA_SENSOR_BATTERY, 0) / 255f);
 
-            final Bg bg = new Bg();
-            bg.direction = intent.getStringExtra(DexDripIntents.EXTRA_BG_SLOPE_NAME);
-            bg.battery = Integer.toString(battery);
-            bg.bgdelta = intent.getDoubleExtra(DexDripIntents.EXTRA_BG_SLOPE, 0);
-            bg.datetime = new Date().getTime();
-            bg.sgv = Integer.toString((int) bgEstimate, 10);
+                final Bg bg = new Bg();
+                bg.direction = intent.getStringExtra(DexDripIntents.EXTRA_BG_SLOPE_NAME);
+                bg.battery = Integer.toString(battery);
+                bg.bgdelta = intent.getDoubleExtra(DexDripIntents.EXTRA_BG_SLOPE, 0);
+                bg.datetime = new Date().getTime();
+                bg.sgv = Integer.toString((int) bgEstimate, 10);
 
-            bg.save();
+                bg.save();
+            }
+
+            DataCollectionService.newDataArrived(this, true);
+        } finally {
+            WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
-
-        DataCollectionService.newDataArrived(this, true);
-
-        WakefulBroadcastReceiver.completeWakefulIntent(intent);
     }
 }
