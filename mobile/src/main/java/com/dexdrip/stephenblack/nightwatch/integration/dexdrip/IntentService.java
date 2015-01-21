@@ -1,6 +1,5 @@
-package com.dexdrip.stephenblack.nightwatch.integration;
+package com.dexdrip.stephenblack.nightwatch.integration.dexdrip;
 
-import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
@@ -10,12 +9,14 @@ import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import java.util.Date;
 
 /**
- * Used by DexdripDataReceiver to store new estimates from DexDrip.
+ * Used by DataReceiver to store new estimates from DexDrip.
+ *
+ * @see com.dexdrip.stephenblack.nightwatch.integration.dexdrip.DataReceiver
  */
-public class DexDripIntentService extends IntentService {
+public class IntentService extends android.app.IntentService {
     public static final String ACTION_NEW_DATA = "com.dexdrip.stephenblack.nightwatch.action.NEW_DATA";
 
-    public DexDripIntentService() {
+    public IntentService() {
         super("DexDripIntentService");
         setIntentRedelivery(true);
     }
@@ -29,16 +30,16 @@ public class DexDripIntentService extends IntentService {
 
         try {
             if (ACTION_NEW_DATA.equals(action)) {
-                final double bgEstimate = intent.getDoubleExtra(DexDripIntents.EXTRA_BG_ESTIMATE, 0);
+                final double bgEstimate = intent.getDoubleExtra(Intents.EXTRA_BG_ESTIMATE, 0);
                 if (bgEstimate == 0)
                     return;
 
-                int battery = (int) (100 * intent.getIntExtra(DexDripIntents.EXTRA_SENSOR_BATTERY, 0) / 255f);
+                int battery = (int) (100 * intent.getIntExtra(Intents.EXTRA_SENSOR_BATTERY, 0) / 255f);
 
                 final Bg bg = new Bg();
-                bg.direction = intent.getStringExtra(DexDripIntents.EXTRA_BG_SLOPE_NAME);
+                bg.direction = intent.getStringExtra(Intents.EXTRA_BG_SLOPE_NAME);
                 bg.battery = Integer.toString(battery);
-                bg.bgdelta = intent.getDoubleExtra(DexDripIntents.EXTRA_BG_SLOPE, 0);
+                bg.bgdelta = intent.getDoubleExtra(Intents.EXTRA_BG_SLOPE, 0);
                 bg.datetime = new Date().getTime();
                 bg.sgv = Integer.toString((int) bgEstimate, 10);
 

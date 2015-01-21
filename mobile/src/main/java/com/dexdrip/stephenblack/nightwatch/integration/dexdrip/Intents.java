@@ -1,9 +1,9 @@
-package com.dexdrip.stephenblack.nightwatch.integration;
+package com.dexdrip.stephenblack.nightwatch.integration.dexdrip;
 
 /**
  * For integration.
  */
-public interface DexDripIntents {
+public interface Intents {
     String RECEIVER_PERMISSION = "com.eveningoutpost.dexdrip.permissions.RECEIVE_BG_ESTIMATE";
 
     String ACTION_NEW_BG_ESTIMATE = "com.eveningoutpost.dexdrip.BgEstimate";

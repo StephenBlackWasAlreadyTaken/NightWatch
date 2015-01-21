@@ -56,7 +56,7 @@
         </service>
 
         <receiver
-            android:name=".integration.DexDripDataReceiver"
+            android:name=".integration.dexdrip.DataReceiver"
             android:exported="true">
 
             <intent-filter>
@@ -65,7 +65,7 @@
         </receiver>
 
         <service
-            android:name=".integration.DexDripIntentService"
+            android:name=".integration.dexdrip.IntentService"
             android:exported="false" />
     </application>
 

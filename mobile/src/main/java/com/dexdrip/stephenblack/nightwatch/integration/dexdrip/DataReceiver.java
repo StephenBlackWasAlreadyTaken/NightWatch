@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.integration;
+package com.dexdrip.stephenblack.nightwatch.integration.dexdrip;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,11 +7,11 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 /**
  * Tells us when G4 data has been updated.
  */
-public class DexDripDataReceiver extends WakefulBroadcastReceiver {
+public class DataReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        startWakefulService(context, new Intent(context, DexDripIntentService.class)
-                .setAction(DexDripIntentService.ACTION_NEW_DATA)
+        startWakefulService(context, new Intent(context, IntentService.class)
+                .setAction(IntentService.ACTION_NEW_DATA)
                 .putExtras(intent));
     }
 }
