@@ -110,4 +110,9 @@ public class DataCollectionService extends Service {
             return false;
         }
     }
+
+    public static void newDataArrived(Context context, boolean success) {
+        if (success) { context.startService(new Intent(context, WatchUpdaterService.class)); }
+        Notifications.notificationSetter(context);
+    }
 }
