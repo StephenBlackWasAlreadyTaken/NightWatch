@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -199,7 +200,7 @@ public class BgGraphBuilder {
         List<AxisValue> xAxisValues = new ArrayList<AxisValue>();
         GregorianCalendar now = new GregorianCalendar();
         GregorianCalendar today = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h a");
+        SimpleDateFormat timeFormat = hourFormat();
         timeFormat.setTimeZone(TimeZone.getDefault());
         double start_hour = today.getTime().getTime();
         double timeNow = new Date().getTime();
@@ -222,7 +223,7 @@ public class BgGraphBuilder {
 
     public Axis previewXAxis(){
         List<AxisValue> previewXaxisValues = new ArrayList<AxisValue>();
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h a");
+        SimpleDateFormat timeFormat = hourFormat();
         timeFormat.setTimeZone(TimeZone.getDefault());
         for(int l=0; l<=24; l++) {
             double timestamp = endHour - (60000 * 60 * l);
@@ -233,6 +234,10 @@ public class BgGraphBuilder {
         previewXaxis.setHasLines(true);
         previewXaxis.setTextSize(5);
         return previewXaxis;
+    }
+
+    private SimpleDateFormat hourFormat() {
+        return new SimpleDateFormat(DateFormat.is24HourFormat(context) ? "HH" : "h a");
     }
 
     /////////VIEWPORT RELATED//////////////
