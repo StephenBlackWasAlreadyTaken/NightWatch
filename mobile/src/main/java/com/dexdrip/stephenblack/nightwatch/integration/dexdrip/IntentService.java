@@ -39,7 +39,7 @@ public class IntentService extends android.app.IntentService {
                 final Bg bg = new Bg();
                 bg.direction = intent.getStringExtra(Intents.EXTRA_BG_SLOPE_NAME);
                 bg.battery = Integer.toString(battery);
-                bg.bgdelta = intent.getDoubleExtra(Intents.EXTRA_BG_SLOPE, 0);
+                bg.bgdelta = (intent.getDoubleExtra(Intents.EXTRA_BG_SLOPE, 0) * 1000 * 60 * 5);
                 bg.datetime = new Date().getTime();
                 bg.sgv = Integer.toString((int) bgEstimate, 10);
 
