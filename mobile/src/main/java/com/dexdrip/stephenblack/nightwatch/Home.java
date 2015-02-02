@@ -86,6 +86,9 @@ public class Home extends Activity {
             case R.id.action_settings:
                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
                 return true;
+            case R.id.action_resend_last_bg:
+                startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
+                return true;
             default:
                 return true;
         }

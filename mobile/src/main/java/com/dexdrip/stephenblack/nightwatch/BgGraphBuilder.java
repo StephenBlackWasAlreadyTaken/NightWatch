@@ -275,6 +275,6 @@ public class BgGraphBuilder {
     }
 
     public double mmolConvert(double mgdl) {
-        return mgdl / 18;
+        return mgdl * Constants.MGDL_TO_MMOLL;
     }
 }

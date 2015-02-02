@@ -52,7 +52,7 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
     public BgGraphBuilder bgGraphBuilder;
     public LineChartView chart;
     public double datetime;
-    public List<BgWatchData> bgDataList = new ArrayList<BgWatchData>();
+    public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,10 +186,18 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
         double high = dataMap.getDouble("high");
         double low = dataMap.getDouble("low");
         double timestamp = dataMap.getDouble("timestamp");
+
+        final int size = bgDataList.size();
+        if (size > 0) {
+            if (bgDataList.get(size - 1).timestamp == timestamp)
+                return; // Ignore duplicates.
+        }
+
         bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
         for(int i = 0; i < bgDataList.size(); i++) {
             if(bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 60 * 5))) {
                 bgDataList.remove(i); //Get rid of anything more than 5 hours old
+                break;
             }
         }
     }

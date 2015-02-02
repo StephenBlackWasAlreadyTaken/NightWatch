@@ -79,7 +79,7 @@ public class Bg extends Model {
         df.setMaximumFractionDigits(1);
         String delta_sign = "";
         if (bgdelta > 0) { delta_sign = "+"; }
-       if(doMgdl()) {
+        if(doMgdl()) {
             return delta_sign + df.format(unitized(bgdelta)) + " mg/dl";
         } else {
             return delta_sign + df.format(unitized(bgdelta)) + " mmol";
@@ -106,7 +106,7 @@ public class Bg extends Model {
     }
 
     public double mmolConvert(double mgdl) {
-        return mgdl / 18;
+        return mgdl * Constants.MGDL_TO_MMOLL;
     }
 
 
@@ -177,7 +177,7 @@ public class Bg extends Model {
 
     public double inMgdl(double value) {
         if (!doMgdl()) {
-            return value * 18;
+            return value * Constants.MMOLL_TO_MGDL;
         } else {
             return value;
         }
@@ -234,7 +234,7 @@ public class Bg extends Model {
                 .where("datetime = ?", bg.datetime)
                 .orderBy("_ID desc")
                 .executeSingle();
-            return (foundBg == null);
+        return (foundBg == null);
     }
 
     public static List<Bg> latestForGraph(int number, double startTime) {
