@@ -70,7 +70,11 @@ public class Notifications {
 
         if (bg_notifications) {
             if (bgGraphBuilder.unitized(bgReading.sgv_double()) >= high || bgGraphBuilder.unitized(bgReading.sgv_double()) <= low) {
-                bgAlert(bgReading.unitized_string(prefs), bgReading.slopeArrow());
+                if(bgReading.sgv_double() > 13) {
+                    bgAlert(bgReading.unitized_string(prefs), bgReading.slopeArrow());
+                } else {
+                    clearBgAlert();
+                }
             } else {
                 clearBgAlert();
             }
