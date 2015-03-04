@@ -3,19 +3,18 @@ NightWatch
 
 A native android Nightscout client with alerts and google wear integration
 
+
 # DOWNLOAD: 
-* NightWatch v0.06.7 App for Phone & Watch: [NightWatch v0.06.7 apk](http://bit.ly/17XhKo8)
+* NightWatch v0.08 App for Phone & Watch: [NightWatch v0.08 apk](http://bit.ly/1CQmuHk)
+
 
 ## New in this version
-* Fix an issue where mmol users were being alerted unncessarily 
+* Backfill watch using data from the app
+* Fix for local brodcasts of slope being converted into Deltas 
 
-## Last version
-* MMOL support
-* BG on Watchfaces (on both light and dark standard watchfaces, not on the 'large' font watchfaces)
-* **NOTE** if you want the graph, dont choose the ones that say LARGE, they just have bigger numbers and no graphs
-* **Also note**, to save battery and storage on your watch the data for the graph is not persisted, changing watchfaces means a refresh of the graph
 
 ## Features
+* MMOL support
 * BG graph on watch!
 * Scrollable, zoomable graph of bg over last 24 hours
 * Retrieves Data from your existing NightScout site
@@ -23,6 +22,7 @@ A native android Nightscout client with alerts and google wear integration
 * 4 (very similar) watchfaces (not making use of the new wear api, next time around though!)
 * Built in Alert Notifications (Still needs a little bit of work)
 * Ability to override phone silent mode on bg alerts
+* **NOTE** if you want the graph, dont choose the ones that say LARGE, they just have bigger numbers and no graphs
 
 
 ## Why is it called NightWatch?
