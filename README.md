@@ -44,7 +44,7 @@ Want to help, SUPER COOL! Put up a PR and clear description of what your goal wi
 (note, you need the phone one installed as well if you intend to use the android wear watchface!)
 
 # WANT MORE?
-you should check out my main project, [DexDrip!!](http://stephenblackwasalreadytaken.github.io/DexDrip/)
+you should check out my main project, [xDrip!!](http://stephenblackwasalreadytaken.github.io/xDrip/)
 
 # Screen Shots
 ![Imgur](http://i.imgur.com/bdAuo1j.jpg)
