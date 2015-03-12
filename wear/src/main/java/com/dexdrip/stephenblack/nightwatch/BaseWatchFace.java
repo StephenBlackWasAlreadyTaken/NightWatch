@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.BatteryManager;
+import android.os.Bundle;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.PowerManager;
@@ -116,7 +119,7 @@ public  abstract class BaseWatchFace extends WatchFace {
     }
 
     public double timeSince() {
-        return new Date().getTime() - datetime;
+        return System.currentTimeMillis() - datetime;
     }
 
     public String readingAge() {
@@ -153,7 +156,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         if (layoutSet && (newTime.hasHourChanged(oldTime) || newTime.hasMinuteChanged(oldTime))) {
             wakeLock.acquire(50);
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
-            mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
+            mTime.setText(timeFormat.format(System.currentTimeMillis()));
             mTimestamp.setText(readingAge());
             missedReadingAlert();
             mRelativeLayout.measure(specW, specH);
@@ -173,6 +176,17 @@ public  abstract class BaseWatchFace extends WatchFace {
                 datetime = dataMap.getDouble("timestamp");
 
                 mSgv.setText(dataMap.getString("sgvString"));
+
+                if(ageLevel()<=0) {
+                    mSgv.setPaintFlags(mSgv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    mSgv.setPaintFlags(mSgv.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                }
+
+                final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFaceActivity.this);
+                mTime.setText(timeFormat.format(System.currentTimeMillis()));
+                mTimestamp.setText(readingAge());
+
                 mDirection.setText(dataMap.getString("slopeArrow"));
                 mUploaderBattery.setText("Uploader: " + dataMap.getString("battery") + "%");
                 mDelta.setText(dataMap.getString("delta"));
