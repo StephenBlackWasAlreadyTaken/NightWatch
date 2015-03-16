@@ -1,7 +1,10 @@
 package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
@@ -78,11 +81,22 @@ public class Bg extends Model {
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(1);
         String delta_sign = "";
-        if (bgdelta > 0) { delta_sign = "+"; }
+        if (bgdelta > 0.1) { delta_sign = "+"; }
         if(doMgdl()) {
             return delta_sign + df.format(unitized(bgdelta)) + " mg/dl";
         } else {
             return delta_sign + df.format(unitized(bgdelta)) + " mmol";
+        }
+    }
+    public String unitizedDeltaStringNoUnit() {
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(1);
+        String delta_sign = "";
+        if (bgdelta > 0.1) { delta_sign = "+"; }
+        if(doMgdl()) {
+            return delta_sign + df.format(unitized(bgdelta));
+        } else {
+            return delta_sign + df.format(unitized(bgdelta));
         }
     }
 
@@ -248,4 +262,18 @@ public class Bg extends Model {
                 .limit(number)
                 .execute();
     }
+
+    public static boolean alreadyExists(double timestamp) {
+        Bg bg = new Select()
+                .from(Bg.class)
+                .where("datetime <= ?", (timestamp + (2 * 1000)))
+                .orderBy("datetime desc")
+                .executeSingle();
+        if(bg != null && bg.datetime >= (timestamp - (2 * 1000))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

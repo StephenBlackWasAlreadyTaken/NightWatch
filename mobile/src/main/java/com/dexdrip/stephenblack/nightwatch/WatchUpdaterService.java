@@ -26,6 +26,7 @@ public class WatchUpdaterService extends Service implements
     private GoogleApiClient googleApiClient;
     public String WEARABLE_DATA_PATH = "/nightscout_watch_data";
     boolean wear_integration  = false;
+    boolean pebble_integration  = false;
     SharedPreferences mPrefs;
 
     @Override
@@ -47,6 +48,7 @@ public class WatchUpdaterService extends Service implements
 
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
+        pebble_integration = mPrefs.getBoolean("pebble_sync", false);
         if(wear_integration) { googleApiConnect(); }
     }
 
@@ -84,6 +86,10 @@ public class WatchUpdaterService extends Service implements
                 googleApiClient.connect();
             }
         }
+
+        if(pebble_integration) {
+            sendData();
+        }
         return START_STICKY;
     }
 
@@ -96,7 +102,13 @@ public class WatchUpdaterService extends Service implements
     public void sendData() {
         Bg last_bg = Bg.last();
         if (last_bg != null) {
-            new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(last_bg.dataMap(mPrefs));
+            if(wear_integration) {
+                new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(last_bg.dataMap(mPrefs));
+            }
+            if(pebble_integration) {
+                PebbleSync pebbleSync = new PebbleSync();
+                pebbleSync.sendData(getApplicationContext(), last_bg);
+            }
         }
     }
 

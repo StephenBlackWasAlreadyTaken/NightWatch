@@ -145,6 +145,7 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
                 mUploaderBattery.setText("Uploader: " + dataMap.getString("battery") + "%");
                 mDelta.setText(dataMap.getString("delta"));
 
+                mTimestamp.setText(readingAge());
                 if (chart != null) {
                     addToWatchSet(dataMap);
                     setupCharts();

@@ -11,6 +11,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.dexdrip.stephenblack.nightwatch.ShareModels.ShareRest;
+
 import java.util.Date;
 
 import retrofit.RetrofitError;
@@ -19,6 +21,7 @@ public class DataCollectionService extends Service {
     DataFetcher dataFetcher;
     SharedPreferences mPrefs;
     boolean wear_integration  = false;
+    boolean pebble_integration  = false;
     boolean endpoint_set = false;
 
     @Override
@@ -43,16 +46,18 @@ public class DataCollectionService extends Service {
         setAlarm();
         return START_STICKY;
     }
+
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
-        String url = mPrefs.getString("dex_collection_method", "https://{yoursite}.azurewebsites.net");
-        if (url.compareTo("https://{yoursite}.azurewebsites.net") == 0 || url.compareTo("") == 0) {
-            endpoint_set = false;
-        } else {
+        pebble_integration = mPrefs.getBoolean("pebble_sync", false);
+        if (mPrefs.getBoolean("nightscout_poll", false) || mPrefs.getBoolean("share_poll", false)) {
             endpoint_set = true;
             doService();
+        } else {
+            endpoint_set = false;
         }
     }
+
     public void listenForChangeInSettings() {
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -98,10 +103,24 @@ public class DataCollectionService extends Service {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                boolean success = new Rest(mContext).getBgData();
-                Thread.sleep(5000);
-                if (success) { mContext.startService(new Intent(mContext, WatchUpdaterService.class)); }
-                Notifications.notificationSetter(mContext);
+                if(mPrefs.getBoolean("nightscout_poll", false)) {
+                    boolean success = new Rest(mContext).getBgData();
+                    Thread.sleep(10000);
+                    if (success) {
+                        mContext.startService(new Intent(mContext, WatchUpdaterService.class));
+                    }
+                    Notifications.notificationSetter(mContext);
+                    return true;
+                }
+                if(mPrefs.getBoolean("share_poll", false)) {
+                    boolean success = new ShareRest(mContext).getBgData();
+                    Thread.sleep(10000);
+                    if (success) {
+                        mContext.startService(new Intent(mContext, WatchUpdaterService.class));
+                    }
+                    Notifications.notificationSetter(mContext);
+                    return true;
+                }
                 return true;
             }
             catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
