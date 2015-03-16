@@ -263,6 +263,14 @@ public class Bg extends Model {
                 .execute();
     }
 
+    public static Bg mostRecentBefore(double timestamp) {
+        return new Select()
+                .from(Bg.class)
+                .where("datetime < ?", (timestamp))
+                .orderBy("datetime desc")
+                .executeSingle();
+    }
+
     public static boolean alreadyExists(double timestamp) {
         Bg bg = new Select()
                 .from(Bg.class)

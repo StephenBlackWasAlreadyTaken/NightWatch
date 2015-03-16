@@ -19,6 +19,7 @@
             android:dependency="share_poll"
             android:key="dexcom_account_password"
             android:title="Dexcom Account Name"
+            android:inputType="textPassword"
             android:summary="Your password for Dexcoms Website"
             android:defaultValue=""/>
         <CheckBoxPreference

@@ -51,7 +51,7 @@ public class ShareGlucose extends Model {
             Bg bg = new Bg();
             bg.direction = slopeDirection();
             bg.battery = Integer.toString(getBatteryLevel());
-            bg.bgdelta = 0;
+            bg.bgdelta = calculateDelta(timestamp, Value);
             bg.datetime = timestamp;
             bg.sgv = Integer.toString((int) Value);
             bg.save();
@@ -92,5 +92,14 @@ public class ShareGlucose extends Model {
             return 50;
         }
         return (int)(((float)level / (float)scale) * 100.0f);
+    }
+
+    public double calculateDelta(double timestamp, double currentValue) {
+        Bg bg = Bg.mostRecentBefore(timestamp);
+        if (bg != null && Math.abs(bg.datetime - timestamp) < (60*1000*15)) {
+            return (bg.sgv_double() - currentValue);
+        } else {
+            return 0;
+        }
     }
 }
