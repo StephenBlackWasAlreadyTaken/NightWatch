@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.dexdrip.stephenblack.nightwatch.ShareModels.ShareRest;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import retrofit.RetrofitError;
@@ -41,7 +42,7 @@ public class DataCollectionService extends Service {
         PendingIntent pending = PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0);
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pending);
-
+        setFailoverTimer();
         if(endpoint_set) { doService(); }
         setAlarm();
         return START_STICKY;
@@ -57,7 +58,14 @@ public class DataCollectionService extends Service {
             endpoint_set = false;
         }
     }
-
+    public void setFailoverTimer() { //Sometimes it gets stuck in limbo on 4.4, this should make it try again
+        long retry_in = (1000 * 60 * 5);
+        Log.d("DataCollectionService", "Fallover Restarting in: " + (retry_in / (60 * 1000)) + " minutes");
+        Calendar calendar = Calendar.getInstance();
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
+    }
+    
     public void listenForChangeInSettings() {
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
