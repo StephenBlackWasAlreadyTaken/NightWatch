@@ -45,9 +45,15 @@ public class ShareGlucose extends Model {
     public String WT;
 
     public void processShareData(Context context) {
+        Log.d("SHARE", "Share Data being processed!");
         mContext = context;
-        double timestamp = Integer.parseInt(WT.split("/\\((.*)\\)/", 3)[1]) * 1000;
+        Log.d("SHARE", "Timestamp before parsing: " + WT);
+        Log.d("SHARE", "Timestamp before parsing: " + WT.replaceAll("[^\\d.]", ""));
+
+        double timestamp = (Double.parseDouble(WT.replaceAll("[^\\d.]", "")));
+        Log.d("SHARE", "Timestamp: " + timestamp);
         if (!Bg.alreadyExists(timestamp)) {
+            Log.d("SHARE", "Data looks new!!");
             Bg bg = new Bg();
             bg.direction = slopeDirection();
             bg.battery = Integer.toString(getBatteryLevel());

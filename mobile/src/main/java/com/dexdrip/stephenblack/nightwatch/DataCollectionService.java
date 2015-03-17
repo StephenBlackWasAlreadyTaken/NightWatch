@@ -39,10 +39,8 @@ public class DataCollectionService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        PendingIntent pending = PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0);
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(pending);
         setFailoverTimer();
+        setSettings();
         if(endpoint_set) { doService(); }
         setAlarm();
         return START_STICKY;
@@ -94,10 +92,10 @@ public class DataCollectionService extends Service {
         Bg last_bg = Bg.last();
         if (last_bg != null) {
             long possibleSleep = (long) ((1000 * 60 * 5) - ((new Date().getTime() - last_bg.datetime) % (1000 * 60 * 5)) + (1000 * 40));
-            if (possibleSleep > 0) {
+            if (possibleSleep > 0 && possibleSleep < (1000 * 60 * 20)) {
                 return possibleSleep;
             } else {
-                return (1000 * 60 * 4);
+                return (1000 * 60 * 5);
             }
         } else {
             return (1000 * 60 * 5);

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Watch Integration"
+        android:key="watch_integration">
+        <CheckBoxPreference
+            android:key="watch_sync"
+            android:title="Android Wear Integration"
+            android:summary="Send data to Android Wear Watchface."
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pebble_sync"
+            android:title="Pebble Integration"
+            android:summary="Send data to Pebble Camping Mode Watchface."
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
