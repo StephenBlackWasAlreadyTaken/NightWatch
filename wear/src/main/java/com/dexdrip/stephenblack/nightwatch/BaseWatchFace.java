@@ -158,6 +158,13 @@ public  abstract class BaseWatchFace extends WatchFace {
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
             mTime.setText(timeFormat.format(System.currentTimeMillis()));
             mTimestamp.setText(readingAge());
+
+            if(ageLevel()<=0) {
+                mSgv.setPaintFlags(mSgv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                mSgv.setPaintFlags(mSgv.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+            }
+
             missedReadingAlert();
             mRelativeLayout.measure(specW, specH);
             mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
