@@ -89,6 +89,9 @@ public class Home extends Activity {
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
                 return true;
+            case R.id.action_fetch_missing_records:
+                startService(new Intent(getApplicationContext(), DataCollectionService.class).putExtra("count", 500));
+                return true;
             default:
                 return true;
         }

@@ -7,10 +7,14 @@
         android:orderInCategory="101"
         android:title="@string/action_settings"
         app:showAsAction="never" />
-
     <item
         android:id="@+id/action_resend_last_bg"
         android:orderInCategory="100"
         android:title="@string/action_resend_to_watch"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_fetch_missing_records"
+        android:orderInCategory="100"
+        android:title="@string/action_fetch_missing_records"
         app:showAsAction="never" />
 </menu>

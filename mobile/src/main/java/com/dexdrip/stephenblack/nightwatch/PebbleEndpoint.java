@@ -2,7 +2,6 @@ package com.dexdrip.stephenblack.nightwatch;
 
 import com.google.gson.annotations.Expose;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,9 +9,12 @@ import java.util.List;
  */
 public class PebbleEndpoint {
     @Expose
-    public List<Statu> status;
+    public List<Status> status;
 
     @Expose
     public List<Bg> bgs;
+
+    @Expose
+    public List<Cal> cals;
 
 }
