@@ -52,7 +52,7 @@ public class DataCollectionService extends Service {
             endpoint_set = false;
         } else {
             endpoint_set = true;
-            doService(1);
+            doService(576);
         }
     }
     public void listenForChangeInSettings() {

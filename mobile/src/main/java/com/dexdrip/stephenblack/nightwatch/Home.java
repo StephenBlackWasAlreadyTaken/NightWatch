@@ -90,7 +90,7 @@ public class Home extends Activity {
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
                 return true;
             case R.id.action_fetch_missing_records:
-                startService(new Intent(getApplicationContext(), DataCollectionService.class).putExtra("count", 500));
+                startService(new Intent(getApplicationContext(), DataCollectionService.class).putExtra("count", 576));
                 return true;
             default:
                 return true;
