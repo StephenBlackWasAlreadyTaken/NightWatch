@@ -27,6 +27,7 @@ public class WatchUpdaterService extends Service implements
     public String WEARABLE_DATA_PATH = "/nightscout_watch_data";
     boolean wear_integration  = false;
     SharedPreferences mPrefs;
+    SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
 
     @Override
     public void onCreate() {
@@ -37,12 +38,12 @@ public class WatchUpdaterService extends Service implements
     }
 
     public void listenForChangeInSettings() {
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 setSettings();
             }
         };
-        mPrefs.registerOnSharedPreferenceChangeListener(listener);
+        mPrefs.registerOnSharedPreferenceChangeListener(mPreferencesListener);
     }
 
     public void setSettings() {

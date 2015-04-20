@@ -18,6 +18,7 @@ import retrofit.RetrofitError;
 public class DataCollectionService extends Service {
     DataFetcher dataFetcher;
     SharedPreferences mPrefs;
+    SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
     boolean wear_integration  = false;
     boolean endpoint_set = false;
 
@@ -55,12 +56,12 @@ public class DataCollectionService extends Service {
         }
     }
     public void listenForChangeInSettings() {
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 setSettings();
             }
         };
-        mPrefs.registerOnSharedPreferenceChangeListener(listener);
+        mPrefs.registerOnSharedPreferenceChangeListener(mPreferencesListener);
     }
 
     public void doService(int count) {
