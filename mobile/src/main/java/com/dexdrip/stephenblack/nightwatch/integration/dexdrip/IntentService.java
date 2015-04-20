@@ -34,13 +34,13 @@ public class IntentService extends android.app.IntentService {
                 if (bgEstimate == 0)
                     return;
 
-                int battery = (int) (100 * intent.getIntExtra(Intents.EXTRA_SENSOR_BATTERY, 0) / 255f);
+                int battery = intent.getIntExtra(Intents.EXTRA_SENSOR_BATTERY, 0);
 
                 final Bg bg = new Bg();
                 bg.direction = intent.getStringExtra(Intents.EXTRA_BG_SLOPE_NAME);
                 bg.battery = Integer.toString(battery);
                 bg.bgdelta = (intent.getDoubleExtra(Intents.EXTRA_BG_SLOPE, 0) * 1000 * 60 * 5);
-                bg.datetime = new Date().getTime();
+                bg.datetime = intent.getLongExtra(Intents.EXTRA_TIMESTAMP, new Date().getTime());
                 bg.sgv = Integer.toString((int) bgEstimate, 10);
 
                 bg.save();
