@@ -39,6 +39,10 @@
             android:name=".SettingsActivity"
             android:label="Settings" >
         </activity>
+        <activity
+            android:name=".LicenseAgreementActivity"
+            android:label="End User License Agreement" >
+        </activity>
         <receiver android:name=".AutoStart" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

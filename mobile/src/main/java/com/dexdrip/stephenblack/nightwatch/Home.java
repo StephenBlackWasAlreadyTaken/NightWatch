@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -37,19 +38,29 @@ public class Home extends Activity {
     public boolean updateStuff;
     public boolean updatingPreviewViewport = false;
     public boolean updatingChartViewport = false;
-
+    public SharedPreferences prefs;
     public BgGraphBuilder bgGraphBuilder;
     BroadcastReceiver _broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        startService(new Intent(getApplicationContext(), DataCollectionService.class));
         super.onCreate(savedInstanceState);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        checkEula();
 
+        startService(new Intent(getApplicationContext(), DataCollectionService.class));
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_bg_notification, false);
-
         setContentView(R.layout.activity_home);
+    }
+
+    public void checkEula() {
+        boolean IUnderstand = prefs.getBoolean("I_understand", false);
+        if (!IUnderstand) {
+            Intent intent = new Intent(getApplicationContext(), LicenseAgreementActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

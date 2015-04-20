@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.dexdrip.stephenblack.nightwatch.Bg;
 import com.dexdrip.stephenblack.nightwatch.Notifications;
 import com.dexdrip.stephenblack.nightwatch.Rest;
 import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
@@ -15,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.security.cert.CertificateException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -151,7 +153,7 @@ public class ShareRest {
         }
     };
 
-    public OkHttpClient getUnsafeOkHttpClient() {
+    public OkHttpClient getOkHttpClient() {
 
         try {
             final TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -183,10 +185,7 @@ public class ShareRest {
 
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
-//                    if (hostname.compareTo("https://share1.dexcom.com") == 0)
                         return true;
-//                    else
-//                        return false;
                 }
             });
 
@@ -198,7 +197,7 @@ public class ShareRest {
     }
 
     public OkClient  getOkClient (){
-        OkHttpClient client1 = getUnsafeOkHttpClient();
+        OkHttpClient client1 = getOkHttpClient();
         OkClient _client = new OkClient(client1);
         return _client;
     }
@@ -206,8 +205,8 @@ public class ShareRest {
     public Map<String, String> queryParamMap(String sessionId) {
         Map map = new HashMap<String, String>();
         map.put("sessionID", sessionId);
-        map.put("minutes", "1440");
-        map.put("maxCount", "1");
+        map.put("minutes", String.valueOf(minutesCount()));
+        map.put("maxCount", String.valueOf(requestCount()));
         return map;
 
     }
@@ -241,6 +240,26 @@ public class ShareRest {
             catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
             catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
             return false;
+        }
+    }
+
+    public int requestCount() {
+        Bg bg = Bg.last();
+        if(bg != null) {
+            return 20;
+        } else if (bg.datetime < new Date().getTime()) {
+            return Math.min((int) Math.ceil(((new Date().getTime() - bg.datetime) / (5 * 1000 * 60))), 10);
+        } else {
+            return 1;
+        }
+    }
+
+    public int minutesCount() {
+        Bg bg = Bg.last();
+        if(bg != null && bg.datetime < new Date().getTime()) {
+            return Math.min((int) Math.ceil(((new Date().getTime() - bg.datetime) / (1000 * 60))), 1440);
+        } else {
+            return 1440;
         }
     }
 }

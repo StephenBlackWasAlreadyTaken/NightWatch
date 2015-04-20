@@ -57,7 +57,7 @@ public class DataCollectionService extends Service {
         }
     }
     public void setFailoverTimer() { //Sometimes it gets stuck in limbo on 4.4, this should make it try again
-        long retry_in = (1000 * 60 * 6);
+        long retry_in = (1000 * 60 * 7);
         Log.d("DataCollectionService", "Fallover Restarting in: " + (retry_in / (60 * 1000)) + " minutes");
         Calendar calendar = Calendar.getInstance();
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -80,23 +80,17 @@ public class DataCollectionService extends Service {
     }
 
     public void setAlarm() {
-        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
-        alarm.set(
-                alarm.RTC_WAKEUP,
-                System.currentTimeMillis() + sleepTime(),
-                PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0)
-        );
+        long retry_in = (long) sleepTime();
+        Log.d("DataCollectionService", "Next packet should be available in " + (retry_in / (60 * 1000)) + " minutes");
+        Calendar calendar = Calendar.getInstance();
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
     }
 
-    public long sleepTime() {
+    public double sleepTime() {
         Bg last_bg = Bg.last();
         if (last_bg != null) {
-            long possibleSleep = (long) ((1000 * 60 * 5) - ((new Date().getTime() - last_bg.datetime) % (1000 * 60 * 5)) + (1000 * 40));
-            if (possibleSleep > 0 && possibleSleep < (1000 * 60 * 20)) {
-                return possibleSleep;
-            } else {
-                return (1000 * 60 * 5);
-            }
+            return Math.max((1000 * 60), Math.min(((long) (((1000 * 60 * 5) + 10000) - ((new Date().getTime()) - last_bg.datetime))), (1000 * 60 * 5)));
         } else {
             return (1000 * 60 * 5);
         }
