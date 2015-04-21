@@ -28,6 +28,7 @@ public class WatchUpdaterService extends Service implements
     boolean wear_integration  = false;
     boolean pebble_integration  = false;
     SharedPreferences mPrefs;
+    SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
 
     @Override
     public void onCreate() {
@@ -38,12 +39,12 @@ public class WatchUpdaterService extends Service implements
     }
 
     public void listenForChangeInSettings() {
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 setSettings();
             }
         };
-        mPrefs.registerOnSharedPreferenceChangeListener(listener);
+        mPrefs.registerOnSharedPreferenceChangeListener(mPreferencesListener);
     }
 
     public void setSettings() {

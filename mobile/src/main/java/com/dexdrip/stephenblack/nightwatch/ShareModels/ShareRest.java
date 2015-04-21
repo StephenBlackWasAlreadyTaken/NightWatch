@@ -45,6 +45,7 @@ public class ShareRest {
     private String login;
     private String password;
     private SharedPreferences prefs;
+    private int requestCount;
     OkClient client;
 
     public static Gson gson = new GsonBuilder()
@@ -59,7 +60,8 @@ public class ShareRest {
         password = prefs.getString("dexcom_account_password", "");
     }
 
-    public boolean getBgData() {
+    public boolean getBgData(int count) {
+        requestCount = count;
         if (prefs.getBoolean("share_poll", false) && login.compareTo("") != 0 && password.compareTo("") != 0) {
             return loginAndGetData();
         } else {
@@ -206,7 +208,7 @@ public class ShareRest {
         Map map = new HashMap<String, String>();
         map.put("sessionID", sessionId);
         map.put("minutes", String.valueOf(minutesCount()));
-        map.put("maxCount", String.valueOf(requestCount()));
+        map.put("maxCount", String.valueOf(requestCount));
         return map;
 
     }
@@ -240,17 +242,6 @@ public class ShareRest {
             catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
             catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
             return false;
-        }
-    }
-
-    public int requestCount() {
-        Bg bg = Bg.last();
-        if(bg != null) {
-            return 20;
-        } else if (bg.datetime < new Date().getTime()) {
-            return Math.min((int) Math.ceil(((new Date().getTime() - bg.datetime) / (5 * 1000 * 60))), 10);
-        } else {
-            return 1;
         }
     }
 

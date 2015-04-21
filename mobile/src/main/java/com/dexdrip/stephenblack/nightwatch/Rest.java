@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.internal.bind.DateTypeAdapter;
 
 import java.util.Date;
+import java.util.ListIterator;
 
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -21,6 +22,7 @@ import retrofit.converter.GsonConverter;
 public class Rest {
     private Context mContext;
     private String mUrl;
+    private static final String UNITS = "mgdl";
     SharedPreferences prefs;
     public static Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
@@ -30,32 +32,46 @@ public class Rest {
         mContext = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         mUrl = prefs.getString("dex_collection_method", "https://{yoursite}.azurewebsites.net");
-
     }
 
-    public boolean getBgData() {
+    public boolean getBgData(int count) {
         if (!prefs.getBoolean("nightscout_poll", false) && mUrl.compareTo("") != 0 && mUrl.compareTo("https://{yoursite}.azurewebsites.net") != 0) {
             return false;
         }
         try {
-            PebbleEndpoint response = pebbleEndpointInterface().getPebbleInfo();
-            Bg returnedBg = response.bgs.get(0);
-            if (Bg.is_new(returnedBg)) {
-                returnedBg.save();
-                return true;
+            PebbleEndpoint response;
+            boolean newData = false;
+
+            if (count > 1) {
+                response =  pebbleEndpointInterface().getPebbleInfo(UNITS, count);
+            } else
+                response = pebbleEndpointInterface().getPebbleInfo(UNITS);
+
+            for (Bg returnedBg: response.bgs) {
+                if (Bg.is_new(returnedBg)) {
+                    returnedBg.save();
+                    newData = true;
+                }
             }
             Log.d("REST CALL SUCCESS: ", "HORRAY");
+            return newData;
         } catch (Exception e) {
-            Log.d("REST CALL ERROR: ", "BOOOO");
+
+            Log.d("REST CALL ERROR: ", e.getMessage());
+            e.printStackTrace();
             return false;
         }
-        return false;
+    }
+
+    public boolean getBgData() {
+        return getBgData(1);
     }
 
     private PebbleEndpointInterface pebbleEndpointInterface() {
         RestAdapter adapter = adapterBuilder().build();
         PebbleEndpointInterface pebbleEndpointInterface =
                 adapter.create(PebbleEndpointInterface.class);
+
         return pebbleEndpointInterface;
     }
 

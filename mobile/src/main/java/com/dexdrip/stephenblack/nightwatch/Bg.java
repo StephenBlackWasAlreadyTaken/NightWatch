@@ -51,6 +51,17 @@ public class Bg extends Model {
     @Column(name = "battery")
     public String battery;
 
+    @Expose
+    @Column(name = "filtered")
+    public double filtered;
+
+    @Expose
+    @Column(name = "unfiltered")
+    public double unfiltered;
+
+    @Expose
+    @Column(name = "noise")
+    public double noise;
 
     public String unitized_string() {
         double value = sgv_double();
@@ -198,6 +209,19 @@ public class Bg extends Model {
 
     }
 
+    public double fromRaw(Cal cal) {
+        double factor = doMgdl() ? 1 : Constants.MMOLL_TO_MGDL;
+        double raw;
+        double mgdl = sgv_double();
+        if (filtered == Double.NaN || mgdl <= 30) {
+            raw = cal.scale * (unfiltered - cal.intercept) / cal.slope;
+        } else {
+            double ratio = cal.scale * (filtered - cal.intercept) / cal.slope / mgdl;
+            raw = cal.scale * (unfiltered - cal.intercept) / cal.slope / ratio;
+        }
+        return raw * factor;
+    }
+
     public long sgvLevel(SharedPreferences prefs) {
         Double highMark = Double.parseDouble(prefs.getString("highValue", "170"));
         Double lowMark = Double.parseDouble(prefs.getString("lowValue", "70"));
@@ -219,7 +243,7 @@ public class Bg extends Model {
     }
 
     public int batteryLevel() {
-        int bat = Integer.valueOf(battery.replaceAll("[^\\d.]", ""));
+        int bat = battery != null ? Integer.valueOf(battery.replaceAll("[^\\d.]", "")) : 0;
         if(bat >= 30) {
             return 1;
         } else {
@@ -238,7 +262,7 @@ public class Bg extends Model {
     public static Bg last() {
         return new Select()
                 .from(Bg.class)
-                .orderBy("_ID desc")
+                .orderBy("datetime desc")
                 .executeSingle();
     }
 
