@@ -18,6 +18,7 @@ import retrofit.RetrofitError;
 public class DataCollectionService extends Service {
     DataFetcher dataFetcher;
     SharedPreferences mPrefs;
+    SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
     boolean wear_integration  = false;
     boolean endpoint_set = false;
 
@@ -39,7 +40,8 @@ public class DataCollectionService extends Service {
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pending);
 
-        if(endpoint_set) { doService(); }
+        int count = intent != null ? intent.getIntExtra("count", 1) : 1;
+        if(endpoint_set) { doService(count); }
         setAlarm();
         return START_STICKY;
     }
@@ -50,28 +52,28 @@ public class DataCollectionService extends Service {
             endpoint_set = false;
         } else {
             endpoint_set = true;
-            doService();
+            doService(576);
         }
     }
     public void listenForChangeInSettings() {
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 setSettings();
             }
         };
-        mPrefs.registerOnSharedPreferenceChangeListener(listener);
+        mPrefs.registerOnSharedPreferenceChangeListener(mPreferencesListener);
     }
 
-    public void doService() {
+    public void doService(int count) {
         Log.d("Performing data fetch: ", "Wish me luck");
         dataFetcher = new DataFetcher(getApplicationContext());
-        dataFetcher.execute((Void) null);
+        dataFetcher.execute(count);
     }
 
     public void setAlarm() {
         AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarm.set(
-                alarm.RTC_WAKEUP,
+                AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + sleepTime(),
                 PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0)
         );
@@ -91,14 +93,14 @@ public class DataCollectionService extends Service {
         }
     }
 
-    public class DataFetcher extends AsyncTask<Void, Void, Boolean> {
+    public class DataFetcher extends AsyncTask<Integer, Void, Boolean> {
         Context mContext;
         DataFetcher(Context context) { mContext = context; }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Boolean doInBackground(Integer... params) {
             try {
-                boolean success = new Rest(mContext).getBgData();
+                boolean success = new Rest(mContext).getBgData(params[0]);
                 Thread.sleep(5000);
                 if (success) { mContext.startService(new Intent(mContext, WatchUpdaterService.class)); }
                 Notifications.notificationSetter(mContext);

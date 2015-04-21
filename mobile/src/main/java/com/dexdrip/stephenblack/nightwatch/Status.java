@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Created by stephenblack on 12/26/14.
  */
-public class Statu {
+public class Status {
     @Expose
     public double now;
 }
