@@ -96,7 +96,6 @@ public class DataCollectionService extends Service {
         } else {
             alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
         }
-
     }
 
     public double sleepTime() {
@@ -153,10 +152,10 @@ public class DataCollectionService extends Service {
 
     public int requestCount() {
         Bg bg = Bg.last();
-        if(bg != null) {
+        if(bg == null) {
             return 576;
         } else if (bg.datetime < new Date().getTime()) {
-            return Math.min((int) Math.ceil(((new Date().getTime() - bg.datetime) / (5 * 1000 * 60))), 10);
+            return Math.min((int) Math.ceil(((new Date().getTime() - bg.datetime) / (5 * 1000 * 60))), 576);
         } else {
             return 1;
         }

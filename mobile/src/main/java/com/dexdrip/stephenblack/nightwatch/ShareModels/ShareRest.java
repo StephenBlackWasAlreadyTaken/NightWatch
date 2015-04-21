@@ -45,6 +45,7 @@ public class ShareRest {
     private String login;
     private String password;
     private SharedPreferences prefs;
+    private int maxCount = 20;
     private int requestCount;
     OkClient client;
 
@@ -61,7 +62,11 @@ public class ShareRest {
     }
 
     public boolean getBgData(int count) {
-        requestCount = count;
+        if(count > maxCount) {
+            requestCount = 20;
+        } else {
+            requestCount = count;
+        }
         if (prefs.getBoolean("share_poll", false) && login.compareTo("") != 0 && password.compareTo("") != 0) {
             return loginAndGetData();
         } else {
