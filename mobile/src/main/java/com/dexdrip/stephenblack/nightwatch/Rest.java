@@ -23,17 +23,21 @@ public class Rest {
     private Context mContext;
     private String mUrl;
     private static final String UNITS = "mgdl";
+    SharedPreferences prefs;
     public static Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
             .create();
 
     Rest(Context context) {
         mContext = context;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         mUrl = prefs.getString("dex_collection_method", "https://{yoursite}.azurewebsites.net");
     }
 
     public boolean getBgData(int count) {
+        if (!prefs.getBoolean("nightscout_poll", false) && mUrl.compareTo("") != 0 && mUrl.compareTo("https://{yoursite}.azurewebsites.net") != 0) {
+            return false;
+        }
         try {
             PebbleEndpoint response;
             boolean newData = false;

@@ -29,7 +29,7 @@ import lecho.lib.hellocharts.view.Chart;
  */
 public class BgGraphBuilder {
     public double end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
-    public double start_time = end_time - (1000 * 60 * 60 * 5); //5 hours ago (plus 20 minutes padding)
+    public double start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
     public double fuzzyTimeDenom = (1000 * 60 * 1);
     public Context context;
     public double highMark;

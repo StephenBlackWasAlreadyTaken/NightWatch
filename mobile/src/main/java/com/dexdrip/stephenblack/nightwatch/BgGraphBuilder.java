@@ -2,6 +2,7 @@ package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -28,8 +29,9 @@ import lecho.lib.hellocharts.view.Chart;
  * Created by stephenblack on 11/15/14.
  */
 public class BgGraphBuilder {
-    public double  end_time = new Date().getTime() + (60000 * 10);
-    public double  start_time = end_time - (60000 * 60 * 24);
+    public double fuzz = (1000 * 30 * 5);
+    public double  end_time = (new Date().getTime() + (60000 * 10))/fuzz;
+    public double  start_time = end_time - ((60000 * 60 * 24)/fuzz);
     public Context context;
     public SharedPreferences prefs;
     public double highMark;
@@ -37,10 +39,14 @@ public class BgGraphBuilder {
     public double defaultMinY;
     public double defaultMaxY;
     public boolean doMgdl;
+    final int pointSize;
+    final int axisTextSize;
+    final int previewAxisTextSize;
+    final int hoursPreviewStep;
 
     private double endHour;
     private final int numValues =(60/5)*24;
-    private final List<Bg> bgReadings = Bg.latestForGraph( numValues, start_time);
+    private final List<Bg> bgReadings = Bg.latestForGraph(numValues, start_time);
     private List<PointValue> inRangeValues = new ArrayList<PointValue>();
     private List<PointValue> highValues = new ArrayList<PointValue>();
     private List<PointValue> lowValues = new ArrayList<PointValue>();
@@ -55,6 +61,10 @@ public class BgGraphBuilder {
         this.doMgdl = (prefs.getString("units", "mgdl").compareTo("mgdl") == 0);
         defaultMinY = unitized(40);
         defaultMaxY = unitized(250);
+        pointSize = isXLargeTablet() ? 5 : 3;
+        axisTextSize = isXLargeTablet() ? 20 : Axis.DEFAULT_TEXT_SIZE_SP;
+        previewAxisTextSize = isXLargeTablet() ? 12 : 5;
+        hoursPreviewStep = isXLargeTablet() ? 2 : 1;
     }
 
     public LineChartData lineData() {
@@ -117,15 +127,15 @@ public class BgGraphBuilder {
     private void addBgReadingValues() {
         for (Bg bgReading : bgReadings) {
             if (bgReading.sgv_double() >= 400) {
-                highValues.add(new PointValue((float) bgReading.datetime, (float) unitized(400)));
+                highValues.add(new PointValue((float) (bgReading.datetime/fuzz), (float) unitized(400)));
             } else if (unitized(bgReading.sgv_double()) >= highMark) {
-                highValues.add(new PointValue((float) bgReading.datetime, (float) unitized(bgReading.sgv_double())));
+                highValues.add(new PointValue((float) (bgReading.datetime/fuzz), (float) unitized(bgReading.sgv_double())));
             } else if (unitized(bgReading.sgv_double()) >= lowMark) {
-                inRangeValues.add(new PointValue((float) bgReading.datetime, (float) unitized(bgReading.sgv_double())));
+                inRangeValues.add(new PointValue((float) (bgReading.datetime/fuzz), (float) unitized(bgReading.sgv_double())));
             } else if (bgReading.sgv_double() >= 40) {
-                lowValues.add(new PointValue((float)bgReading.datetime, (float) unitized(bgReading.sgv_double())));
-            } else if(bgReading.sgv_double() >= 11) {
-                lowValues.add(new PointValue((float)bgReading.datetime, (float) unitized(40)));
+                lowValues.add(new PointValue((float)(bgReading.datetime/fuzz), (float) unitized(bgReading.sgv_double())));
+            } else if(bgReading.sgv_double() >= 13) {
+                lowValues.add(new PointValue((float)(bgReading.datetime/fuzz), (float) unitized(40)));
             }
         }
     }
@@ -200,41 +210,47 @@ public class BgGraphBuilder {
         List<AxisValue> xAxisValues = new ArrayList<AxisValue>();
         GregorianCalendar now = new GregorianCalendar();
         GregorianCalendar today = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
-        SimpleDateFormat timeFormat = hourFormat();
+        final java.text.DateFormat timeFormat = hourFormat();
         timeFormat.setTimeZone(TimeZone.getDefault());
-        double start_hour = today.getTime().getTime();
+        double start_hour_block = today.getTime().getTime();
         double timeNow = new Date().getTime();
         for(int l=0; l<=24; l++) {
-            if ((start_hour + (60000 * 60 * (l))) <  timeNow) {
-                if((start_hour + (60000 * 60 * (l + 1))) >=  timeNow) {
-                    endHour = start_hour + (60000 * 60 * (l));
+            if ((start_hour_block + (60000 * 60 * (l))) <  timeNow) {
+                if((start_hour_block + (60000 * 60 * (l + 1))) >=  timeNow) {
+                    endHour = start_hour_block + (60000 * 60 * (l));
                     l=25;
                 }
             }
         }
         for(int l=0; l<=24; l++) {
-            double timestamp = endHour - (60000 * 60 * l);
-            xAxisValues.add(new AxisValue((long)(timestamp), (timeFormat.format(timestamp)).toCharArray()));
+            double timestamp = (endHour - (60000 * 60 * l));
+            xAxisValues.add(new AxisValue((long)(timestamp/fuzz), (timeFormat.format(timestamp)).toCharArray()));
         }
         xAxis.setValues(xAxisValues);
         xAxis.setHasLines(true);
+        xAxis.setTextSize(axisTextSize);
         return xAxis;
+    }
+
+    private boolean isXLargeTablet() {
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     public Axis previewXAxis(){
         List<AxisValue> previewXaxisValues = new ArrayList<AxisValue>();
-        SimpleDateFormat timeFormat = hourFormat();
+        final java.text.DateFormat timeFormat = hourFormat();
         timeFormat.setTimeZone(TimeZone.getDefault());
-        for(int l=0; l<=24; l++) {
-            double timestamp = endHour - (60000 * 60 * l);
-            previewXaxisValues.add(new AxisValue((long)(timestamp), (timeFormat.format(timestamp)).toCharArray()));
+        for(int l=0; l<=24; l+=hoursPreviewStep) {
+            double timestamp = (endHour - (60000 * 60 * l));
+            previewXaxisValues.add(new AxisValue((long)(timestamp/fuzz), (timeFormat.format(timestamp)).toCharArray()));
         }
         Axis previewXaxis = new Axis();
         previewXaxis.setValues(previewXaxisValues);
         previewXaxis.setHasLines(true);
-        previewXaxis.setTextSize(5);
+        previewXaxis.setTextSize(previewAxisTextSize);
         return previewXaxis;
     }
+
 
     private SimpleDateFormat hourFormat() {
         return new SimpleDateFormat(DateFormat.is24HourFormat(context) ? "HH" : "h a");
@@ -243,8 +259,8 @@ public class BgGraphBuilder {
     /////////VIEWPORT RELATED//////////////
     public Viewport advanceViewport(Chart chart, Chart previewChart) {
         viewport = new Viewport(previewChart.getMaximumViewport());
-        viewport.inset((float)(86400000 / 2.5), 0);
-        double distance_to_move = (new Date().getTime()) - viewport.left - (((viewport.right - viewport.left) /2));
+        viewport.inset((float)((86400000 / 2.5)/fuzz), 0);
+        double distance_to_move = ((new Date().getTime())/fuzz) - viewport.left - (((viewport.right - viewport.left) /2));
         viewport.offset((float) distance_to_move, 0);
         return viewport;
     }
@@ -269,8 +285,29 @@ public class BgGraphBuilder {
                 df.setMaximumFractionDigits(1);
                 return df.format(mmolConvert(value));
             }
-        } else {
+        } else if (value > 12) {
             return "LOW";
+        } else {
+            switch((int)value) {
+                case 0:
+                    return "??0";
+                case 1:
+                    return "?SN";
+                case 2:
+                    return "??2";
+                case 3:
+                    return "?NA";
+                case 5:
+                    return "?NC";
+                case 6:
+                    return "?CD";
+                case 9:
+                    return "?AD";
+                case 12:
+                    return "?RF";
+                default:
+                    return "???";
+            }
         }
     }
 

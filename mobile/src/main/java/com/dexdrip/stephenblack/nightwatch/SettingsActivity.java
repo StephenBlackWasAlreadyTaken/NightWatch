@@ -21,9 +21,13 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupSimplePreferencesScreen() {
-        addPreferencesFromResource(R.xml.pref_general);
+        addPreferencesFromResource(R.xml.pref_license);
 
         PreferenceCategory fakeHeader = new PreferenceCategory(this);
+        getPreferenceScreen().addPreference(fakeHeader);
+        addPreferencesFromResource(R.xml.pref_general);
+
+        fakeHeader = new PreferenceCategory(this);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_bg_notification);
 
@@ -31,11 +35,20 @@ public class SettingsActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_data_source);
 
+        fakeHeader = new PreferenceCategory(this);
+        getPreferenceScreen().addPreference(fakeHeader);
+        addPreferencesFromResource(R.xml.pref_share);
+
+        fakeHeader = new PreferenceCategory(this);
+        getPreferenceScreen().addPreference(fakeHeader);
+        addPreferencesFromResource(R.xml.pref_watch_integration);
+
         bindPreferenceSummaryToValue(findPreference("highValue"));
         bindPreferenceSummaryToValue(findPreference("lowValue"));
 //        bindPreferenceSummaryToValue(findPreference("bg_snooze"));
         bindPreferenceSummaryToValue(findPreference("dex_collection_method"));
         bindPreferenceSummaryToValue(findPreference("units"));
+        bindPreferenceSummaryToValue(findPreference("dexcom_account_name"));
     }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
