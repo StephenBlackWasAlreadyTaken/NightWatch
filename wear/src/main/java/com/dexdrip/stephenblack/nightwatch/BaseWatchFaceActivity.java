@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -16,18 +15,12 @@ import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.google.android.gms.wearable.DataMap;
+import lecho.lib.hellocharts.view.LineChartView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-
-import lecho.lib.hellocharts.gesture.ZoomType;
-import lecho.lib.hellocharts.view.LineChartView;
-import lecho.lib.hellocharts.view.PreviewLineChartView;
 
 /**
  * Created by stephenblack on 12/29/14.
@@ -85,6 +78,7 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
                 registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
             }
         });
+        ListenerService.requestData(this);
     }
 
     public int ageLevel() {
@@ -179,24 +173,45 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
                         .setVibrate(vibratePattern);
             NotificationManager mNotifyMgr = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
             mNotifyMgr.notify(missed_readings_alert_id, notification.build());
+            ListenerService.requestData(this); // attempt to recover missing data
         }
     }
 
-    public void addToWatchSet(DataMap dataMap){
-        double sgv = dataMap.getDouble("sgvDouble");
-        double high = dataMap.getDouble("high");
-        double low = dataMap.getDouble("low");
-        double timestamp = dataMap.getDouble("timestamp");
+    public void addToWatchSet(DataMap dataMap) {
 
-        final int size = bgDataList.size();
-        if (size > 0) {
-            if (bgDataList.get(size - 1).timestamp == timestamp)
-                return; // Ignore duplicates.
+        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        if (entries != null) {
+            for (DataMap entry : entries) {
+                double sgv = entry.getDouble("sgvDouble");
+                double high = entry.getDouble("high");
+                double low = entry.getDouble("low");
+                double timestamp = entry.getDouble("timestamp");
+
+                final int size = bgDataList.size();
+                if (size > 0) {
+                    if (bgDataList.get(size - 1).timestamp == timestamp)
+                        continue; // Ignore duplicates.
+                }
+
+                bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
+            }
+        } else {
+            double sgv = dataMap.getDouble("sgvDouble");
+            double high = dataMap.getDouble("high");
+            double low = dataMap.getDouble("low");
+            double timestamp = dataMap.getDouble("timestamp");
+
+            final int size = bgDataList.size();
+            if (size > 0) {
+                if (bgDataList.get(size - 1).timestamp == timestamp)
+                    return; // Ignore duplicates.
+            }
+
+            bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
         }
 
-        bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
-        for(int i = 0; i < bgDataList.size(); i++) {
-            if(bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 60 * 5))) {
+        for (int i = 0; i < bgDataList.size(); i++) {
+            if (bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 60 * 5))) {
                 bgDataList.remove(i); //Get rid of anything more than 5 hours old
                 break;
             }
@@ -214,6 +229,8 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
             chart.setLineChartData(bgGraphBuilder.lineData());
             chart.setViewportCalculationEnabled(true);
             chart.setMaximumViewport(chart.getMaximumViewport());
+        } else {
+            ListenerService.requestData(this);
         }
     }
 }

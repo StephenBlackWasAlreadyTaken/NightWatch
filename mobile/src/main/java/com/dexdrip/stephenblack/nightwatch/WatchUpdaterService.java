@@ -12,19 +12,21 @@ import android.preference.PreferenceManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.wearable.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class WatchUpdaterService extends Service implements
+public class WatchUpdaterService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     public static final String ACTION_RESEND = WatchUpdaterService.class.getName().concat(".Resend");
 
     private GoogleApiClient googleApiClient;
     public String WEARABLE_DATA_PATH = "/nightscout_watch_data";
+    public String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
+
     boolean wear_integration  = false;
     boolean pebble_integration  = false;
     SharedPreferences mPrefs;
@@ -59,6 +61,7 @@ public class WatchUpdaterService extends Service implements
                 .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
                 .build();
+        Wearable.MessageApi.addListener(googleApiClient, this);
         if (googleApiClient.isConnected()) {
             sendData();
         } else {
@@ -100,6 +103,14 @@ public class WatchUpdaterService extends Service implements
         sendData();
     }
 
+    @Override
+    public void onMessageReceived(MessageEvent event) {
+        if (wear_integration) {
+            if (event.getPath().equals(WEARABLE_RESEND_PATH))
+                resendData();
+        }
+    }
+
     public void sendData() {
         Bg last_bg = Bg.last();
         if (last_bg != null) {
@@ -115,18 +126,17 @@ public class WatchUpdaterService extends Service implements
 
     private void resendData() {
         double startTime = new Date().getTime() - (60000 * 60 * 24);
-
-        List<Bg> last_bg = Bg.latestForGraph(60, startTime);
-        if (!last_bg.isEmpty()) {
-            final DataMap[] dataMaps = new DataMap[last_bg.size()];
-            int i = last_bg.size() -1;
-            for (Bg bg : last_bg) {
-                // Reverse the order.
-                dataMaps[i] = bg.dataMap(mPrefs);
-                i-=1;
+        Bg last_bg = Bg.last();
+        List<Bg> graph_bgs = Bg.latestForGraph(60, startTime);
+        if (!graph_bgs.isEmpty()) {
+            DataMap entries = last_bg.dataMap(mPrefs);
+            final ArrayList<DataMap> dataMaps = new ArrayList<>(graph_bgs.size());
+            for (Bg bg : graph_bgs) {
+                dataMaps.add(bg.dataMap(mPrefs));
             }
+            entries.putDataMapArrayList("entries",dataMaps);
 
-            new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(dataMaps);
+            new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(entries);
         }
     }
 
@@ -143,6 +153,4 @@ public class WatchUpdaterService extends Service implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) { }
 
-    @Override
-    public IBinder onBind(Intent intent) { throw new UnsupportedOperationException("Not yet implemented"); }
 }
