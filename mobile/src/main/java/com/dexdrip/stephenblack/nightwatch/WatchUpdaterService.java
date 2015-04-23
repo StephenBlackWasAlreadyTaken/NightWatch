@@ -27,8 +27,8 @@ public class WatchUpdaterService extends WearableListenerService implements
     public String WEARABLE_DATA_PATH = "/nightscout_watch_data";
     public String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
 
-    boolean wear_integration  = false;
-    boolean pebble_integration  = false;
+    boolean wear_integration = false;
+    boolean pebble_integration = false;
     SharedPreferences mPrefs;
     SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
 
@@ -63,7 +63,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 .build();
         Wearable.MessageApi.addListener(googleApiClient, this);
         if (googleApiClient.isConnected()) {
-            sendData();
+            sendData(0);
         } else {
             googleApiClient.connect();
         }
@@ -71,6 +71,10 @@ public class WatchUpdaterService extends WearableListenerService implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        double timestamp = 0;
+        if(intent != null) {
+            timestamp = intent.getDoubleExtra("timestamp", 0);
+        }
         PendingIntent pending = PendingIntent.getService(this, 0, new Intent(this, WatchUpdaterService.class), 0);
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pending);
@@ -84,7 +88,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 if (ACTION_RESEND.equals(action)) {
                     resendData();
                 } else {
-                    sendData();
+                    sendData(timestamp);
                 }
             } else {
                 googleApiClient.connect();
@@ -92,7 +96,7 @@ public class WatchUpdaterService extends WearableListenerService implements
         }
 
         if(pebble_integration) {
-            sendData();
+            sendData(timestamp);
         }
         return START_STICKY;
     }
@@ -100,7 +104,7 @@ public class WatchUpdaterService extends WearableListenerService implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        sendData();
+        sendData(0);
     }
 
     @Override
@@ -111,15 +115,20 @@ public class WatchUpdaterService extends WearableListenerService implements
         }
     }
 
-    public void sendData() {
-        Bg last_bg = Bg.last();
-        if (last_bg != null) {
+    public void sendData(double timestamp) {
+        Bg bg;
+        if(timestamp > 0) {
+           bg = Bg.findByTimestamp(timestamp);
+        } else {
+            bg = Bg.last();
+        }
+        if (bg != null) {
             if(wear_integration) {
-                new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(last_bg.dataMap(mPrefs));
+                new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(bg.dataMap(mPrefs));
             }
             if(pebble_integration) {
                 PebbleSync pebbleSync = new PebbleSync();
-                pebbleSync.sendData(getApplicationContext(), last_bg);
+                pebbleSync.sendData(getApplicationContext(), bg);
             }
         }
     }

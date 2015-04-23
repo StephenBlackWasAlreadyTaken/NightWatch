@@ -31,7 +31,7 @@ import lecho.lib.hellocharts.view.Chart;
 public class BgGraphBuilder {
     public double fuzz = (1000 * 30 * 5);
     public double  end_time = (new Date().getTime() + (60000 * 10))/fuzz;
-    public double  start_time = end_time - ((60000 * 60 * 24)/fuzz);
+    public double  start_time = (new Date().getTime() - ((60000 * 60 * 24)))/fuzz;
     public Context context;
     public SharedPreferences prefs;
     public double highMark;
@@ -46,7 +46,7 @@ public class BgGraphBuilder {
 
     private double endHour;
     private final int numValues =(60/5)*24;
-    private final List<Bg> bgReadings = Bg.latestForGraph(numValues, start_time);
+    private final List<Bg> bgReadings = Bg.latestForGraph(numValues, start_time * fuzz);
     private List<PointValue> inRangeValues = new ArrayList<PointValue>();
     private List<PointValue> highValues = new ArrayList<PointValue>();
     private List<PointValue> lowValues = new ArrayList<PointValue>();

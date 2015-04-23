@@ -15,6 +15,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
+
 import java.text.DecimalFormat;
 import java.util.Date;
 
@@ -41,6 +44,7 @@ public class Home extends Activity {
     public SharedPreferences prefs;
     public BgGraphBuilder bgGraphBuilder;
     BroadcastReceiver _broadcastReceiver;
+    BroadcastReceiver newDataReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,19 +71,26 @@ public class Home extends Activity {
     protected void onResume(){
         super.onResume();
         bgGraphBuilder = new BgGraphBuilder(getApplicationContext());
-        setupCharts();
-        displayCurrentInfo();
         _broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
-                    bgGraphBuilder = new BgGraphBuilder(getApplicationContext());
-                    setupCharts();
                     displayCurrentInfo();
                 }
             }
         };
+        newDataReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context ctx, Intent intent) {
+                holdViewport.set(0, 0, 0, 0);
+                setupCharts();
+                displayCurrentInfo();
+            }
+        };
         registerReceiver(_broadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        registerReceiver(newDataReceiver, new IntentFilter(Intents.ACTION_NEW_BG));
+        setupCharts();
+        displayCurrentInfo();
         holdViewport.set(0, 0, 0, 0);
     }
 
@@ -164,8 +175,12 @@ public class Home extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        if (_broadcastReceiver != null)
+        if (_broadcastReceiver != null) {
             unregisterReceiver(_broadcastReceiver);
+        }
+        if(newDataReceiver != null) {
+            unregisterReceiver(newDataReceiver);
+        }
     }
 
     public void displayCurrentInfo() {

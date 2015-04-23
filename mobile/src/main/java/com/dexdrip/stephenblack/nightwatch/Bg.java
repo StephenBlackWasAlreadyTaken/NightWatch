@@ -295,6 +295,14 @@ public class Bg extends Model {
                 .executeSingle();
     }
 
+    public static Bg findByTimestamp(double timestamp) {
+        return new Select()
+                .from(Bg.class)
+                .where("datetime = ?", (timestamp))
+                .executeSingle();
+    }
+
+
     public static boolean alreadyExists(double timestamp) {
         Bg bg = new Select()
                 .from(Bg.class)
