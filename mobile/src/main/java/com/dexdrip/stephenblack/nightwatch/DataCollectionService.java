@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.dexdrip.stephenblack.nightwatch.ShareModels.ShareRest;
+import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -52,10 +53,8 @@ public class DataCollectionService extends Service {
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
         if (mPrefs.getBoolean("nightscout_poll", false) || mPrefs.getBoolean("share_poll", false)) {
             endpoint_set = true;
-            doService();
         } else {
             endpoint_set = false;
-            doService();
         }
     }
     public void setFailoverTimer() { //Sometimes it gets stuck in limbo on 4.4, this should make it try again
@@ -119,6 +118,7 @@ public class DataCollectionService extends Service {
             }
             try {
                 if(mPrefs.getBoolean("nightscout_poll", false)) {
+                    Log.d("NightscoutPoll", "fetching " + requestCount);
                     boolean success = new Rest(mContext).getBgData(requestCount);
                     Thread.sleep(10000);
                     if (success) {
@@ -128,6 +128,7 @@ public class DataCollectionService extends Service {
                     return true;
                 }
                 if(mPrefs.getBoolean("share_poll", false)) {
+                    Log.d("ShareRest", "fetching " + requestCount);
                     boolean success = new ShareRest(mContext).getBgData(requestCount);
                     Thread.sleep(10000);
                     if (success) {
@@ -145,11 +146,18 @@ public class DataCollectionService extends Service {
         }
     }
 
-    public static void newDataArrived(Context context, boolean success) {
-        if (success) { context.startService(new Intent(context, WatchUpdaterService.class)); }
+    public static void newDataArrived(Context context, boolean success, Bg bg) {
+        Log.d("NewDataArrived", "New Data Arrived");
+        if (success && bg != null) {
+            Intent intent = new Intent(context, WatchUpdaterService.class);
+            intent.putExtra("timestamp", bg.datetime);
+            Log.d("NewDataArrived", "New Data Arrived with timestamp "+ bg.datetime);
+            context.startService(intent);
+            Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
+            context.sendBroadcast(updateIntent);
+        }
         Notifications.notificationSetter(context);
     }
-
     public int requestCount() {
         Bg bg = Bg.last();
         if(bg == null) {

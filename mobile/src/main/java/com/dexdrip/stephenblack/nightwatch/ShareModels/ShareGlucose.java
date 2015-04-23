@@ -61,7 +61,7 @@ public class ShareGlucose extends Model {
             bg.datetime = timestamp;
             bg.sgv = Integer.toString((int) Value);
             bg.save();
-            DataCollectionService.newDataArrived(mContext, true);
+            DataCollectionService.newDataArrived(mContext, true, bg);
             Log.d("SHARE", "Share Data Processed Successfully!");
         } else {
             Log.d("SHARE", "A Bg Value similar to this timestamp already exists.");

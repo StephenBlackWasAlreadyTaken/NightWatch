@@ -50,6 +50,7 @@ public class Rest {
             for (Bg returnedBg: response.bgs) {
                 if (Bg.is_new(returnedBg)) {
                     returnedBg.save();
+                    DataCollectionService.newDataArrived(mContext, true, returnedBg);
                     newData = true;
                 }
             }

@@ -167,7 +167,7 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
 
     public void missedReadingAlert() {
         int minutes_since = (int) Math.floor(timeSince()/(1000*60));
-        if(minutes_since >= 16 && (minutes_since - 16) % 5 == 0) {
+        if(minutes_since >= 16 && ((minutes_since - 16) % 5) == 0) {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext())
                         .setContentTitle("Missed BG Readings")
                         .setVibrate(vibratePattern);

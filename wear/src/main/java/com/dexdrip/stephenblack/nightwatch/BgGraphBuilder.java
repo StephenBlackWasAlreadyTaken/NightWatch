@@ -28,8 +28,8 @@ import lecho.lib.hellocharts.view.Chart;
  * Created by stephenblack on 11/15/14.
  */
 public class BgGraphBuilder {
-    public double end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
-    public double start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
+    public double end_time;
+    public double start_time;
     public double fuzzyTimeDenom = (1000 * 60 * 1);
     public Context context;
     public double highMark;
@@ -49,6 +49,8 @@ public class BgGraphBuilder {
     public Viewport viewport;
 
     public BgGraphBuilder(Context context, List<BgWatchData> aBgDataList, int aPointSize, int aMidColor) {
+        end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
+        start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
         this.bgDataList = aBgDataList;
         this.context = context;
         this.highMark = aBgDataList.get(aBgDataList.size() - 1).high;
@@ -61,6 +63,8 @@ public class BgGraphBuilder {
     }
 
     public BgGraphBuilder(Context context, List<BgWatchData> aBgDataList, int aPointSize, int aHighColor, int aLowColor, int aMidColor) {
+        end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
+        start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
         this.bgDataList = aBgDataList;
         this.context = context;
         this.highMark = aBgDataList.get(aBgDataList.size() - 1).high;
@@ -125,30 +129,34 @@ public class BgGraphBuilder {
     private void addBgReadingValues() {
         if(singleLine) {
             for (BgWatchData bgReading : bgDataList) {
-                if (bgReading.sgv >= 400) {
-                    inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 400));
-                } else if (bgReading.sgv >= highMark) {
-                    inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
-                } else if (bgReading.sgv >= lowMark) {
-                    inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
-                } else if (bgReading.sgv >= 40) {
-                    inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
-                } else if (bgReading.sgv >= 11) {
-                    inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 40));
+                if(bgReading.timestamp > start_time) {
+                    if (bgReading.sgv >= 400) {
+                        inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 400));
+                    } else if (bgReading.sgv >= highMark) {
+                        inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
+                    } else if (bgReading.sgv >= lowMark) {
+                        inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
+                    } else if (bgReading.sgv >= 40) {
+                        inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
+                    } else if (bgReading.sgv >= 11) {
+                        inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 40));
+                    }
                 }
             }
         } else {
             for (BgWatchData bgReading : bgDataList) {
-                if (bgReading.sgv >= 400) {
-                    highValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 400));
-                } else if (bgReading.sgv >= highMark) {
-                    highValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
-                } else if (bgReading.sgv >= lowMark) {
-                    inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
-                } else if (bgReading.sgv >= 40) {
-                    lowValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
-                } else if (bgReading.sgv >= 11) {
-                    lowValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 40));
+                if (bgReading.timestamp > start_time) {
+                    if (bgReading.sgv >= 400) {
+                        highValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 400));
+                    } else if (bgReading.sgv >= highMark) {
+                        highValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
+                    } else if (bgReading.sgv >= lowMark) {
+                        inRangeValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
+                    } else if (bgReading.sgv >= 40) {
+                        lowValues.add(new PointValue(fuzz(bgReading.timestamp), (float) bgReading.sgv));
+                    } else if (bgReading.sgv >= 11) {
+                        lowValues.add(new PointValue(fuzz(bgReading.timestamp), (float) 40));
+                    }
                 }
             }
         }
