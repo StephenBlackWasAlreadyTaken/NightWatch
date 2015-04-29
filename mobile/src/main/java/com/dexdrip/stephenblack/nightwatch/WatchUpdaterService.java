@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -63,7 +64,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 .build();
         Wearable.MessageApi.addListener(googleApiClient, this);
         if (googleApiClient.isConnected()) {
-            sendData(0);
+            Log.d("WatchUpdater", "API client is connected");
         } else {
             googleApiClient.connect();
         }
@@ -75,13 +76,11 @@ public class WatchUpdaterService extends WearableListenerService implements
         if(intent != null) {
             timestamp = intent.getDoubleExtra("timestamp", 0);
         }
-        PendingIntent pending = PendingIntent.getService(this, 0, new Intent(this, WatchUpdaterService.class), 0);
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(pending);
 
         String action = null;
-        if (intent != null)
+        if (intent != null) {
             action = intent.getAction();
+        }
 
         if (wear_integration) {
             if (googleApiClient.isConnected()) {
@@ -110,7 +109,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     @Override
     public void onMessageReceived(MessageEvent event) {
         if (wear_integration) {
-            if (event.getPath().equals(WEARABLE_RESEND_PATH))
+            if(event != null && event.getPath().equals(WEARABLE_RESEND_PATH))
                 resendData();
         }
     }
@@ -130,6 +129,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 PebbleSync pebbleSync = new PebbleSync();
                 pebbleSync.sendData(getApplicationContext(), bg);
             }
+            getApplicationContext().startService(new Intent(getApplicationContext(), WidgetUpdateService.class));
         }
     }
 
@@ -151,7 +151,7 @@ public class WatchUpdaterService extends WearableListenerService implements
 
     @Override
     public void onDestroy() {
-        if (null != googleApiClient && googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
     }
@@ -161,5 +161,4 @@ public class WatchUpdaterService extends WearableListenerService implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) { }
-
 }
