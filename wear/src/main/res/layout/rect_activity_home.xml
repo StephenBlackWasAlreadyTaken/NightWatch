@@ -15,22 +15,27 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="112dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:paddingTop="5dp"
             android:weightSum="1"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-5dp"
+            android:gravity="center_horizontal">
 
             <TextView
                 android:id="@+id/sgv"
-                android:textSize="40sp"
+                android:textSize="41sp"
                 android:text="---"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
                 android:layout_gravity="bottom"
-                android:gravity="bottom|right" />
+                android:gravity="bottom|right"
+                android:layout_marginBottom="-2dp"
+                android:paddingTop="-2dp"
+                android:layout_marginRight="5dp" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -39,30 +44,35 @@
                 android:weightSum="1"
                 android:textAlignment="center"
                 android:baselineAligned="false"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal">
 
                 <TextView
                     android:id="@+id/direction"
-                    android:textSize="23sp"
+                    android:textSize="30sp"
                     android:textStyle="bold"
                     android:text="--"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#FFFFFF"
                     android:textAlignment="center"
                     android:layout_gravity="center_horizontal|bottom"
                     android:gravity="center_horizontal|bottom"
+                    android:layout_marginBottom="-5dp"
+                    android:layout_marginTop="-2dp"
                     android:paddingTop="1dp" />
 
                 <TextView
                     android:id="@+id/delta"
-                    android:textSize="7sp"
+                    android:textSize="10sp"
                     android:text="--- mg/dl"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#FFFFFF"
                     android:layout_gravity="bottom"
-                    android:gravity="center_horizontal|bottom" />
+                    android:gravity="center_horizontal|bottom"
+                    android:textStyle="bold"
+                    android:singleLine="true" />
 
 
             </LinearLayout>
