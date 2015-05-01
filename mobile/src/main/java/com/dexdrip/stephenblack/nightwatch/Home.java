@@ -16,8 +16,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 
+import io.fabric.sdk.android.Fabric;
 import java.text.DecimalFormat;
 import java.util.Date;
 
@@ -49,6 +51,7 @@ public class Home extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         checkEula();
 
@@ -75,16 +78,18 @@ public class Home extends Activity {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                    setupCharts();
                     displayCurrentInfo();
+                    holdViewport.set(0, 0, 0, 0);
                 }
             }
         };
         newDataReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
-                holdViewport.set(0, 0, 0, 0);
                 setupCharts();
                 displayCurrentInfo();
+                holdViewport.set(0, 0, 0, 0);
             }
         };
         registerReceiver(_broadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
