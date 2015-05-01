@@ -1,3 +1,5 @@
+### Find download links and more info on the [NightWatch Project page](http://stephenblackwasalreadytaken.github.io/NightWatch/)
+
 ## Collects BG data from the following sources:
 * Dexcom Share Servers (Acts as a follow app for Android!!)
 * xDrip
