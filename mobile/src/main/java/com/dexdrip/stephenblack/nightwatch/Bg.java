@@ -25,7 +25,7 @@ import java.util.List;
 
 @Table(name = "Bg", id = BaseColumns._ID)
 public class Bg extends Model {
-    private SharedPreferences prefs;
+    public SharedPreferences prefs;
 
     @Expose
     @Column(name = "sgv")

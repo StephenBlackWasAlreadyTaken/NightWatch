@@ -3,7 +3,9 @@ package com.dexdrip.stephenblack.nightwatch;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.BatteryManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
@@ -35,11 +37,12 @@ public class PebbleSync {
     private Context mContext;
     private BgGraphBuilder bgGraphBuilder;
     private Bg mBgReading;
+    public SharedPreferences prefs;
 
     public PebbleDictionary buildDictionary() {
         PebbleDictionary dictionary = new PebbleDictionary();
         dictionary.addString(ICON_KEY, slopeOrdinal());
-        dictionary.addString(BG_KEY, mBgReading.unitized_string());
+        dictionary.addString(BG_KEY, mBgReading.unitized_string(prefs));
         dictionary.addUint32(RECORD_TIME_KEY, (int) (mBgReading.datetime / 1000));
         dictionary.addUint32(PHONE_TIME_KEY, (int) (new Date().getTime() / 1000));
         dictionary.addString(BG_DELTA_KEY, mBgReading.unitizedDeltaStringNoUnit());
@@ -50,8 +53,10 @@ public class PebbleSync {
 
     public void sendData(Context context, Bg bgReading){
         mContext = context;
+        prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         bgGraphBuilder = new BgGraphBuilder(mContext);
         mBgReading = bgReading;
+        bgReading.prefs = prefs;
         sendDownload(buildDictionary());
     }
 
