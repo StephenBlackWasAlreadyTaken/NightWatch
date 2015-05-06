@@ -1,6 +1,7 @@
 package com.dexdrip.stephenblack.nightwatch;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -97,6 +98,34 @@ public class Notifications {
         }
     }
 
+    private static Bitmap createWearBitmap(long start, long end) {
+        return new BgSparklineBuilder(mContext)
+                .setBgGraphBuilder(new BgGraphBuilder(mContext))
+                .setStart(start)
+                .setEnd(end)
+                .showHighLine()
+                .showLowLine()
+                .showAxes()
+                .setWidthPx(400)
+                .setHeightPx(400)
+                .setSmallDots()
+                .build();
+    }
+
+    private static Bitmap createWearBitmap(long hours) {
+        return createWearBitmap(System.currentTimeMillis() - 60000 * 60 * hours, System.currentTimeMillis());
+    }
+
+    private static Notification createExtensionPage(long hours) {
+        return new NotificationCompat.Builder(mContext)
+                //.setContentTitle(deltaText)
+                .extend(new NotificationCompat.WearableExtender()
+                        .setBackground(createWearBitmap(hours))
+                        .setHintShowBackgroundOnly(true)
+                        .setHintAvoidBackgroundClipping(true))
+                .build();
+    }
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private static void bgOngoingNotification(BgGraphBuilder bgGraphBuilder) {
         mHandler.post(new Runnable() {
@@ -126,14 +155,7 @@ public class Notifications {
                         .setSmallIcon(R.drawable.ic_action_communication_invert_colors_on)
                         .setUsesChronometer(false);
                 if (lastReading != null) {
-                    Bitmap wearBitmap = new BgSparklineBuilder(mContext)
-                            .setBgGraphBuilder(new BgGraphBuilder(mContext))
-                            .showHighLine()
-                            .showLowLine()
-                            .showAxes()
-                            .setWidth(400)
-                            .setHeight(400)
-                            .build();
+                    Bitmap wearBitmap3h = createWearBitmap(3);
 
                     b.setWhen((long) lastReading.datetime);
                     String deltaText = "Delta: " + lastReading.unitizedDeltaString();
@@ -154,14 +176,11 @@ public class Notifications {
                             .setSummaryText(deltaText).setBigContentTitle(deltaText);
                     b.setStyle(bigPictureStyle)
                             .extend(new NotificationCompat.WearableExtender()
-                                    .setBackground(wearBitmap)
-                                    .addPage(new NotificationCompat.Builder(mContext)
-                                            //.setContentTitle(deltaText)
-                                            .extend(new NotificationCompat.WearableExtender()
-                                                    .setBackground(wearBitmap)
-                                                    .setHintShowBackgroundOnly(true)
-                                                    .setHintAvoidBackgroundClipping(true))
-                                            .build())
+                                    .setBackground(wearBitmap3h)
+                                    .addPage(createExtensionPage(3))
+                                    .addPage(createExtensionPage(6))
+                                    .addPage(createExtensionPage(12))
+                                    .addPage(createExtensionPage(24))
                                     );
                 }
                 b.setContentIntent(resultPendingIntent);

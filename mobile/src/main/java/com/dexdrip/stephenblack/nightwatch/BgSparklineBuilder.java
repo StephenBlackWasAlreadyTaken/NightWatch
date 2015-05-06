@@ -34,6 +34,7 @@ public class BgSparklineBuilder {
     private boolean showLowLine = false;
     private boolean showHighLine = false;
     private boolean showAxes = false;
+    private boolean useSmallDots = false;
 
     public BgSparklineBuilder setStart(long start) {
         this.start = start / (float) BgGraphBuilder.fuzz;
@@ -90,6 +91,15 @@ public class BgSparklineBuilder {
     public BgSparklineBuilder setHeightPx(int height) {
         this.height = height;
         return this;
+    }
+
+    public BgSparklineBuilder setSmallDots(boolean useSmallDots) {
+        this.useSmallDots = useSmallDots;
+        return this;
+    }
+
+    public BgSparklineBuilder setSmallDots() {
+        return this.setSmallDots(true);
     }
 
     public BgSparklineBuilder setBgGraphBuilder(BgGraphBuilder bgGraphBuilder) {
@@ -156,6 +166,10 @@ public class BgSparklineBuilder {
             lines.add(bgGraphBuilder.lowLine());
         if (showHighLine)
             lines.add(bgGraphBuilder.highLine());
+        if (useSmallDots) {
+            for(Line line: lines)
+                line.setPointRadius(1);
+        }
         LineChartData lineData = new LineChartData(lines);
         if (showAxes) {
             lineData.setAxisYLeft(bgGraphBuilder.yAxis());
