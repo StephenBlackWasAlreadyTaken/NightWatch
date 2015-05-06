@@ -1,17 +1,24 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -23,6 +30,7 @@ import java.util.List;
 public class Notifications {
     public static final long[] vibratePattern = {0,1000,300,1000,300,1000};
     public static boolean bg_notifications;
+    public static boolean bg_ongoing;
     public static boolean bg_vibrate;
     public static boolean bg_lights;
     public static boolean bg_sound;
@@ -39,19 +47,22 @@ public class Notifications {
 
     public static Context mContext;
 
-    public static int BgNotificationId = 001;
-    public static int calibrationNotificationId = 002;
-    public static int doubleCalibrationNotificationId = 003;
-    public static int extraCalibrationNotificationId = 004;
+    public static int BgNotificationId = 1;
+    public static int calibrationNotificationId = 2;
+    public static int doubleCalibrationNotificationId = 3;
+    public static int extraCalibrationNotificationId = 4;
+    public static final int OngoingNotificationId = 5;
     public static SharedPreferences prefs;
 
     public static int currentVolume;
     public static AudioManager manager;
+    private static Handler mHandler = new Handler(Looper.getMainLooper());
 
     public static void setNotificationSettings(Context context) {
         mContext = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         bg_notifications = prefs.getBoolean("bg_notifications", true);
+        bg_ongoing = prefs.getBoolean("bg_ongoing", true);
         bg_vibrate = prefs.getBoolean("bg_vibrate", true);
         bg_lights = prefs.getBoolean("bg_lights", true);
         bg_sound = prefs.getBoolean("bg_play_sound", true);
@@ -68,6 +79,9 @@ public class Notifications {
 
         Bg bgReading = Bg.last();
 
+        if (bg_ongoing && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
+            bgOngoingNotification(bgGraphBuilder);
+        }
         if (bg_notifications) {
             if (bgGraphBuilder.unitized(bgReading.sgv_double()) >= high || bgGraphBuilder.unitized(bgReading.sgv_double()) <= low) {
                 if(bgReading.sgv_double() > 13 && bgReading.datetime > (new Date().getTime() - (60 * 1000 * 60))) {
@@ -82,6 +96,82 @@ public class Notifications {
             clearAllBgNotifications();
         }
     }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private static void bgOngoingNotification(BgGraphBuilder bgGraphBuilder) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(mContext, Home.class);
+                List<Bg> lastReadings = Bg.latest(2);
+                Bg lastReading = null;
+                if (lastReadings != null && lastReadings.size() >= 2) {
+                    lastReading = lastReadings.get(0);
+                }
+
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+                stackBuilder.addParentStack(Home.class);
+                stackBuilder.addNextIntent(intent);
+                PendingIntent resultPendingIntent =
+                        stackBuilder.getPendingIntent(
+                                0,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+
+                NotificationCompat.Builder b = new NotificationCompat.Builder(mContext);
+                //b.setOngoing(true);
+                b.setCategory(NotificationCompat.CATEGORY_STATUS);
+                b.setContentTitle(lastReading == null ? "BG Reading Unavailable" : (lastReading.unitized_string(prefs) + " " + lastReading.slopeArrow()))
+                        .setContentText("xDrip Data collection service is running.")
+                        .setSmallIcon(R.drawable.ic_action_communication_invert_colors_on)
+                        .setUsesChronometer(false);
+                if (lastReading != null) {
+                    Bitmap wearBitmap = new BgSparklineBuilder(mContext)
+                            .setBgGraphBuilder(new BgGraphBuilder(mContext))
+                            .showHighLine()
+                            .showLowLine()
+                            .showAxes()
+                            .setWidth(400)
+                            .setHeight(400)
+                            .build();
+
+                    b.setWhen((long) lastReading.datetime);
+                    String deltaText = "Delta: " + lastReading.unitizedDeltaString();
+                    b.setContentText(deltaText);
+                    b.setLargeIcon(new BgSparklineBuilder(mContext)
+                            .setHeight(64)
+                            .setWidth(64)
+                            .setStart(System.currentTimeMillis() - 60000 * 60 * 3)
+                            .setBgGraphBuilder(new BgGraphBuilder(mContext))
+                            .build());
+
+                    NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
+                    bigPictureStyle.bigPicture(new BgSparklineBuilder(mContext)
+                            .setBgGraphBuilder(new BgGraphBuilder(mContext))
+                            .showHighLine()
+                            .showLowLine()
+                            .build())
+                            .setSummaryText(deltaText).setBigContentTitle(deltaText);
+                    b.setStyle(bigPictureStyle)
+                            .extend(new NotificationCompat.WearableExtender()
+                                    .setBackground(wearBitmap)
+                                    .addPage(new NotificationCompat.Builder(mContext)
+                                            //.setContentTitle(deltaText)
+                                            .extend(new NotificationCompat.WearableExtender()
+                                                    .setBackground(wearBitmap)
+                                                    .setHintShowBackgroundOnly(true)
+                                                    .setHintAvoidBackgroundClipping(true))
+                                            .build())
+                                    );
+                }
+                b.setContentIntent(resultPendingIntent);
+                NotificationManagerCompat
+                        .from(mContext)
+                        .notify(OngoingNotificationId, b.build());
+            }
+        });
+    }
+
     public static void clearAllBgNotifications() {
         notificationDismiss(BgNotificationId);
     }
