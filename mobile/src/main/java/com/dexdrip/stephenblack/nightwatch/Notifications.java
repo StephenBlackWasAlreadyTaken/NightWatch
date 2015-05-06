@@ -47,17 +47,17 @@ public class Notifications {
     public static String calibration_notification_sound;
 
     public static Context mContext;
+    private static Handler mHandler = new Handler(Looper.getMainLooper());
 
-    public static int BgNotificationId = 1;
-    public static int calibrationNotificationId = 2;
-    public static int doubleCalibrationNotificationId = 3;
-    public static int extraCalibrationNotificationId = 4;
-    public static final int OngoingNotificationId = 5;
+    public static final int BgNotificationId = 1;
+    public static final int calibrationNotificationId = 2;
+    public static final int doubleCalibrationNotificationId = 3;
+    public static final int extraCalibrationNotificationId = 4;
+    public static final int ongoingNotificationId = 5;
     public static SharedPreferences prefs;
 
     public static int currentVolume;
     public static AudioManager manager;
-    private static Handler mHandler = new Handler(Looper.getMainLooper());
 
     public static void setNotificationSettings(Context context) {
         mContext = context;
@@ -127,69 +127,76 @@ public class Notifications {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private static void bgOngoingNotification(BgGraphBuilder bgGraphBuilder) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(mContext, Home.class);
-                List<Bg> lastReadings = Bg.latest(2);
-                Bg lastReading = null;
-                if (lastReadings != null && lastReadings.size() >= 2) {
-                    lastReading = lastReadings.get(0);
-                }
+    public static Notification createOngoingNotification(BgGraphBuilder bgGraphBuilder) {
+        Intent intent = new Intent(mContext, Home.class);
+        List<Bg> lastReadings = Bg.latest(2);
+        Bg lastReading = null;
+        if (lastReadings != null && lastReadings.size() >= 2) {
+            lastReading = lastReadings.get(0);
+        }
 
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-                stackBuilder.addParentStack(Home.class);
-                stackBuilder.addNextIntent(intent);
-                PendingIntent resultPendingIntent =
-                        stackBuilder.getPendingIntent(
-                                0,
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        );
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+        stackBuilder.addParentStack(Home.class);
+        stackBuilder.addNextIntent(intent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
 
-                NotificationCompat.Builder b = new NotificationCompat.Builder(mContext);
-                //b.setOngoing(true);
-                b.setCategory(NotificationCompat.CATEGORY_STATUS);
-                b.setContentTitle(lastReading == null ? "BG Reading Unavailable" : (lastReading.unitized_string(prefs) + " " + lastReading.slopeArrow()))
-                        .setContentText("xDrip Data collection service is running.")
-                        .setSmallIcon(R.drawable.ic_action_communication_invert_colors_on)
-                        .setUsesChronometer(false);
-                if (lastReading != null) {
-                    Bitmap wearBitmap3h = createWearBitmap(3);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(mContext);
+        //b.setOngoing(true);
+        b.setCategory(NotificationCompat.CATEGORY_STATUS);
+        String titleString = lastReading == null ? "BG Reading Unavailable" : (lastReading.unitized_string(prefs) + " " + lastReading.slopeArrow());
+        b.setContentTitle(titleString)
+                .setContentText("xDrip Data collection service is running.")
+                .setSmallIcon(R.drawable.ic_action_communication_invert_colors_on)
+                .setUsesChronometer(false);
+        if (lastReading != null) {
+            Bitmap wearBitmap3h = createWearBitmap(3);
 
-                    b.setWhen((long) lastReading.datetime);
-                    String deltaText = "Delta: " + lastReading.unitizedDeltaString();
-                    b.setContentText(deltaText);
-                    b.setLargeIcon(new BgSparklineBuilder(mContext)
-                            .setHeight(64)
-                            .setWidth(64)
-                            .setStart(System.currentTimeMillis() - 60000 * 60 * 3)
-                            .setBgGraphBuilder(new BgGraphBuilder(mContext))
-                            .build());
+            b.setWhen((long) lastReading.datetime);
+            String deltaString = "Delta: " + bgGraphBuilder.unitizedDeltaString(lastReading.sgv_double() - lastReadings.get(1).sgv_double());
+            b.setContentText(deltaString);
+            b.setLargeIcon(new BgSparklineBuilder(mContext)
+                    .setHeight(64)
+                    .setWidth(64)
+                    .setStart(System.currentTimeMillis() - 60000 * 60 * 3)
+                    .setBgGraphBuilder(new BgGraphBuilder(mContext))
+                    .build());
 
-                    NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
-                    bigPictureStyle.bigPicture(new BgSparklineBuilder(mContext)
-                            .setBgGraphBuilder(new BgGraphBuilder(mContext))
-                            .showHighLine()
-                            .showLowLine()
-                            .build())
-                            .setSummaryText(deltaText).setBigContentTitle(deltaText);
-                    b.setStyle(bigPictureStyle)
-                            .extend(new NotificationCompat.WearableExtender()
+            NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
+            bigPictureStyle.bigPicture(new BgSparklineBuilder(mContext)
+                    .setBgGraphBuilder(new BgGraphBuilder(mContext))
+                    .showHighLine()
+                    .showLowLine()
+                    .build())
+                    .setSummaryText(deltaString)
+                    .setBigContentTitle(titleString);
+            b.setStyle(bigPictureStyle)
+                    .extend(new NotificationCompat.WearableExtender()
                                     .setBackground(wearBitmap3h)
                                     .addPage(createExtensionPage(3))
                                     .addPage(createExtensionPage(6))
                                     .addPage(createExtensionPage(12))
                                     .addPage(createExtensionPage(24))
-                                    );
-                }
-                b.setContentIntent(resultPendingIntent);
+                    );
+        }
+        b.setContentIntent(resultPendingIntent);
+        return b.build();
+    }
+
+    public static void bgOngoingNotification(final BgGraphBuilder bgGraphBuilder) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
                 NotificationManagerCompat
                         .from(mContext)
-                        .notify(OngoingNotificationId, b.build());
+                        .notify(ongoingNotificationId, createOngoingNotification(bgGraphBuilder));
             }
         });
     }
+
 
     public static void clearAllBgNotifications() {
         notificationDismiss(BgNotificationId);

@@ -25,8 +25,8 @@ public class BgSparklineBuilder {
     private static final int NOTIFICATION_WIDTH_DP = 460; // 476 width minus 8 padding on each side
     private static final int NOTIFICATION_HEIGHT_DP = 256;
 
-    private int width = NOTIFICATION_WIDTH_DP;
-    private int height = NOTIFICATION_HEIGHT_DP;
+    private int width;
+    private int height;
     private BgGraphBuilder bgGraphBuilder;
     private LineChartView chart;
     private float end = new Date().getTime() / (float) BgGraphBuilder.fuzz;
@@ -157,7 +157,7 @@ public class BgSparklineBuilder {
     }
 
     Bitmap build() {
-        List<Line> lines = new ArrayList<>(4);
+        List<Line> lines = new ArrayList<>();
         bgGraphBuilder.defaultLines();
         lines.add(bgGraphBuilder.inRangeValuesLine());
         lines.add(bgGraphBuilder.lowValuesLine());
