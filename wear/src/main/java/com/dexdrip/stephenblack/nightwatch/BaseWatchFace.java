@@ -97,6 +97,10 @@ public  abstract class BaseWatchFace extends WatchFace {
                 mLinearLayout = (LinearLayout) stub.findViewById(R.id.secondary_layout);
                 chart = (LineChartView) stub.findViewById(R.id.chart);
                 layoutSet = true;
+                mRelativeLayout.measure(specW, specH);
+                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                        mRelativeLayout.getMeasuredHeight());
+
                 mTimeInfoReceiver.onReceive(getApplicationContext(), registerReceiver(null, INTENT_FILTER));
                 registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
             }
@@ -152,9 +156,6 @@ public  abstract class BaseWatchFace extends WatchFace {
     protected void onDraw(Canvas canvas) {
         Log.d("onDraw", "enter");
         if(layoutSet) {
-            mRelativeLayout.measure(specW, specH);
-            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
-                    mRelativeLayout.getMeasuredHeight());
             this.mRelativeLayout.draw(canvas);
             Log.d("onDraw", "draw");
         }
