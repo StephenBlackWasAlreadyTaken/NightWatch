@@ -3,6 +3,11 @@
         android:title="BG Level Alerts"
         android:key="bgLevelAlerts">
         <CheckBoxPreference
+            android:key="bg_ongoing"
+            android:title="BG Notification"
+            android:summary="Display current BG in notification area."
+            android:defaultValue="true" />
+        <CheckBoxPreference
             android:key="bg_notifications"
             android:title="BG Alerts"
             android:summary="Alert when BG readings cross the threshold."
