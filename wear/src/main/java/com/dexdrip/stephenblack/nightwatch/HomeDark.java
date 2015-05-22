@@ -1,29 +1,16 @@
 package com.dexdrip.stephenblack.nightwatch;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.BatteryManager;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.view.WatchViewStub;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
-import com.google.android.gms.wearable.DataMap;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-public class HomeDark extends BaseWatchFaceActivity {
+public class HomeDark extends BaseWatchFace {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+    public void onCreate() {
+        super.onCreate();
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutView = inflater.inflate(R.layout.activity_home, null);
         performViewSetup();
     }
 

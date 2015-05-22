@@ -1,13 +1,16 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 
-public class LargeHomeDark extends BaseWatchFaceActivity {
+public class LargeHomeDark extends BaseWatchFace {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_large);
+    public void onCreate() {
+        super.onCreate();
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutView = inflater.inflate(R.layout.activity_home_large, null);
         performViewSetup();
     }
 
