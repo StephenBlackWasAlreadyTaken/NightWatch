@@ -5,17 +5,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Bundle;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.android.gms.wearable.DataMap;
+import com.ustwo.clockwise.WatchFace;
+import com.ustwo.clockwise.WatchShape;
 import lecho.lib.hellocharts.view.LineChartView;
 
 import java.util.ArrayList;
@@ -25,7 +30,7 @@ import java.util.Date;
 /**
  * Created by stephenblack on 12/29/14.
  */
-public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
+public  abstract class BaseWatchFace extends WatchFace {
     public final static IntentFilter INTENT_FILTER;
     public static final long[] vibratePattern = {0,400,300,400,300,400};
     public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta;
@@ -47,15 +52,32 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
     public double datetime;
     public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
 
+    // related to manual layout
+    public View layoutView;
+    private final Point displaySize = new Point();
+    private int specW, specH;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        performViewSetup();
+    public void onCreate() {
+        super.onCreate();
+        Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay();
+        display.getSize(displaySize);
+
+        specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
+                View.MeasureSpec.EXACTLY);
+        specH = View.MeasureSpec.makeMeasureSpec(displaySize.y,
+                View.MeasureSpec.EXACTLY);
+    }
+
+    @Override
+    protected void onLayout(WatchShape shape, Rect screenBounds, WindowInsets screenInsets) {
+        super.onLayout(shape, screenBounds, screenInsets);
+        layoutView.onApplyWindowInsets(screenInsets);
     }
 
     public void performViewSetup() {
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
+        final WatchViewStub stub = (WatchViewStub) layoutView.findViewById(R.id.watch_view_stub);
         IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
 
         MessageReceiver messageReceiver = new MessageReceiver();
@@ -64,6 +86,7 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
+                Log.d("layout", "inflated");
                 mTime = (TextView) stub.findViewById(R.id.watch_time);
                 mSgv = (TextView) stub.findViewById(R.id.sgv);
                 mDirection = (TextView) stub.findViewById(R.id.direction);
@@ -74,6 +97,10 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
                 mLinearLayout = (LinearLayout) stub.findViewById(R.id.secondary_layout);
                 chart = (LineChartView) stub.findViewById(R.id.chart);
                 layoutSet = true;
+                mRelativeLayout.measure(specW, specH);
+                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                        mRelativeLayout.getMeasuredHeight());
+
                 mTimeInfoReceiver.onReceive(getApplicationContext(), registerReceiver(null, INTENT_FILTER));
                 registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
             }
@@ -103,7 +130,7 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mTimeInfoReceiver);
     }
@@ -118,12 +145,21 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
     private BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver(){
         @Override
         public void onReceive(Context arg0, Intent intent) {
-            final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFaceActivity.this);
+            final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
             mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
             mTimestamp.setText(readingAge());
             missedReadingAlert();
         }
     };
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Log.d("onDraw", "enter");
+        if(layoutSet) {
+            this.mRelativeLayout.draw(canvas);
+            Log.d("onDraw", "draw");
+        }
+    }
 
     public class MessageReceiver extends BroadcastReceiver {
         @Override
@@ -153,17 +189,6 @@ public  abstract class BaseWatchFaceActivity extends WatchFaceActivity{
 
     public void setColor() { Log.e("ERROR: ", "MUST OVERRIDE IN CLASS"); }
 
-    @Override
-    public void onScreenDim() {
-        screenAwake = false;
-        if (layoutSet) { setColor(); }
-    }
-
-    @Override
-    public void onScreenAwake() {
-        screenAwake = true;
-        if (layoutSet) { setColor(); }
-    }
 
     public void missedReadingAlert() {
         int minutes_since = (int) Math.floor(timeSince()/(1000*60));
