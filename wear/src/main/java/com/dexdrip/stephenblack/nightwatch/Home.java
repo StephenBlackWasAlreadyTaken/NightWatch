@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
+import com.ustwo.clockwise.WatchMode;
 import lecho.lib.hellocharts.util.Utils;
 
 public class Home extends BaseWatchFace {
@@ -19,7 +20,7 @@ public class Home extends BaseWatchFace {
 
     @Override
     public void setColor() {
-        if (screenAwake) {
+        if (getCurrentWatchMode() == WatchMode.INTERACTIVE) {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
