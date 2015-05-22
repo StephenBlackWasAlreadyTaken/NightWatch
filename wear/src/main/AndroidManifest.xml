@@ -16,7 +16,8 @@
         <service
             android:name=".Home"
             android:allowEmbedded="true"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_WALLPAPER">
             <meta-data android:name="android.service.wallpaper"
                        android:resource="@xml/watch_face"/>
             <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
@@ -29,7 +30,8 @@
         <service
             android:name=".HomeDark"
             android:allowEmbedded="true"
-            android:label="NightWatch(Dark)" >
+            android:label="NightWatch(Dark)"
+            android:permission="android.permission.BIND_WALLPAPER">
             <meta-data android:name="android.service.wallpaper"
                        android:resource="@xml/watch_face"/>
             <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
@@ -42,7 +44,8 @@
         <service
             android:name=".LargeHomeDark"
             android:allowEmbedded="true"
-            android:label="NightWatch(Large+Dark)" >
+            android:label="NightWatch(Large+Dark)"
+            android:permission="android.permission.BIND_WALLPAPER">
             <meta-data android:name="android.service.wallpaper"
                        android:resource="@xml/watch_face"/>
             <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
@@ -55,7 +58,8 @@
         <service
             android:name=".LargeHome"
             android:allowEmbedded="true"
-            android:label="NightWatch(Large)" >
+            android:label="NightWatch(Large)"
+            android:permission="android.permission.BIND_WALLPAPER">
             <meta-data android:name="android.service.wallpaper"
                        android:resource="@xml/watch_face"/>
             <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />

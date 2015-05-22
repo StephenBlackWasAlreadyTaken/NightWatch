@@ -7,18 +7,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
+import com.ustwo.clockwise.WatchShape;
 import lecho.lib.hellocharts.view.LineChartView;
 
 import java.util.ArrayList;
@@ -49,11 +51,29 @@ public  abstract class BaseWatchFace extends WatchFace {
     public LineChartView chart;
     public double datetime;
     public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
+
+    // related to manual layout
     public View layoutView;
+    private final Point displaySize = new Point();
+    private int specW, specH;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay();
+        display.getSize(displaySize);
+
+        specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
+                View.MeasureSpec.EXACTLY);
+        specH = View.MeasureSpec.makeMeasureSpec(displaySize.y,
+                View.MeasureSpec.EXACTLY);
+    }
+
+    @Override
+    protected void onLayout(WatchShape shape, Rect screenBounds, WindowInsets screenInsets) {
+        super.onLayout(shape, screenBounds, screenInsets);
+        layoutView.onApplyWindowInsets(screenInsets);
     }
 
     public void performViewSetup() {
@@ -66,6 +86,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
+                Log.d("layout", "inflated");
                 mTime = (TextView) stub.findViewById(R.id.watch_time);
                 mSgv = (TextView) stub.findViewById(R.id.sgv);
                 mDirection = (TextView) stub.findViewById(R.id.direction);
@@ -129,7 +150,14 @@ public  abstract class BaseWatchFace extends WatchFace {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        this.mRelativeLayout.draw(canvas);
+        Log.d("onDraw", "enter");
+        if(layoutSet) {
+            mRelativeLayout.measure(specW, specH);
+            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                    mRelativeLayout.getMeasuredHeight());
+            this.mRelativeLayout.draw(canvas);
+            Log.d("onDraw", "draw");
+        }
     }
 
     public class MessageReceiver extends BroadcastReceiver {
