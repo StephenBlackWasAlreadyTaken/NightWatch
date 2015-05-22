@@ -174,6 +174,7 @@ public  abstract class BaseWatchFace extends WatchFace {
                     addToWatchSet(dataMap);
                     setupCharts();
                 }
+                invalidate();
             } else {
                 Log.d("ERROR: ", "DATA IS NOT YET SET");
             }
