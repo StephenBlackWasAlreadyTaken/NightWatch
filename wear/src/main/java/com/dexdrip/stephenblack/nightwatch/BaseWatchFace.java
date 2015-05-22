@@ -39,7 +39,6 @@ public  abstract class BaseWatchFace extends WatchFace {
     public long sgvLevel = 0;
     public int batteryLevel = 1;
     public int ageLevel = 1;
-    public boolean screenAwake = true;
     public int highColor = Color.YELLOW;
     public int lowColor = Color.RED;
     public int midColor = Color.WHITE;

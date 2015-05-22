@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import com.ustwo.clockwise.WatchMode;
 
 public class LargeHome extends BaseWatchFace {
 
@@ -17,7 +18,7 @@ public class LargeHome extends BaseWatchFace {
 
     @Override
     public void setColor() {
-        if (screenAwake) {
+        if (getCurrentWatchMode() == WatchMode.INTERACTIVE) {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);
             if (sgvLevel == 1) {
