@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
+import com.ustwo.clockwise.WatchFaceTime;
 import com.ustwo.clockwise.WatchShape;
 import lecho.lib.hellocharts.view.LineChartView;
 
@@ -85,7 +86,6 @@ public  abstract class BaseWatchFace extends WatchFace {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
-                Log.d("layout", "inflated");
                 mTime = (TextView) stub.findViewById(R.id.watch_time);
                 mSgv = (TextView) stub.findViewById(R.id.sgv);
                 mDirection = (TextView) stub.findViewById(R.id.direction);
@@ -99,9 +99,6 @@ public  abstract class BaseWatchFace extends WatchFace {
                 mRelativeLayout.measure(specW, specH);
                 mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
                         mRelativeLayout.getMeasuredHeight());
-
-                mTimeInfoReceiver.onReceive(getApplicationContext(), registerReceiver(null, INTENT_FILTER));
-                registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
             }
         });
         ListenerService.requestData(this);
@@ -131,7 +128,6 @@ public  abstract class BaseWatchFace extends WatchFace {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mTimeInfoReceiver);
     }
 
     static {
@@ -141,22 +137,21 @@ public  abstract class BaseWatchFace extends WatchFace {
         INTENT_FILTER.addAction(Intent.ACTION_TIME_CHANGED);
     }
 
-    private BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver(){
-        @Override
-        public void onReceive(Context arg0, Intent intent) {
+    @Override
+    protected void onDraw(Canvas canvas) {
+        if(layoutSet) {
+            this.mRelativeLayout.draw(canvas);
+            Log.d("onDraw", "draw");
+        }
+    }
+
+    @Override
+    protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
+        if (layoutSet && (newTime.hasHourChanged(oldTime) || newTime.hasMinuteChanged(oldTime))) {
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
             mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
             mTimestamp.setText(readingAge());
             missedReadingAlert();
-        }
-    };
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        Log.d("onDraw", "enter");
-        if(layoutSet) {
-            this.mRelativeLayout.draw(canvas);
-            Log.d("onDraw", "draw");
         }
     }
 
