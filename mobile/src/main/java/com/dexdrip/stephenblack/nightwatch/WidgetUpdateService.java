@@ -60,6 +60,8 @@ public class WidgetUpdateService extends Service {
             Calendar calendar = Calendar.getInstance();
             AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
             alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, WidgetUpdateService.class), 0));
+        } else {
+            stopSelf();
         }
     }
 

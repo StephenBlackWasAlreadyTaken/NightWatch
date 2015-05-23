@@ -63,7 +63,7 @@ public class Notifications {
         mContext = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         bg_notifications = prefs.getBoolean("bg_notifications", true);
-        bg_ongoing = prefs.getBoolean("bg_ongoing", true);
+        bg_ongoing = prefs.getBoolean("bg_ongoing", false);
         bg_vibrate = prefs.getBoolean("bg_vibrate", true);
         bg_lights = prefs.getBoolean("bg_lights", true);
         bg_sound = prefs.getBoolean("bg_play_sound", true);

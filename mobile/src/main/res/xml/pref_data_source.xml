@@ -2,11 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-            android:title="NightScout Source"
+            android:title="NightWatch Data Source"
             android:key="dataSource">
         <CheckBoxPreference
             android:key="nightscout_poll"
-            android:title="Read BG values from NightScout"
+            android:title="Read from NightScout"
             android:summary="If you are already sending values to nightscout, choose this option."
             android:defaultValue="false" />
         <EditTextPreference
@@ -15,6 +15,25 @@
             android:title="Nightscout URL"
             android:summary="URL for your nightscout site"
             android:defaultValue="https://{yoursite}.azurewebsites.net"/>
+
+        <CheckBoxPreference
+            android:key="share_poll"
+            android:title="Read from Dexcom Share"
+            android:summary="If you are using Dexcom Share, choose this option."
+            android:defaultValue="false" />
+        <EditTextPreference
+            android:dependency="share_poll"
+            android:key="dexcom_account_name"
+            android:title="Dexcom Account Login"
+            android:summary="Your login for Dexcoms Website"
+            android:defaultValue=""/>
+        <EditTextPreference
+            android:dependency="share_poll"
+            android:key="dexcom_account_password"
+            android:title="Dexcom Account Password"
+            android:inputType="textPassword"
+            android:summary="Your password for Dexcoms Website"
+            android:defaultValue=""/>
     </PreferenceCategory>
 
 </PreferenceScreen>
