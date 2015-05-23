@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
@@ -51,7 +52,7 @@ public  abstract class BaseWatchFace extends WatchFace {
     public LineChartView chart;
     public double datetime;
     public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
-
+    public PowerManager.WakeLock wakeLock;
     // related to manual layout
     public View layoutView;
     private final Point displaySize = new Point();
@@ -63,6 +64,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
+        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Clock");
 
         specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
                 View.MeasureSpec.EXACTLY);
@@ -102,6 +104,7 @@ public  abstract class BaseWatchFace extends WatchFace {
             }
         });
         ListenerService.requestData(this);
+        wakeLock.acquire(50);
     }
 
     public int ageLevel() {
@@ -148,6 +151,7 @@ public  abstract class BaseWatchFace extends WatchFace {
     @Override
     protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
         if (layoutSet && (newTime.hasHourChanged(oldTime) || newTime.hasMinuteChanged(oldTime))) {
+            wakeLock.acquire(50);
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
             mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
             mTimestamp.setText(readingAge());
@@ -163,6 +167,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         public void onReceive(Context context, Intent intent) {
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             if (layoutSet) {
+                wakeLock.acquire(50);
                 sgvLevel = dataMap.getLong("sgvLevel");
                 batteryLevel = dataMap.getInt("batteryLevel");
                 datetime = dataMap.getDouble("timestamp");
