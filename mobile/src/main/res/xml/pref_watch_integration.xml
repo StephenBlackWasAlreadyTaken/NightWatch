@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <PreferenceCategory
+        android:title="Other Settings"
+        android:key="other_settings">
+        <CheckBoxPreference
+            android:key="bg_ongoing"
+            android:title="Persistent Notification"
+            android:summary="Display current BG in notification area."
+            android:defaultValue="false" />
+    </PreferenceCategory>
     <PreferenceCategory
         android:title="Watch Integration"
         android:key="watch_integration">
@@ -15,5 +23,4 @@
             android:summary="Send data to Pebble Camping Mode Watchface."
             android:defaultValue="false" />
     </PreferenceCategory>
-
 </PreferenceScreen>
