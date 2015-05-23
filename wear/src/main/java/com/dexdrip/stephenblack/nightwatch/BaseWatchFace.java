@@ -152,6 +152,9 @@ public  abstract class BaseWatchFace extends WatchFace {
             mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
             mTimestamp.setText(readingAge());
             missedReadingAlert();
+            mRelativeLayout.measure(specW, specH);
+            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                    mRelativeLayout.getMeasuredHeight());
         }
     }
 
@@ -174,6 +177,9 @@ public  abstract class BaseWatchFace extends WatchFace {
                     addToWatchSet(dataMap);
                     setupCharts();
                 }
+                mRelativeLayout.measure(specW, specH);
+                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                        mRelativeLayout.getMeasuredHeight());
                 invalidate();
             } else {
                 Log.d("ERROR: ", "DATA IS NOT YET SET");
