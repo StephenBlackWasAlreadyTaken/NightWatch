@@ -275,6 +275,14 @@ public class Bg extends Model {
         return (foundBg == null);
     }
 
+    public static List<Bg> latest(int number) {
+        return new Select()
+                .from(Bg.class)
+                .orderBy("datetime desc")
+                .limit(number)
+                .execute();
+    }
+
     public static List<Bg> latestForGraph(int number, double startTime) {
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(1);

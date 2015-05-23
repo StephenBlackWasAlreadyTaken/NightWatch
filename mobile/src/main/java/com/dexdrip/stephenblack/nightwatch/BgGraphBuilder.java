@@ -29,7 +29,7 @@ import lecho.lib.hellocharts.view.Chart;
  * Created by stephenblack on 11/15/14.
  */
 public class BgGraphBuilder {
-    public double fuzz = (1000 * 30 * 5);
+    public static final double fuzz = (1000 * 30 * 5);
     public double  end_time = (new Date().getTime() + (60000 * 10))/fuzz;
     public double  start_time = (new Date().getTime() - ((60000 * 60 * 24)))/fuzz;
     public Context context;
