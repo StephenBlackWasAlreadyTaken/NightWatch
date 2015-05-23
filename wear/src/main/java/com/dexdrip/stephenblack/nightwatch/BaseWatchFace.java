@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
@@ -20,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
+import com.ustwo.clockwise.WatchFaceTime;
 import com.ustwo.clockwise.WatchShape;
 import lecho.lib.hellocharts.view.LineChartView;
 
@@ -50,7 +52,7 @@ public  abstract class BaseWatchFace extends WatchFace {
     public LineChartView chart;
     public double datetime;
     public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
-
+    public PowerManager.WakeLock wakeLock;
     // related to manual layout
     public View layoutView;
     private final Point displaySize = new Point();
@@ -62,6 +64,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
+        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Clock");
 
         specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
                 View.MeasureSpec.EXACTLY);
@@ -85,7 +88,6 @@ public  abstract class BaseWatchFace extends WatchFace {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
-                Log.d("layout", "inflated");
                 mTime = (TextView) stub.findViewById(R.id.watch_time);
                 mSgv = (TextView) stub.findViewById(R.id.sgv);
                 mDirection = (TextView) stub.findViewById(R.id.direction);
@@ -99,12 +101,10 @@ public  abstract class BaseWatchFace extends WatchFace {
                 mRelativeLayout.measure(specW, specH);
                 mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
                         mRelativeLayout.getMeasuredHeight());
-
-                mTimeInfoReceiver.onReceive(getApplicationContext(), registerReceiver(null, INTENT_FILTER));
-                registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
             }
         });
         ListenerService.requestData(this);
+        wakeLock.acquire(50);
     }
 
     public int ageLevel() {
@@ -131,7 +131,6 @@ public  abstract class BaseWatchFace extends WatchFace {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mTimeInfoReceiver);
     }
 
     static {
@@ -141,22 +140,25 @@ public  abstract class BaseWatchFace extends WatchFace {
         INTENT_FILTER.addAction(Intent.ACTION_TIME_CHANGED);
     }
 
-    private BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver(){
-        @Override
-        public void onReceive(Context arg0, Intent intent) {
+    @Override
+    protected void onDraw(Canvas canvas) {
+        if(layoutSet) {
+            this.mRelativeLayout.draw(canvas);
+            Log.d("onDraw", "draw");
+        }
+    }
+
+    @Override
+    protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
+        if (layoutSet && (newTime.hasHourChanged(oldTime) || newTime.hasMinuteChanged(oldTime))) {
+            wakeLock.acquire(50);
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
             mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
             mTimestamp.setText(readingAge());
             missedReadingAlert();
-        }
-    };
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        Log.d("onDraw", "enter");
-        if(layoutSet) {
-            this.mRelativeLayout.draw(canvas);
-            Log.d("onDraw", "draw");
+            mRelativeLayout.measure(specW, specH);
+            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                    mRelativeLayout.getMeasuredHeight());
         }
     }
 
@@ -165,6 +167,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         public void onReceive(Context context, Intent intent) {
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             if (layoutSet) {
+                wakeLock.acquire(50);
                 sgvLevel = dataMap.getLong("sgvLevel");
                 batteryLevel = dataMap.getInt("batteryLevel");
                 datetime = dataMap.getDouble("timestamp");
@@ -179,6 +182,10 @@ public  abstract class BaseWatchFace extends WatchFace {
                     addToWatchSet(dataMap);
                     setupCharts();
                 }
+                mRelativeLayout.measure(specW, specH);
+                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                        mRelativeLayout.getMeasuredHeight());
+                invalidate();
             } else {
                 Log.d("ERROR: ", "DATA IS NOT YET SET");
             }
