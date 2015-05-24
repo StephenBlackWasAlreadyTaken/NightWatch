@@ -1,12 +1,8 @@
 package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,8 +17,6 @@ import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.util.Utils;
-import lecho.lib.hellocharts.view.Chart;
 
 /**
  * Created by stephenblack on 11/15/14.
