@@ -190,7 +190,7 @@ public  abstract class BaseWatchFace extends WatchFace {
                     mSgv.setPaintFlags(mSgv.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
                 }
 
-                final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFaceActivity.this);
+                final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
                 mTime.setText(timeFormat.format(System.currentTimeMillis()));
                 mTimestamp.setText(readingAge());
 
