@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.PowerManager;
@@ -15,19 +16,23 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.*;
+import android.view.Display;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
 import com.ustwo.clockwise.WatchFaceTime;
 import com.ustwo.clockwise.WatchShape;
-import lecho.lib.hellocharts.view.LineChartView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
+
+import lecho.lib.hellocharts.view.LineChartView;
 
 /**
  * Created by stephenblack on 12/29/14.
@@ -58,6 +63,9 @@ public  abstract class BaseWatchFace extends WatchFace {
     private final Point displaySize = new Point();
     private int specW, specH;
 
+    private LocalBroadcastManager localBroadcastManager;
+    private MessageReceiver messageReceiver;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -82,8 +90,9 @@ public  abstract class BaseWatchFace extends WatchFace {
         final WatchViewStub stub = (WatchViewStub) layoutView.findViewById(R.id.watch_view_stub);
         IntentFilter messageFilter = new IntentFilter(Intent.ACTION_SEND);
 
-        MessageReceiver messageReceiver = new MessageReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, messageFilter);
+        messageReceiver = new MessageReceiver();
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(messageReceiver, messageFilter);
 
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
@@ -116,7 +125,7 @@ public  abstract class BaseWatchFace extends WatchFace {
     }
 
     public double timeSince() {
-        return new Date().getTime() - datetime;
+        return System.currentTimeMillis() - datetime;
     }
 
     public String readingAge() {
@@ -130,6 +139,8 @@ public  abstract class BaseWatchFace extends WatchFace {
 
     @Override
     public void onDestroy() {
+        if(localBroadcastManager != null && messageReceiver != null)
+            localBroadcastManager.unregisterReceiver(messageReceiver);
         super.onDestroy();
     }
 
@@ -153,8 +164,15 @@ public  abstract class BaseWatchFace extends WatchFace {
         if (layoutSet && (newTime.hasHourChanged(oldTime) || newTime.hasMinuteChanged(oldTime))) {
             wakeLock.acquire(50);
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
-            mTime.setText(timeFormat.format(Calendar.getInstance().getTime()));
+            mTime.setText(timeFormat.format(System.currentTimeMillis()));
             mTimestamp.setText(readingAge());
+
+            if(ageLevel()<=0) {
+                mSgv.setPaintFlags(mSgv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                mSgv.setPaintFlags(mSgv.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+            }
+
             missedReadingAlert();
             mRelativeLayout.measure(specW, specH);
             mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
@@ -173,6 +191,17 @@ public  abstract class BaseWatchFace extends WatchFace {
                 datetime = dataMap.getDouble("timestamp");
 
                 mSgv.setText(dataMap.getString("sgvString"));
+
+                if(ageLevel()<=0) {
+                    mSgv.setPaintFlags(mSgv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    mSgv.setPaintFlags(mSgv.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                }
+
+                final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
+                mTime.setText(timeFormat.format(System.currentTimeMillis()));
+                mTimestamp.setText(readingAge());
+
                 mDirection.setText(dataMap.getString("slopeArrow"));
                 mUploaderBattery.setText("Uploader: " + dataMap.getString("battery") + "%");
                 mDelta.setText(dataMap.getString("delta"));

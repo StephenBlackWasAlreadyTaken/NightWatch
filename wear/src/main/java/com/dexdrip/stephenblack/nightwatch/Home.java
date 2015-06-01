@@ -2,10 +2,10 @@ package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
-
 import android.view.LayoutInflater;
+
 import com.ustwo.clockwise.WatchMode;
+
 import lecho.lib.hellocharts.util.Utils;
 
 public class Home extends BaseWatchFace {
