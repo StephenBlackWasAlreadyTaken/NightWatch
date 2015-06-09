@@ -47,6 +47,20 @@ public abstract class ModernWatchface extends WatchFace {
     public final int NEAR = 2; //how near do the hands have to be to activate overlapping mode
     public final boolean ALWAYS_HIGHLIGT_SMALL = false;
 
+    //variables for time
+    private float angleBig = 0f;
+    private float angleSMALL = 0f;
+    private int hour, minute;
+    private int color;
+    private Paint circlePaint = new Paint();
+    private RectF rect;
+    private boolean overlapping;
+
+
+
+
+
+
     private Point displaySize = new Point();
     private MessageReceiver messageReceiver = new MessageReceiver();
 
@@ -79,10 +93,10 @@ public abstract class ModernWatchface extends WatchFace {
         //register Message Receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter(Intent.ACTION_SEND));
 
-
-        //TODO: Try to get a layout to work:
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         myLayout = inflater.inflate(R.layout.modern_layout, null);
+        prepareLayout();
+        prepareDrawTime();
     }
 
     /*@Override
@@ -101,7 +115,12 @@ public abstract class ModernWatchface extends WatchFace {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        drawTime(canvas);
+        myLayout.draw(canvas);
 
+    }
+
+    private void prepareLayout() {
         // prepare fields
         ((TextView) myLayout.findViewById(R.id.sgvString)).setText(getSgvString());
         ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
@@ -120,52 +139,16 @@ public abstract class ModernWatchface extends WatchFace {
         myLayout.measure(specW, specH);
         myLayout.layout(0, 0, myLayout.getMeasuredWidth(),
                 myLayout.getMeasuredHeight());
-        //canvas.drawColor(Color.BLACK);
-
-
-
-        myLayout.draw(canvas);
-        drawTime(canvas);
-        myLayout.draw(canvas);
-
     }
 
     private void drawTime(Canvas canvas) {
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 12;
-        int minute = Calendar.getInstance().get(Calendar.MINUTE);
-        float angleBig = (((hour + minute / 60f) / 12f * 360) - 90 - BIG_HAND_WIDTH / 2f + 360) % 360;
-        float angleSMALL = ((minute / 60f * 360) - 90 - SMALL_HAND_WIDTH / 2f + 360) % 360;
-
-
-        int color = 0;
-        switch (getSvgLevel()) {
-            case -1:
-                color = getLowColor();
-                break;
-            case 0:
-                color = getInRangeColor();
-                break;
-            case 1:
-                color = getHighColor();
-                break;
-        }
-        ;
-
-
-        Log.d("ModernWatchface", "angleBig : " + angleBig);
-        Paint circlePaint = new Paint();
-        circlePaint.setColor(color);
-        circlePaint.setStyle(Paint.Style.STROKE);
-        circlePaint.setStrokeWidth(CIRCLE_WIDTH);
-        circlePaint.setAntiAlias(true);
 
         //delete Canvas
         canvas.drawColor(getBackgroundColor());
 
         //draw circle
-        RectF rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
+        circlePaint.setColor(color);
         canvas.drawArc(rect, 0, 360, false, circlePaint);
-
         //"remove" hands from circle
         float plus = CIRCLE_WIDTH / 2f; // delete more to fight antializing artifacts
         circlePaint.setColor(getBackgroundColor());
@@ -175,7 +158,7 @@ public abstract class ModernWatchface extends WatchFace {
 
 
 
-        if (ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL,  angleSMALL + SMALL_HAND_WIDTH + NEAR ,angleBig,angleBig + BIG_HAND_WIDTH + NEAR) ){
+        if (overlapping){
             //add small hand with extra
             circlePaint.setStrokeWidth(CIRCLE_WIDTH + 2 * plus);
             circlePaint.setColor(color);
@@ -189,6 +172,35 @@ public abstract class ModernWatchface extends WatchFace {
         }
     }
 
+    private void prepareDrawTime() {
+        hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 12;
+        minute = Calendar.getInstance().get(Calendar.MINUTE);
+        angleBig = (((hour + minute / 60f) / 12f * 360) - 90 - BIG_HAND_WIDTH / 2f + 360) % 360;
+        angleSMALL = ((minute / 60f * 360) - 90 - SMALL_HAND_WIDTH / 2f + 360) % 360;
+
+
+        color = 0;
+        switch (getSvgLevel()) {
+            case -1:
+                color = getLowColor();
+                break;
+            case 0:
+                color = getInRangeColor();
+                break;
+            case 1:
+                color = getHighColor();
+                break;
+        }
+
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(CIRCLE_WIDTH);
+        circlePaint.setAntiAlias(true);
+        ;
+
+        rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
+        overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL,  angleSMALL + SMALL_HAND_WIDTH + NEAR ,angleBig,angleBig + BIG_HAND_WIDTH + NEAR);
+    }
+
     private boolean areOverlapping(float aBegin, float aEnd, float bBegin, float bEnd){
         return
                 aBegin<=bBegin && aEnd>=bBegin ||
@@ -199,6 +211,8 @@ public abstract class ModernWatchface extends WatchFace {
 
     @Override
     protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
+        prepareLayout();
+        prepareDrawTime();
         invalidate();  //redraw the time
     }
 
@@ -271,7 +285,8 @@ public abstract class ModernWatchface extends WatchFace {
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     "MyWakelockTag");
-            wakeLock.acquire();
+            wakeLock.acquire(); //do we need this?
+
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             setSvgLevel((int) dataMap.getLong("sgvLevel"));
             Log.d("ModernWatchface", "svg level : " + getSvgLevel());
@@ -279,10 +294,11 @@ public abstract class ModernWatchface extends WatchFace {
             setSgvString(dataMap.getString("sgvString"));
             setDelta(dataMap.getString("delta"));
             setDatetime(dataMap.getDouble("timestamp"));
-
+            wakeLock.release();
+            prepareLayout();
+            prepareDrawTime();
 
             invalidate();
-            wakeLock.release();
         }
     }
 
