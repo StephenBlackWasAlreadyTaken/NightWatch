@@ -12,12 +12,14 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.PowerManager;
+import android.service.wallpaper.WallpaperService;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -54,18 +56,39 @@ public abstract class ModernWatchface extends WatchFace {
     private double datetime = 0;
     private String direction = "";
 
+    private View layoutView;
+    private int specW;
+    private int specH;
+    private View myLayout;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
 
+        specW = View.MeasureSpec.makeMeasureSpec(displaySize.x,
+                View.MeasureSpec.EXACTLY);
+        specH = View.MeasureSpec.makeMeasureSpec(displaySize.y,
+                View.MeasureSpec.EXACTLY);
+
         //register Message Receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter(Intent.ACTION_SEND));
 
+
+        //TODO: Try to get a layout to work:
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        myLayout = inflater.inflate(R.layout.modern_layout, null);
     }
+
+    /*@Override
+    protected void onLayout(WatchShape shape, Rect screenBounds, WindowInsets screenInsets) {
+        super.onLayout(shape, screenBounds, screenInsets);
+        layoutView.onApplyWindowInsets(screenInsets);
+    }*/
 
     @Override
     public void onDestroy() {
@@ -77,9 +100,16 @@ public abstract class ModernWatchface extends WatchFace {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        drawTime(canvas);
-    }
 
+        myLayout.measure(specW, specH);
+        myLayout.layout(0, 0, myLayout.getMeasuredWidth(),
+                myLayout.getMeasuredHeight());
+        canvas.drawColor(Color.BLACK);
+        myLayout.draw(canvas);
+        drawTime(canvas);
+        myLayout.draw(canvas);
+
+    }
 
     private void drawTime(Canvas canvas) {
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 12;
