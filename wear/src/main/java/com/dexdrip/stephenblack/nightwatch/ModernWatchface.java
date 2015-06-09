@@ -42,9 +42,17 @@ public abstract class ModernWatchface extends WatchFace {
     public final float CIRCLE_WIDTH = 6f;
     public final int BIG_HAND_WIDTH = 16;
     public final int SMALL_HAND_WIDTH = 8;
-    public final int NEAR = 4; //how near do the hands have to be to activate overlapping mode
+    public final int NEAR = 1; //how near do the hands have to be to activate overlapping mode
 
     private Point displaySize = new Point();
+    private MessageReceiver messageReceiver = new MessageReceiver();
+
+    private int svgLevel = 0;
+    private int batteryLevel = 0;
+    private int bgLevel = 0;
+    private double datetime = 0;
+    private String direction = "";
+
 
     @Override
     public void onCreate() {
@@ -52,6 +60,18 @@ public abstract class ModernWatchface extends WatchFace {
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
+
+        //register Message Receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter(Intent.ACTION_SEND));
+
+    }
+
+    @Override
+    public void onDestroy() {
+        if (messageReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -66,7 +86,20 @@ public abstract class ModernWatchface extends WatchFace {
         float angleBig = (((hour + minute / 60f) / 12f * 360) - 90 - BIG_HAND_WIDTH / 2f + 360) % 360;
         float angleSMALL = ((minute / 60f * 360) - 90 - SMALL_HAND_WIDTH / 2f + 360) % 360;
 
-        int color = getLowColor();
+
+        int color = 0;
+        switch (getSvgLevel()) {
+            case -1:
+                color = getLowColor();
+                break;
+            case 0:
+                color = getInRangeColor();
+                break;
+            case 1:
+                color = getHighColor();
+                break;
+        }
+        ;
 
 
         Log.d("ModernWatchface", "angleBig : " + angleBig);
@@ -114,56 +147,67 @@ public abstract class ModernWatchface extends WatchFace {
     /*Some methods to implement by child classes*/
     public abstract int getLowColor();
 
+    public abstract int getInRangeColor();
+
+    public abstract int getHighColor();
+
     public abstract int getBackgroundColor();
+
+
+    //getters & setters
+
+    private synchronized int getSvgLevel() {
+        return svgLevel;
+    }
+
+    private synchronized void setSvgLevel(int svgLevel) {
+        this.svgLevel = svgLevel;
+    }
+
+    private synchronized int getBatteryLevel() {
+        return batteryLevel;
+    }
+
+    private synchronized void setBatteryLevel(int batteryLevel) {
+        this.batteryLevel = batteryLevel;
+    }
+
+    private synchronized int getBgLevel() {
+        return bgLevel;
+    }
+
+    private synchronized void setBgLevel(int bgLevel) {
+        this.bgLevel = bgLevel;
+    }
+
+    private synchronized double getDatetime() {
+        return datetime;
+    }
+
+    private synchronized void setDatetime(double datetime) {
+        this.datetime = datetime;
+    }
+
+    private synchronized String getDirection() {
+        return direction;
+    }
+
+    private void setDirection(String direction) {
+        this.direction = direction;
+    }
 
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ON_AFTER_RELEASE, null);
-            wl.acquire();
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    "MyWakelockTag");
+            wakeLock.acquire();
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
-
-
-
-
-            wl.release();
-/*
-
-            if (layoutSet) {
-                wakeLock.acquire(50);
-                sgvLevel = dataMap.getLong("sgvLevel");
-                batteryLevel = dataMap.getInt("batteryLevel");
-                datetime = dataMap.getDouble("timestamp");
-
-                mSgv.setText(dataMap.getString("sgvString"));
-
-                if(ageLevel()<=0) {
-                    mSgv.setPaintFlags(mSgv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                } else {
-                    mSgv.setPaintFlags(mSgv.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-                }
-
-                final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(ModernWatchface.this);
-                mTime.setText(timeFormat.format(System.currentTimeMillis()));
-                mTimestamp.setText(readingAge());
-
-                mDirection.setText(dataMap.getString("slopeArrow"));
-                mUploaderBattery.setText("Uploader: " + dataMap.getString("battery") + "%");
-                mDelta.setText(dataMap.getString("delta"));
-
-                mTimestamp.setText(readingAge());
-                if (chart != null) {
-                    addToWatchSet(dataMap);
-                    setupCharts();
-                }
-                mRelativeLayout.measure(specW, specH);
-                mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
-                        mRelativeLayout.getMeasuredHeight());
-                invalidate();
-            } else {
-                Log.d("ERROR: ", "DATA IS NOT YET SET");
-            }*/
+            setSvgLevel((int) dataMap.getLong("sgvLevel"));
+            Log.d("ModernWatchface", "svg level : " + getSvgLevel());
+            invalidate();
+            wakeLock.release();
         }
     }
 

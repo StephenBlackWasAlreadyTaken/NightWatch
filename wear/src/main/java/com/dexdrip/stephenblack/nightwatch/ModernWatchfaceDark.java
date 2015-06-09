@@ -13,6 +13,18 @@ public class ModernWatchfaceDark extends ModernWatchface{
     }
 
     @Override
+    public int getInRangeColor() {
+        return Color.argb(255,120,255,120);
+
+    }
+
+    @Override
+    public int getHighColor() {
+        return Color.argb(255,255,255,120);
+
+    }
+
+    @Override
     public int getBackgroundColor() {
         return Color.BLACK;
     }
