@@ -83,6 +83,7 @@ public abstract class ModernWatchface extends WatchFace {
         myLayout = inflater.inflate(R.layout.modern_layout, null);
         prepareLayout();
         prepareDrawTime();
+        ListenerService.requestData(this);
     }
 
     /*@Override
