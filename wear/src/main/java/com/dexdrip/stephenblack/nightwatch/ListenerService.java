@@ -72,7 +72,7 @@ public class ListenerService extends WearableListenerService implements GoogleAp
         }
         return START_STICKY;
     }
-    
+
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
 
