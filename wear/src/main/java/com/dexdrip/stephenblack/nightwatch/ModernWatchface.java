@@ -53,9 +53,9 @@ public abstract class ModernWatchface extends WatchFace {
     private int svgLevel = 0;
     private String sgvString = "999";
     private int batteryLevel = 0;
-    private int bgLevel = 0;
     private double datetime = 0;
     private String direction = "";
+    private String delta = "";
 
     private View layoutView;
     private int specW;
@@ -103,9 +103,18 @@ public abstract class ModernWatchface extends WatchFace {
     protected void onDraw(Canvas canvas) {
 
         // prepare fields
-        ((TextView) myLayout.findViewById(R.id.sgvString)).setText(sgvString);
+        ((TextView) myLayout.findViewById(R.id.sgvString)).setText(getSgvString());
         ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
-        //TODO: add more view elements
+
+        String minutes = "--\'";
+        if(getDatetime()!=0){
+            minutes = ((int)Math.floor((System.currentTimeMillis() - getDatetime())/60000)) + "\'";;
+        }
+        ((TextView) myLayout.findViewById(R.id.agoString)).setText(minutes);
+        ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
+        ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
+        ((TextView) myLayout.findViewById(R.id.deltaString)).setTextColor(getTextColor());
+        //TODO: add more view elements?
 
 
         myLayout.measure(specW, specH);
@@ -248,6 +257,14 @@ public abstract class ModernWatchface extends WatchFace {
         this.sgvString = sgvString;
     }
 
+    private String getDelta() {
+        return delta;
+    }
+
+    private void setDelta(String delta) {
+        this.delta = delta;
+    }
+
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -260,6 +277,8 @@ public abstract class ModernWatchface extends WatchFace {
             Log.d("ModernWatchface", "svg level : " + getSvgLevel());
 
             setSgvString(dataMap.getString("sgvString"));
+            setDelta(dataMap.getString("delta"));
+            setDatetime(dataMap.getDouble("timestamp"));
 
 
             invalidate();
