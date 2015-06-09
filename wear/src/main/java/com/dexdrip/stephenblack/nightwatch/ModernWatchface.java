@@ -1,6 +1,5 @@
 package com.dexdrip.stephenblack.nightwatch;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,39 +8,26 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.PowerManager;
-import android.service.wallpaper.WallpaperService;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.wearable.view.WatchViewStub;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
 import com.ustwo.clockwise.WatchFaceTime;
-import com.ustwo.clockwise.WatchShape;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-
-import lecho.lib.hellocharts.view.LineChartView;
 
 
 public abstract class ModernWatchface extends WatchFace {
     public final float PADDING = 20f;
-    public final float CIRCLE_WIDTH = 6f;
+    public final float CIRCLE_WIDTH = 10f;
     public final int BIG_HAND_WIDTH = 16;
     public final int SMALL_HAND_WIDTH = 8;
     public final int NEAR = 2; //how near do the hands have to be to activate overlapping mode
@@ -53,7 +39,7 @@ public abstract class ModernWatchface extends WatchFace {
     private int hour, minute;
     private int color;
     private Paint circlePaint = new Paint();
-    private RectF rect;
+    private RectF rect, rectDelete;
     private boolean overlapping;
 
 
@@ -148,19 +134,21 @@ public abstract class ModernWatchface extends WatchFace {
 
         //draw circle
         circlePaint.setColor(color);
+        circlePaint.setStrokeWidth(CIRCLE_WIDTH);
         canvas.drawArc(rect, 0, 360, false, circlePaint);
         //"remove" hands from circle
-        float plus = CIRCLE_WIDTH / 2f; // delete more to fight antializing artifacts
         circlePaint.setColor(getBackgroundColor());
-        circlePaint.setStrokeWidth(CIRCLE_WIDTH + 2 * plus);
-        canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
-        canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
+        //circlePaint.setColor(Color.RED);
+        circlePaint.setStrokeWidth(CIRCLE_WIDTH * 3);
+
+        canvas.drawArc(rectDelete, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
+        canvas.drawArc(rectDelete, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
 
 
 
         if (overlapping){
             //add small hand with extra
-            circlePaint.setStrokeWidth(CIRCLE_WIDTH + 2 * plus);
+            circlePaint.setStrokeWidth(CIRCLE_WIDTH *2);
             circlePaint.setColor(color);
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
 
@@ -198,6 +186,7 @@ public abstract class ModernWatchface extends WatchFace {
         ;
 
         rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
+        rectDelete = new RectF(PADDING-CIRCLE_WIDTH/2, PADDING-CIRCLE_WIDTH/2, (float) (displaySize.x - PADDING+CIRCLE_WIDTH/2), (float) (displaySize.y - PADDING+CIRCLE_WIDTH/2));
         overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL,  angleSMALL + SMALL_HAND_WIDTH + NEAR ,angleBig,angleBig + BIG_HAND_WIDTH + NEAR);
     }
 
