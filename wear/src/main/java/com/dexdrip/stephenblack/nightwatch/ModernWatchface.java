@@ -42,7 +42,8 @@ public abstract class ModernWatchface extends WatchFace {
     public final float CIRCLE_WIDTH = 6f;
     public final int BIG_HAND_WIDTH = 16;
     public final int SMALL_HAND_WIDTH = 8;
-    public final int NEAR = 1; //how near do the hands have to be to activate overlapping mode
+    public final int NEAR = 2; //how near do the hands have to be to activate overlapping mode
+    public final boolean ALWAYS_HIGHLIGT_SMALL = false;
 
     private Point displaySize = new Point();
     private MessageReceiver messageReceiver = new MessageReceiver();
@@ -123,9 +124,9 @@ public abstract class ModernWatchface extends WatchFace {
         canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
         canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
 
-        if ((angleSMALL + SMALL_HAND_WIDTH + NEAR) % 360 >= angleBig
-                && angleSMALL <= (angleBig + BIG_HAND_WIDTH + NEAR) % 360) {
 
+
+        if (ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL,  angleSMALL + SMALL_HAND_WIDTH + NEAR ,angleBig,angleBig + BIG_HAND_WIDTH + NEAR) ){
             //add small hand with extra
             circlePaint.setStrokeWidth(CIRCLE_WIDTH + 2 * plus);
             circlePaint.setColor(color);
@@ -137,6 +138,14 @@ public abstract class ModernWatchface extends WatchFace {
             canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
         }
+    }
+
+    private boolean areOverlapping(float aBegin, float aEnd, float bBegin, float bEnd){
+        return
+                aBegin<=bBegin && aEnd>=bBegin ||
+                        aBegin<=bBegin && (bEnd>360) && bEnd%360 > aBegin ||
+                        bBegin<=aBegin && bEnd>=aBegin ||
+                        bBegin<=aBegin && aEnd>360 && aEnd%360 > bBegin;
     }
 
     @Override
