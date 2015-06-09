@@ -51,6 +51,7 @@ public abstract class ModernWatchface extends WatchFace {
     private MessageReceiver messageReceiver = new MessageReceiver();
 
     private int svgLevel = 0;
+    private String sgvString = "999";
     private int batteryLevel = 0;
     private int bgLevel = 0;
     private double datetime = 0;
@@ -101,10 +102,19 @@ public abstract class ModernWatchface extends WatchFace {
     @Override
     protected void onDraw(Canvas canvas) {
 
+        // prepare fields
+        ((TextView) myLayout.findViewById(R.id.sgvString)).setText(sgvString);
+        ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
+        //TODO: add more view elements
+
+
         myLayout.measure(specW, specH);
         myLayout.layout(0, 0, myLayout.getMeasuredWidth(),
                 myLayout.getMeasuredHeight());
-        canvas.drawColor(Color.BLACK);
+        //canvas.drawColor(Color.BLACK);
+
+
+
         myLayout.draw(canvas);
         drawTime(canvas);
         myLayout.draw(canvas);
@@ -192,6 +202,8 @@ public abstract class ModernWatchface extends WatchFace {
 
     public abstract int getBackgroundColor();
 
+    public abstract int getTextColor();
+
 
     //getters & setters
 
@@ -211,13 +223,6 @@ public abstract class ModernWatchface extends WatchFace {
         this.batteryLevel = batteryLevel;
     }
 
-    private synchronized int getBgLevel() {
-        return bgLevel;
-    }
-
-    private synchronized void setBgLevel(int bgLevel) {
-        this.bgLevel = bgLevel;
-    }
 
     private synchronized double getDatetime() {
         return datetime;
@@ -235,6 +240,14 @@ public abstract class ModernWatchface extends WatchFace {
         this.direction = direction;
     }
 
+    String getSgvString() {
+        return sgvString;
+    }
+
+    void setSgvString(String sgvString) {
+        this.sgvString = sgvString;
+    }
+
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -245,6 +258,10 @@ public abstract class ModernWatchface extends WatchFace {
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             setSvgLevel((int) dataMap.getLong("sgvLevel"));
             Log.d("ModernWatchface", "svg level : " + getSvgLevel());
+
+            setSgvString(dataMap.getString("sgvString"));
+
+
             invalidate();
             wakeLock.release();
         }

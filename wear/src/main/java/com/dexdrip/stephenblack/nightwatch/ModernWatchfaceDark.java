@@ -29,5 +29,10 @@ public class ModernWatchfaceDark extends ModernWatchface{
         return Color.BLACK;
     }
 
+    @Override
+    public int getTextColor() {
+        return Color.WHITE;
+    }
+
 
 }
