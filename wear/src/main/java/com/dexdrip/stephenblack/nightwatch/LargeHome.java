@@ -2,8 +2,8 @@ package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.view.LayoutInflater;
+
 import com.ustwo.clockwise.WatchMode;
 
 public class LargeHome extends BaseWatchFace {

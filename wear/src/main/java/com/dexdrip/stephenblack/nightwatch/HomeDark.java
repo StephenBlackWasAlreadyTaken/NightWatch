@@ -2,8 +2,6 @@ package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.support.wearable.view.WatchViewStub;
 import android.view.LayoutInflater;
 
 public class HomeDark extends BaseWatchFace {

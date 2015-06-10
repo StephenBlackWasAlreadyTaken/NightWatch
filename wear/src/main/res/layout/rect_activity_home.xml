@@ -71,8 +71,7 @@
                     android:textColor="#FFFFFF"
                     android:layout_gravity="bottom"
                     android:gravity="center_horizontal|bottom"
-                    android:textStyle="bold"
-                    android:singleLine="true" />
+                    android:textStyle="bold" />
 
 
             </LinearLayout>
