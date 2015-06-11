@@ -1,11 +1,13 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -42,17 +44,27 @@ public class NightWatchWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         mContext = context;
+        Intent intent = new Intent(context, Home.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         views = new RemoteViews(context.getPackageName(), R.layout.nightwatch_widget_small);
+        views.setOnClickPendingIntent(R.id.widget_small, pendingIntent);;
         Log.d(TAG, "Update widget signal received");
-        displayCurrentInfo();
+        displayCurrentInfo(appWidgetManager, appWidgetId);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
 
-    public static void displayCurrentInfo() {
+    public static void displayCurrentInfo(AppWidgetManager appWidgetManager, int appWidgetId) {
         BgGraphBuilder bgGraphBuilder = new BgGraphBuilder(mContext);
         Bg lastBgreading = Bg.last();
         if (lastBgreading != null) {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                int height = appWidgetManager.getAppWidgetOptions(appWidgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
+                int width = appWidgetManager.getAppWidgetOptions(appWidgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH);
+                views.setImageViewBitmap(R.id.widgetGraph, new BgSparklineBuilder(mContext)
+                        .setBgGraphBuilder(bgGraphBuilder)
+                        .setHeight(height).setWidth(width).build());
+            }
             double estimate = 0;
             if ((new Date().getTime()) - (60000 * 11) - lastBgreading.datetime > 0) {
                 estimate = lastBgreading.sgv_double();
