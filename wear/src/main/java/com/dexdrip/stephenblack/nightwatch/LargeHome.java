@@ -18,6 +18,9 @@ public class LargeHome extends BaseWatchFace {
 
     @Override
     public void setColor() {
+
+
+
         if (getCurrentWatchMode() == WatchMode.INTERACTIVE) {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
             mLinearLayout.setBackgroundColor(Color.BLACK);

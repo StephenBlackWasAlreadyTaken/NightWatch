@@ -5,12 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.WatchViewStub;
@@ -37,7 +39,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 /**
  * Created by stephenblack on 12/29/14.
  */
-public  abstract class BaseWatchFace extends WatchFace {
+public  abstract class BaseWatchFace extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
     public final static IntentFilter INTENT_FILTER;
     public static final long[] vibratePattern = {0,400,300,400,300,400};
     public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta;
@@ -66,6 +68,8 @@ public  abstract class BaseWatchFace extends WatchFace {
     private LocalBroadcastManager localBroadcastManager;
     private MessageReceiver messageReceiver;
 
+    protected SharedPreferences sharedPrefs;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -78,6 +82,9 @@ public  abstract class BaseWatchFace extends WatchFace {
                 View.MeasureSpec.EXACTLY);
         specH = View.MeasureSpec.makeMeasureSpec(displaySize.y,
                 View.MeasureSpec.EXACTLY);
+        sharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -156,6 +163,7 @@ public  abstract class BaseWatchFace extends WatchFace {
         if(layoutSet) {
             this.mRelativeLayout.draw(canvas);
             Log.d("onDraw", "draw");
+            Log.d("onDraw", "Setting for dark: " + sharedPrefs.getBoolean("dark", false));
         }
     }
 
@@ -223,6 +231,12 @@ public  abstract class BaseWatchFace extends WatchFace {
     }
 
     public void setColor() { Log.e("ERROR: ", "MUST OVERRIDE IN CLASS"); }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
+        setColor();
+        invalidate();
+    }
 
 
     public void missedReadingAlert() {
