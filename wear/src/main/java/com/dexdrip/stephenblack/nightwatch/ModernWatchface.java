@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
@@ -43,14 +42,10 @@ public abstract class ModernWatchface extends WatchFace {
     private boolean overlapping;
 
 
-
-
-
-
     private Point displaySize = new Point();
     private MessageReceiver messageReceiver = new MessageReceiver();
 
-    private int svgLevel = 0;
+    private int sgvLevel = 0;
     private String sgvString = "999";
     private int batteryLevel = 0;
     private double datetime = 0;
@@ -113,8 +108,9 @@ public abstract class ModernWatchface extends WatchFace {
         ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
 
         String minutes = "--\'";
-        if(getDatetime()!=0){
-            minutes = ((int)Math.floor((System.currentTimeMillis() - getDatetime())/60000)) + "\'";;
+        if (getDatetime() != 0) {
+            minutes = ((int) Math.floor((System.currentTimeMillis() - getDatetime()) / 60000)) + "\'";
+            ;
         }
         ((TextView) myLayout.findViewById(R.id.agoString)).setText(minutes);
         ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
@@ -146,10 +142,9 @@ public abstract class ModernWatchface extends WatchFace {
         canvas.drawArc(rectDelete, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
 
 
-
-        if (overlapping){
+        if (overlapping) {
             //add small hand with extra
-            circlePaint.setStrokeWidth(CIRCLE_WIDTH *2);
+            circlePaint.setStrokeWidth(CIRCLE_WIDTH * 2);
             circlePaint.setColor(color);
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
 
@@ -169,7 +164,7 @@ public abstract class ModernWatchface extends WatchFace {
 
 
         color = 0;
-        switch (getSvgLevel()) {
+        switch (getSgvLevel()) {
             case -1:
                 color = getLowColor();
                 break;
@@ -187,23 +182,31 @@ public abstract class ModernWatchface extends WatchFace {
         ;
 
         rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
-        rectDelete = new RectF(PADDING-CIRCLE_WIDTH/2, PADDING-CIRCLE_WIDTH/2, (float) (displaySize.x - PADDING+CIRCLE_WIDTH/2), (float) (displaySize.y - PADDING+CIRCLE_WIDTH/2));
-        overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL,  angleSMALL + SMALL_HAND_WIDTH + NEAR ,angleBig,angleBig + BIG_HAND_WIDTH + NEAR);
+        rectDelete = new RectF(PADDING - CIRCLE_WIDTH / 2, PADDING - CIRCLE_WIDTH / 2, (float) (displaySize.x - PADDING + CIRCLE_WIDTH / 2), (float) (displaySize.y - PADDING + CIRCLE_WIDTH / 2));
+        overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL, angleSMALL + SMALL_HAND_WIDTH + NEAR, angleBig, angleBig + BIG_HAND_WIDTH + NEAR);
     }
 
-    private boolean areOverlapping(float aBegin, float aEnd, float bBegin, float bEnd){
+    private boolean areOverlapping(float aBegin, float aEnd, float bBegin, float bEnd) {
         return
-                aBegin<=bBegin && aEnd>=bBegin ||
-                        aBegin<=bBegin && (bEnd>360) && bEnd%360 > aBegin ||
-                        bBegin<=aBegin && bEnd>=aBegin ||
-                        bBegin<=aBegin && aEnd>360 && aEnd%360 > bBegin;
+                aBegin <= bBegin && aEnd >= bBegin ||
+                        aBegin <= bBegin && (bEnd > 360) && bEnd % 360 > aBegin ||
+                        bBegin <= aBegin && bEnd >= aBegin ||
+                        bBegin <= aBegin && aEnd > 360 && aEnd % 360 > bBegin;
     }
 
     @Override
     protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
-        prepareLayout();
-        prepareDrawTime();
-        invalidate();  //redraw the time
+        if (oldTime.hasMinuteChanged(newTime)) {
+            /*Preparing the layout just on every minute tick:
+            *  - hopefully better battery life
+            *  - drawback: might update the minutes since last reading up to one minute late*/
+            prepareLayout();
+            prepareDrawTime();
+            invalidate();  //redraw the time
+
+            //TODO: Just for testing:
+            ListenerService.requestData(this);
+        }
     }
 
     /*Some methods to implement by child classes*/
@@ -220,12 +223,12 @@ public abstract class ModernWatchface extends WatchFace {
 
     //getters & setters
 
-    private synchronized int getSvgLevel() {
-        return svgLevel;
+    private synchronized int getSgvLevel() {
+        return sgvLevel;
     }
 
-    private synchronized void setSvgLevel(int svgLevel) {
-        this.svgLevel = svgLevel;
+    private synchronized void setSgvLevel(int sgvLevel) {
+        this.sgvLevel = sgvLevel;
     }
 
     private synchronized int getBatteryLevel() {
@@ -278,8 +281,8 @@ public abstract class ModernWatchface extends WatchFace {
             wakeLock.acquire(); //do we need this?
 
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
-            setSvgLevel((int) dataMap.getLong("sgvLevel"));
-            Log.d("ModernWatchface", "svg level : " + getSvgLevel());
+            setSgvLevel((int) dataMap.getLong("sgvLevel"));
+            Log.d("ModernWatchface", "sgv level : " + getSgvLevel());
 
             setSgvString(dataMap.getString("sgvString"));
             setDelta(dataMap.getString("delta"));
