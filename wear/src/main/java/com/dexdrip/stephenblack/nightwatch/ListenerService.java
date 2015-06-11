@@ -114,4 +114,14 @@ public class ListenerService extends WearableListenerService implements GoogleAp
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+        if (googleApiClient != null) {
+            Wearable.MessageApi.removeListener(googleApiClient, this);
+        }
+    }
 }

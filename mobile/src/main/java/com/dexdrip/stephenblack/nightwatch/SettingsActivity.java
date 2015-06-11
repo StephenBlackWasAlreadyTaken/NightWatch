@@ -99,7 +99,7 @@ public class SettingsActivity extends PreferenceActivity {
             share_poll.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object value) {
-                    if (value == true) {
+                    if ((boolean) value) {
                         dataSource.addPreference(dexcom_account_name);
                         dataSource.addPreference(dexcom_account_password);
                     } else {
@@ -115,7 +115,7 @@ public class SettingsActivity extends PreferenceActivity {
             nightscout_poll.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object value) {
-                    if (value == true) {
+                    if ((boolean) value) {
                         dataSource.addPreference(dex_collection_method);
                     } else {
                         dataSource.removePreference(dex_collection_method);

@@ -48,6 +48,15 @@ public class DataCollectionService extends Service {
         return START_STICKY;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mPrefs != null && mPreferencesListener != null) {
+            mPrefs.unregisterOnSharedPreferenceChangeListener(mPreferencesListener);
+        }
+        setFailoverTimer();
+    }
+
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
@@ -91,6 +100,7 @@ public class DataCollectionService extends Service {
         Calendar calendar = Calendar.getInstance();
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+
             alarm.setExact(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
         } else {
             alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));

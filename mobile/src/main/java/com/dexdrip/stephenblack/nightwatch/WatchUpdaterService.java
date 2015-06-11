@@ -154,6 +154,9 @@ public class WatchUpdaterService extends WearableListenerService implements
         if (googleApiClient != null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
+        if(mPrefs != null && mPreferencesListener != null) {
+            mPrefs.unregisterOnSharedPreferenceChangeListener(mPreferencesListener);
+        }
     }
 
     @Override
