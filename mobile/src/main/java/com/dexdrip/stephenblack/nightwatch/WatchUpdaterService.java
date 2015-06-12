@@ -84,6 +84,7 @@ public class WatchUpdaterService extends WearableListenerService implements
 
         if (wear_integration) {
             if (googleApiClient.isConnected()) {
+                //TODO Adrian: ACTION_OPEN_MENU?
                 if (ACTION_RESEND.equals(action)) {
                     resendData();
                 } else {
