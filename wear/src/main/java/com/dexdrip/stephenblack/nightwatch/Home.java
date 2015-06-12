@@ -18,7 +18,7 @@ public class Home extends BaseWatchFace {
         performViewSetup();
     }
 
-    private void setColorDark() {
+    protected void setColorDark() {
         mTime.setTextColor(Color.WHITE);
         mRelativeLayout.setBackgroundColor(Color.BLACK);
         mLinearLayout.setBackgroundColor(Color.WHITE);
@@ -50,7 +50,7 @@ public class Home extends BaseWatchFace {
     }
 
 
-    private void setColorBright() {
+    protected void setColorBright() {
 
         if (getCurrentWatchMode() == WatchMode.INTERACTIVE) {
             mRelativeLayout.setBackgroundColor(Color.WHITE);
@@ -122,15 +122,4 @@ public class Home extends BaseWatchFace {
         }
 
     }
-
-    @Override
-    public void setColor() {
-
-        if (sharedPrefs.getBoolean("dark", false)) {
-            setColorDark();
-        } else {
-            setColorBright();
-        }
-
     }
-}

@@ -4,11 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Display;
@@ -24,7 +27,7 @@ import com.ustwo.clockwise.WatchFaceTime;
 import java.util.Calendar;
 
 
-public abstract class ModernWatchface extends WatchFace {
+public class ModernWatchface extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
     public final float PADDING = 20f;
     public final float CIRCLE_WIDTH = 10f;
     public final int BIG_HAND_WIDTH = 16;
@@ -57,6 +60,8 @@ public abstract class ModernWatchface extends WatchFace {
     private int specH;
     private View myLayout;
 
+    protected SharedPreferences sharedPrefs;
+
 
     @Override
     public void onCreate() {
@@ -70,6 +75,10 @@ public abstract class ModernWatchface extends WatchFace {
                 View.MeasureSpec.EXACTLY);
         specH = View.MeasureSpec.makeMeasureSpec(displaySize.y,
                 View.MeasureSpec.EXACTLY);
+
+        sharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
         //register Message Receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter(Intent.ACTION_SEND));
@@ -91,6 +100,9 @@ public abstract class ModernWatchface extends WatchFace {
     public void onDestroy() {
         if (messageReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+        }
+        if (sharedPrefs != null){
+            sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
         }
         super.onDestroy();
     }
@@ -204,21 +216,56 @@ public abstract class ModernWatchface extends WatchFace {
             prepareDrawTime();
             invalidate();  //redraw the time
 
-            //TODO: Just for testing:
-            ListenerService.requestData(this);
         }
     }
 
-    /*Some methods to implement by child classes*/
-    public abstract int getLowColor();
 
-    public abstract int getInRangeColor();
+    // defining color for dark and bright
+    public int getLowColor() {
+        if (sharedPrefs.getBoolean("dark", false)){
+            return Color.argb(255, 255, 120, 120);
 
-    public abstract int getHighColor();
+        }else{
+            return Color.argb(255, 255, 80, 80);
 
-    public abstract int getBackgroundColor();
+        }
+    }
 
-    public abstract int getTextColor();
+    public int getInRangeColor() {
+        if (sharedPrefs.getBoolean("dark", false)){
+            return Color.argb(255,120,255,120);
+        }else{
+            return Color.argb(255,0,240,0);
+
+        }
+    }
+
+    public int getHighColor() {
+        if (sharedPrefs.getBoolean("dark", false)){
+            return Color.argb(255,255,255,120);
+        }else{
+            return Color.argb(255,255,200,0);
+        }
+
+    }
+
+    public int getBackgroundColor() {
+        if (sharedPrefs.getBoolean("dark", false)){
+            return Color.BLACK;
+        }else{
+            return Color.WHITE;
+
+        }
+    }
+
+    public int getTextColor() {
+        if (sharedPrefs.getBoolean("dark", false)){
+            return Color.WHITE;
+        }else{
+            return Color.BLACK;
+
+        }
+    }
 
 
     //getters & setters
@@ -270,6 +317,15 @@ public abstract class ModernWatchface extends WatchFace {
 
     private void setDelta(String delta) {
         this.delta = delta;
+    }
+
+
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        prepareDrawTime();
+        prepareLayout();
+        invalidate();
     }
 
     public class MessageReceiver extends BroadcastReceiver {
