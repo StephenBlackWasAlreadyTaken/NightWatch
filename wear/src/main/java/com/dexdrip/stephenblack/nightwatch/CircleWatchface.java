@@ -7,9 +7,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -41,8 +44,12 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     private int hour, minute;
     private int color;
     private Paint circlePaint = new Paint();
+    private Paint removePaint = new Paint();
     private RectF rect, rectDelete;
     private boolean overlapping;
+
+    private int animationAngle = 0;
+    private boolean isAnimated = false;
 
 
     private Point displaySize = new Point();
@@ -101,7 +108,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         if (messageReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
         }
-        if (sharedPrefs != null){
+        if (sharedPrefs != null) {
             sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
         }
         super.onDestroy();
@@ -118,7 +125,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         // prepare fields
 
 
-        if(sharedPrefs.getBoolean("showBG", true)){
+        if (sharedPrefs.getBoolean("showBG", true)) {
             ((TextView) myLayout.findViewById(R.id.sgvString)).setVisibility(View.VISIBLE);
             ((TextView) myLayout.findViewById(R.id.sgvString)).setText(getSgvString());
             ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
@@ -126,14 +133,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
             ((TextView) myLayout.findViewById(R.id.sgvString)).setVisibility(View.GONE);
         }
-;
+        ;
 
         String minutes = "--\'";
         if (getDatetime() != 0) {
             minutes = ((int) Math.floor((System.currentTimeMillis() - getDatetime()) / 60000)) + "\'";
             ;
         }
-        if(sharedPrefs.getBoolean("showAgo", true)){
+        if (sharedPrefs.getBoolean("showAgo", true)) {
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.VISIBLE);
             ((TextView) myLayout.findViewById(R.id.agoString)).setText(minutes);
             ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
@@ -141,7 +148,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.GONE);
         }
-        if(sharedPrefs.getBoolean("showDelta", true)){
+        if (sharedPrefs.getBoolean("showDelta", true)) {
             ((TextView) myLayout.findViewById(R.id.deltaString)).setVisibility(View.VISIBLE);
             ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
             ((TextView) myLayout.findViewById(R.id.deltaString)).setTextColor(getTextColor());
@@ -167,12 +174,10 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         circlePaint.setStrokeWidth(CIRCLE_WIDTH);
         canvas.drawArc(rect, 0, 360, false, circlePaint);
         //"remove" hands from circle
-        circlePaint.setColor(getBackgroundColor());
-        //circlePaint.setColor(Color.RED);
-        circlePaint.setStrokeWidth(CIRCLE_WIDTH * 3);
+        removePaint.setStrokeWidth(CIRCLE_WIDTH * 3);
 
-        canvas.drawArc(rectDelete, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
-        canvas.drawArc(rectDelete, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
+        canvas.drawArc(rectDelete, angleBig, (float) BIG_HAND_WIDTH, false, removePaint);
+        canvas.drawArc(rectDelete, angleSMALL, (float) SMALL_HAND_WIDTH, false, removePaint);
 
 
         if (overlapping) {
@@ -182,10 +187,9 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
 
             //remove inner part of hands
-            circlePaint.setColor(getBackgroundColor());
-            circlePaint.setStrokeWidth(CIRCLE_WIDTH);
-            canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
-            canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
+            removePaint.setStrokeWidth(CIRCLE_WIDTH);
+            canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, removePaint);
+            canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, removePaint);
         }
     }
 
@@ -209,15 +213,46 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                 break;
         }
 
+
+        if (isAnimated()) {
+            //Animation matrix:
+            int[] rainbow = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE
+                    , Color.CYAN};
+            Shader shader = new LinearGradient(0, 0, 0, 20, rainbow,
+                    null, Shader.TileMode.MIRROR);
+            Matrix matrix = new Matrix();
+            matrix.setRotate(animationAngle);
+            shader.setLocalMatrix(matrix);
+            circlePaint.setShader(shader);
+        } else {
+            circlePaint.setShader(null);
+        }
+
+
         circlePaint.setStyle(Paint.Style.STROKE);
         circlePaint.setStrokeWidth(CIRCLE_WIDTH);
         circlePaint.setAntiAlias(true);
+        circlePaint.setColor(color);
+
+        removePaint.setStyle(Paint.Style.STROKE);
+        removePaint.setStrokeWidth(CIRCLE_WIDTH);
+        removePaint.setAntiAlias(true);
+        removePaint.setColor(getBackgroundColor());
+
         ;
 
         rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
         rectDelete = new RectF(PADDING - CIRCLE_WIDTH / 2, PADDING - CIRCLE_WIDTH / 2, (float) (displaySize.x - PADDING + CIRCLE_WIDTH / 2), (float) (displaySize.y - PADDING + CIRCLE_WIDTH / 2));
         overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL, angleSMALL + SMALL_HAND_WIDTH + NEAR, angleBig, angleBig + BIG_HAND_WIDTH + NEAR);
     }
+
+
+    synchronized void animationStep() {
+        animationAngle = (animationAngle + 1) % 360;
+        prepareDrawTime();
+        invalidate();
+    }
+
 
     private boolean areOverlapping(float aBegin, float aEnd, float bBegin, float bEnd) {
         return
@@ -243,46 +278,46 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
     // defining color for dark and bright
     public int getLowColor() {
-        if (sharedPrefs.getBoolean("dark", false)){
+        if (sharedPrefs.getBoolean("dark", false)) {
             return Color.argb(255, 255, 120, 120);
 
-        }else{
+        } else {
             return Color.argb(255, 255, 80, 80);
 
         }
     }
 
     public int getInRangeColor() {
-        if (sharedPrefs.getBoolean("dark", false)){
-            return Color.argb(255,120,255,120);
-        }else{
-            return Color.argb(255,0,240,0);
+        if (sharedPrefs.getBoolean("dark", false)) {
+            return Color.argb(255, 120, 255, 120);
+        } else {
+            return Color.argb(255, 0, 240, 0);
 
         }
     }
 
     public int getHighColor() {
-        if (sharedPrefs.getBoolean("dark", false)){
-            return Color.argb(255,255,255,120);
-        }else{
-            return Color.argb(255,255,200,0);
+        if (sharedPrefs.getBoolean("dark", false)) {
+            return Color.argb(255, 255, 255, 120);
+        } else {
+            return Color.argb(255, 255, 200, 0);
         }
 
     }
 
     public int getBackgroundColor() {
-        if (sharedPrefs.getBoolean("dark", false)){
+        if (sharedPrefs.getBoolean("dark", false)) {
             return Color.BLACK;
-        }else{
+        } else {
             return Color.WHITE;
 
         }
     }
 
     public int getTextColor() {
-        if (sharedPrefs.getBoolean("dark", false)){
+        if (sharedPrefs.getBoolean("dark", false)) {
             return Color.WHITE;
-        }else{
+        } else {
             return Color.BLACK;
 
         }
@@ -341,13 +376,45 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
 
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         prepareDrawTime();
         prepareLayout();
         invalidate();
     }
+
+    private synchronized boolean isAnimated() {
+        return isAnimated;
+    }
+
+    private synchronized void setIsAnimated(boolean isAnimated) {
+        this.isAnimated = isAnimated;
+    }
+
+    void startAnimation() {
+        Thread animator = new Thread() {
+
+
+            public void run() {
+                //TODO:Wakelock?
+                setIsAnimated(true);
+                for (int i = 0; i <= 10 * 1000 / 30; i++) {
+                    animationStep();
+                    try {
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                setIsAnimated(false);
+                prepareDrawTime();
+                invalidate();
+            }
+        };
+
+        animator.start();
+    }
+
 
     public class MessageReceiver extends BroadcastReceiver {
         @Override
@@ -364,10 +431,17 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             setSgvString(dataMap.getString("sgvString"));
             setDelta(dataMap.getString("delta"));
             setDatetime(dataMap.getDouble("timestamp"));
+
+            //start animation?
+            if (sharedPrefs.getBoolean("animation", false) && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
+
+                startAnimation();
+
+            }
+
             wakeLock.release();
             prepareLayout();
             prepareDrawTime();
-
             invalidate();
         }
     }
