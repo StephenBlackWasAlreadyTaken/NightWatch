@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_icon"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault" >
         <meta-data
@@ -16,39 +16,11 @@
         <service
             android:name=".Home"
             android:allowEmbedded="true"
-            android:label="@string/app_name"
+            android:label="NightWatch"
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data android:name="android.service.wallpaper"
                        android:resource="@xml/watch_face"/>
-            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".HomeDark"
-            android:allowEmbedded="true"
-            android:label="NightWatch(Dark)"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <meta-data android:name="android.service.wallpaper"
-                       android:resource="@xml/watch_face"/>
-            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".LargeHomeDark"
-            android:allowEmbedded="true"
-            android:label="NightWatch(Large+Dark)"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <meta-data android:name="android.service.wallpaper"
-                       android:resource="@xml/watch_face"/>
-            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
+            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/watchface_graph" />
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
@@ -62,18 +34,44 @@
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data android:name="android.service.wallpaper"
                        android:resource="@xml/watch_face"/>
-            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
+            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/watchface_dark" />
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
 
+        <service
+            android:name=".CircleWatchface"
+            android:allowEmbedded="true"
+            android:label="NightWatch(Circle)"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <meta-data android:name="android.service.wallpaper"
+                android:resource="@xml/watch_face"/>
+            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/watchface_circle" />
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
+            </intent-filter>
+        </service>
+
+
+
         <service android:name=".ListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".NWPreferences"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
     </application>
 

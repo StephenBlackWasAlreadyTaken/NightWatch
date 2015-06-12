@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="NightWatch Settings"
+        android:key="category"
+        android:selectable="false">
+    <CheckBoxPreference android:title="Dark"
+        android:defaultValue="false"
+        android:summary="Use dark Watchface"
+        android:key="dark" />
+
+        <CheckBoxPreference android:title="Show Ago"
+            android:defaultValue="true"
+            android:summary="Show minutes since last reading. (Just Circle Watchface)"
+            android:key="showAgo" />
+
+        <CheckBoxPreference android:title="Show Delta"
+            android:defaultValue="true"
+            android:summary="Show delta. (Just Circle Watchface)"
+            android:key="showDelta" />
+
+        <CheckBoxPreference android:title="Show BG"
+            android:defaultValue="true"
+            android:summary="Show BG. (Just Circle Watchface)"
+            android:key="showBG" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

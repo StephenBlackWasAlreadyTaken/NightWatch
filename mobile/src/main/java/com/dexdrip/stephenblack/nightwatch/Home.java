@@ -15,11 +15,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import com.crashlytics.android.Crashlytics;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 
 import io.fabric.sdk.android.Fabric;
+
 import java.text.DecimalFormat;
 import java.util.Date;
 
@@ -47,6 +49,7 @@ public class Home extends Activity {
     public BgGraphBuilder bgGraphBuilder;
     BroadcastReceiver _broadcastReceiver;
     BroadcastReceiver newDataReceiver;
+    OnSharedPreferenceChangeListener preferenceChangeListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,16 @@ public class Home extends Activity {
         startService(new Intent(getApplicationContext(), DataCollectionService.class));
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_bg_notification, false);
+
+        preferenceChangeListener = new OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                invalidateOptionsMenu();
+            }
+        };
+
+        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+
         setContentView(R.layout.activity_home);
     }
 
@@ -71,7 +84,7 @@ public class Home extends Activity {
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         bgGraphBuilder = new BgGraphBuilder(getApplicationContext());
         _broadcastReceiver = new BroadcastReceiver() {
@@ -100,9 +113,26 @@ public class Home extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (preferenceChangeListener != null) {
+            prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_home, menu);
+
+        if (!prefs.getBoolean("watch_sync", false)) {
+            menu.removeItem(R.id.action_open_watch_settings);
+        }
+        if (!prefs.getBoolean("watch_sync", false) && !prefs.getBoolean("pebble_sync", false)) {
+            menu.removeItem(R.id.action_resend_last_bg);
+
+        }
         return true;
     }
 
@@ -115,6 +145,9 @@ public class Home extends Activity {
                 return true;
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
+                return true;
+            case R.id.action_open_watch_settings:
+                startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
                 return true;
             default:
                 return true;
@@ -170,7 +203,7 @@ public class Home extends Activity {
     }
 
     public void setViewport() {
-        if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right  >= (new Date().getTime())) {
+        if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right >= (new Date().getTime())) {
             previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart), false);
         } else {
             previewChart.setCurrentViewport(holdViewport, false);
@@ -183,14 +216,14 @@ public class Home extends Activity {
         if (_broadcastReceiver != null) {
             unregisterReceiver(_broadcastReceiver);
         }
-        if(newDataReceiver != null) {
+        if (newDataReceiver != null) {
             unregisterReceiver(newDataReceiver);
         }
     }
 
     public void displayCurrentInfo() {
-        final TextView currentBgValueText = (TextView)findViewById(R.id.currentBgValueRealTime);
-        final TextView notificationText = (TextView)findViewById(R.id.notices);
+        final TextView currentBgValueText = (TextView) findViewById(R.id.currentBgValueRealTime);
+        final TextView notificationText = (TextView) findViewById(R.id.notices);
         if ((currentBgValueText.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) {
             currentBgValueText.setPaintFlags(currentBgValueText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
@@ -206,9 +239,9 @@ public class Home extends Activity {
                 notificationText.setTextColor(Color.WHITE);
             }
             double estimate = lastBgreading.sgv_double();
-            if(bgGraphBuilder.unitized(estimate) <= bgGraphBuilder.lowMark) {
+            if (bgGraphBuilder.unitized(estimate) <= bgGraphBuilder.lowMark) {
                 currentBgValueText.setTextColor(Color.parseColor("#C30909"));
-            } else if(bgGraphBuilder.unitized(estimate) >= bgGraphBuilder.highMark) {
+            } else if (bgGraphBuilder.unitized(estimate) >= bgGraphBuilder.highMark) {
                 currentBgValueText.setTextColor(Color.parseColor("#FFBB33"));
             } else {
                 currentBgValueText.setTextColor(Color.WHITE);
