@@ -46,6 +46,14 @@ public class Home extends BaseWatchFace {
         } else {
             mUploaderBattery.setTextColor(Color.RED);
         }
+        if (chart != null) {
+            highColor = Color.YELLOW;
+           lowColor = Color.RED;
+            midColor = Color.WHITE;
+            singleLine = false;
+            pointSize = 2;
+            setupCharts();
+        }
 
     }
 

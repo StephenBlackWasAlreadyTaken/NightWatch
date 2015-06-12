@@ -19,6 +19,7 @@ public class LargeHome extends BaseWatchFace {
 
     @Override
     protected void setColorDark(){
+        mTime.setTextColor(Color.WHITE);
         mRelativeLayout.setBackgroundColor(Color.BLACK);
         mLinearLayout.setBackgroundColor(Color.WHITE);
         if (sgvLevel == 1) {

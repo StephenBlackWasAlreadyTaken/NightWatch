@@ -42,7 +42,7 @@
         </service>
 
         <service
-            android:name=".ModernWatchface"
+            android:name=".CircleWatchface"
             android:allowEmbedded="true"
             android:label="NightWatch(Circle)"
             android:permission="android.permission.BIND_WALLPAPER">

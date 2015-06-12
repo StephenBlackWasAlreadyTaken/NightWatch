@@ -166,7 +166,6 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
         if(layoutSet) {
             this.mRelativeLayout.draw(canvas);
             Log.d("onDraw", "draw");
-            Log.d("onDraw", "Setting for dark: " + sharedPrefs.getBoolean("dark", false));
         }
     }
 
