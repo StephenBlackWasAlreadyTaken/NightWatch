@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
@@ -21,7 +22,9 @@ import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
 import com.ustwo.clockwise.WatchFaceTime;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public abstract class ModernWatchface extends WatchFace {
@@ -42,7 +45,7 @@ public abstract class ModernWatchface extends WatchFace {
     private boolean overlapping;
 
 
-    private Point displaySize = new Point();
+    public Point displaySize = new Point();
     private MessageReceiver messageReceiver = new MessageReceiver();
 
     private int sgvLevel = 0;
@@ -51,6 +54,7 @@ public abstract class ModernWatchface extends WatchFace {
     private double datetime = 0;
     private String direction = "";
     private String delta = "";
+    public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
 
     private View layoutView;
     private int specW;
@@ -61,7 +65,9 @@ public abstract class ModernWatchface extends WatchFace {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "CreateWakelock");
+        wakeLock.acquire(30000);
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         display.getSize(displaySize);
@@ -79,6 +85,7 @@ public abstract class ModernWatchface extends WatchFace {
         prepareLayout();
         prepareDrawTime();
         ListenerService.requestData(this);
+        wakeLock.release();
     }
 
     /*@Override
@@ -99,7 +106,6 @@ public abstract class ModernWatchface extends WatchFace {
     protected void onDraw(Canvas canvas) {
         drawTime(canvas);
         myLayout.draw(canvas);
-
     }
 
     private void prepareLayout() {
@@ -107,12 +113,8 @@ public abstract class ModernWatchface extends WatchFace {
         ((TextView) myLayout.findViewById(R.id.sgvString)).setText(getSgvString());
         ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
 
-        String minutes = "--\'";
-        if (getDatetime() != 0) {
-            minutes = ((int) Math.floor((System.currentTimeMillis() - getDatetime()) / 60000)) + "\'";
-            ;
-        }
-        ((TextView) myLayout.findViewById(R.id.agoString)).setText(minutes);
+
+        ((TextView) myLayout.findViewById(R.id.agoString)).setText(getMinutes());
         ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
         ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
         ((TextView) myLayout.findViewById(R.id.deltaString)).setTextColor(getTextColor());
@@ -154,6 +156,7 @@ public abstract class ModernWatchface extends WatchFace {
             canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, circlePaint);
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, circlePaint);
         }
+        drawOtherStuff(canvas);
     }
 
     private void prepareDrawTime() {
@@ -197,15 +200,16 @@ public abstract class ModernWatchface extends WatchFace {
     @Override
     protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
         if (oldTime.hasMinuteChanged(newTime)) {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TimeChangedWakelock");
+            wakeLock.acquire(30000);
             /*Preparing the layout just on every minute tick:
             *  - hopefully better battery life
             *  - drawback: might update the minutes since last reading up to one minute late*/
             prepareLayout();
             prepareDrawTime();
             invalidate();  //redraw the time
-
-            //TODO: Just for testing:
-            ListenerService.requestData(this);
+            wakeLock.release();
         }
     }
 
@@ -219,6 +223,9 @@ public abstract class ModernWatchface extends WatchFace {
     public abstract int getBackgroundColor();
 
     public abstract int getTextColor();
+
+    public void drawOtherStuff(Canvas canvas) {}
+    public int holdInMemory() { return 1;}
 
 
     //getters & setters
@@ -264,12 +271,20 @@ public abstract class ModernWatchface extends WatchFace {
         this.sgvString = sgvString;
     }
 
-    private String getDelta() {
+    public String getDelta() {
         return delta;
     }
 
     private void setDelta(String delta) {
         this.delta = delta;
+    }
+
+    public String getMinutes() {
+        String minutes = "--\'";
+        if (getDatetime() != 0) {
+            minutes = ((int) Math.floor((System.currentTimeMillis() - getDatetime()) / 60000)) + "\'";
+        }
+        return minutes;
     }
 
     public class MessageReceiver extends BroadcastReceiver {
@@ -278,7 +293,7 @@ public abstract class ModernWatchface extends WatchFace {
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     "MyWakelockTag");
-            wakeLock.acquire(); //do we need this?
+            wakeLock.acquire(30000);
 
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             setSgvLevel((int) dataMap.getLong("sgvLevel"));
@@ -287,13 +302,97 @@ public abstract class ModernWatchface extends WatchFace {
             setSgvString(dataMap.getString("sgvString"));
             setDelta(dataMap.getString("delta"));
             setDatetime(dataMap.getDouble("timestamp"));
-            wakeLock.release();
+            addToWatchSet(dataMap);
+
             prepareLayout();
             prepareDrawTime();
 
             invalidate();
+            wakeLock.release();
         }
     }
 
+    public void addToWatchSet(DataMap dataMap) {
+        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        if (entries != null) {
+            for (DataMap entry : entries) {
+                double sgv = entry.getDouble("sgvDouble");
+                double high = entry.getDouble("high");
+                double low = entry.getDouble("low");
+                double timestamp = entry.getDouble("timestamp");
+
+                final int size = bgDataList.size();
+                if (size > 0) {
+                    if (bgDataList.get(bgDataList.size() - 1).timestamp == timestamp)
+                        continue; // Ignore duplicates.
+                }
+                bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
+            }
+        } else {
+            double sgv = dataMap.getDouble("sgvDouble");
+            double high = dataMap.getDouble("high");
+            double low = dataMap.getDouble("low");
+            double timestamp = dataMap.getDouble("timestamp");
+
+            final int size = bgDataList.size();
+            if (size > 0) {
+                if (bgDataList.get(bgDataList.size() - 1).timestamp == timestamp)
+                    return; // Ignore duplicates.
+            }
+            bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
+        }
+
+        for (int i = 0; i < bgDataList.size(); i++) {
+            if (bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()))) {
+                bgDataList.remove(i);
+            }
+        }
+    }
+
+    public static int darken(int color, double fraction) {
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+        red = darkenColor(red, fraction);
+        green = darkenColor(green, fraction);
+        blue = darkenColor(blue, fraction);
+        int alpha = Color.alpha(color);
+
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    private static int darkenColor(int color, double fraction) {
+        return (int)Math.max(color - (color * fraction), 0);
+    }
+
+
+    public void addArch(Canvas canvas, float offset, int color, float size) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, 270, size, true, paint);
+    }
+
+    public void addArch(Canvas canvas, float start, float offset, int color, float size) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, start+270, size, true, paint);
+    }
+
+    public void addIndicator(Canvas canvas, float bg, int color) {
+        float convertedBg;
+        if(bg > 100){
+            convertedBg = (((bg - 100f) / 300f) * 225f) + 135;
+        } else {
+            convertedBg = ((bg / 100) * 135);
+        }
+        convertedBg += 270;
+        Paint paint = new Paint();
+        paint.setColor(color);
+        float offset = 9;
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, convertedBg, 2, true, paint);
+    }
 
 }
