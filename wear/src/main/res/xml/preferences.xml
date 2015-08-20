@@ -24,5 +24,10 @@
             android:summary="Show BG. (Just Circle Watchface)"
             android:key="showBG" />
 
+        <CheckBoxPreference android:title="Show Animations"
+            android:defaultValue="false"
+            android:summary="Show Animations. (Just Circle Watchface)"
+            android:key="animation" />
+
     </PreferenceCategory>
 </PreferenceScreen>
