@@ -10,9 +10,9 @@ import java.util.Date;
 /**
  * Created by stephenblack on 6/13/15.
  */
-public class ModernWatchfaceRings extends ModernWatchface{
+public class ModernWatchfaceRings extends CircleWatchface{
 
-    @Override
+    /*@Override
     public int getLowColor() {
         return Color.argb(255, 255, 120, 120);
     }
@@ -41,17 +41,22 @@ public class ModernWatchfaceRings extends ModernWatchface{
 
     @Override
     public int holdInMemory() {
+
+        //TODO: adjust according to screen size!
         return 6;
     }
+
     @Override
     public String getMinutes() {
+        //TODO: disable in baseclass according to settings
         return "";
     }
 
     @Override
     public String getDelta() {
+        //TODO: disable in baseclass according to settings
         return "";
-    }
+    }*/
 
     @Override
     public void drawOtherStuff(Canvas canvas) {
@@ -66,28 +71,4 @@ public class ModernWatchfaceRings extends ModernWatchface{
         }
     }
 
-    public void addReading2(Canvas canvas, BgWatchData entry, int i) {
-        double size;
-        int color = Color.DKGRAY;
-        int indicatorColor = Color.LTGRAY;
-        int barColor = Color.GRAY;
-        if(entry.sgv >= entry.high) {
-            indicatorColor = getHighColor();
-            barColor = darken(getHighColor(), .5);
-        } else if (entry.sgv <= entry.low) {
-            indicatorColor = getLowColor();
-            barColor =  darken(getLowColor(), .5);
-        }
-        float offsetMultiplier = (((displaySize.x / 2f) - PADDING) / 12f);
-        float offset = (float) Math.max(1,Math.ceil((new Date().getTime() - entry.timestamp)/(1000 * 60 * 5)));
-        if(entry.sgv > 100){
-            size = (((entry.sgv - 100f) / 300f) * 225f) + 135;
-        } else {
-            size = ((entry.sgv / 100) * 135);
-        }
-        addArch(canvas, offset * offsetMultiplier + 11, barColor, (float) size - 2); // Dark Color Bar
-        addArch(canvas, (float) size - 2, offset * offsetMultiplier + 11, indicatorColor, 2f); // Indicator at end of bar
-        addArch(canvas, (float) size, offset * offsetMultiplier + 11, color, (float) (360f - size)); // Dark fill
-        addArch(canvas, (offset + .8f) * offsetMultiplier + 11, getBackgroundColor(), 360);
-    }
 }

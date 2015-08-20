@@ -28,7 +28,9 @@ import com.google.android.gms.wearable.DataMap;
 import com.ustwo.clockwise.WatchFace;
 import com.ustwo.clockwise.WatchFaceTime;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class CircleWatchface extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -53,7 +55,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     private boolean isAnimated = false;
 
 
-    private Point displaySize = new Point();
+    public Point displaySize = new Point();
     private MessageReceiver messageReceiver = new MessageReceiver();
 
     private int sgvLevel = 0;
@@ -62,6 +64,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     private double datetime = 0;
     private String direction = "";
     private String delta = "";
+    public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
 
     private View layoutView;
     private int specW;
@@ -74,6 +77,10 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     @Override
     public void onCreate() {
         super.onCreate();
+
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "CreateWakelock");
+        wakeLock.acquire(30000);
 
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
@@ -96,6 +103,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         prepareLayout();
         prepareDrawTime();
         ListenerService.requestData(this);
+
+        wakeLock.release();
     }
 
     /*@Override
@@ -136,14 +145,10 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         }
         ;
 
-        String minutes = "--\'";
-        if (getDatetime() != 0) {
-            minutes = ((int) Math.floor((System.currentTimeMillis() - getDatetime()) / 60000)) + "\'";
-            ;
-        }
+
         if (sharedPrefs.getBoolean("showAgo", true)) {
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.VISIBLE);
-            ((TextView) myLayout.findViewById(R.id.agoString)).setText(minutes);
+            ((TextView) myLayout.findViewById(R.id.agoString)).setText(getMinutes());
             ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
 
             if(sharedPrefs.getBoolean("showBigNumbers", false)){
@@ -182,6 +187,15 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                 myLayout.getMeasuredHeight());
     }
 
+
+    public String getMinutes() {
+        String minutes = "--\'";
+        if (getDatetime() != 0) {
+            minutes = ((int) Math.floor((System.currentTimeMillis() - getDatetime()) / 60000)) + "\'";
+        }
+        return minutes;
+    }
+
     private void drawTime(Canvas canvas) {
 
         //delete Canvas
@@ -209,6 +223,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, removePaint);
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, removePaint);
         }
+        drawOtherStuff(canvas);
     }
 
     private void prepareDrawTime() {
@@ -283,12 +298,16 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     @Override
     protected void onTimeChanged(WatchFaceTime oldTime, WatchFaceTime newTime) {
         if (oldTime.hasMinuteChanged(newTime)) {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TimeChangedWakelock");
+            wakeLock.acquire(30000);
             /*Preparing the layout just on every minute tick:
             *  - hopefully better battery life
             *  - drawback: might update the minutes since last reading up to one minute late*/
             prepareLayout();
             prepareDrawTime();
             invalidate();  //redraw the time
+            wakeLock.release();
 
         }
     }
@@ -341,6 +360,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         }
     }
 
+    public void drawOtherStuff(Canvas canvas) {}
+    public int holdInMemory() { return 6;}
 
     //getters & setters
 
@@ -385,7 +406,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         this.sgvString = sgvString;
     }
 
-    private String getDelta() {
+    public String getDelta() {
         return delta;
     }
 
@@ -440,28 +461,131 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     "MyWakelockTag");
-            wakeLock.acquire(); //do we need this?
+            wakeLock.acquire(30000);
 
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             setSgvLevel((int) dataMap.getLong("sgvLevel"));
-            Log.d("CircleWatchface", "sgv level : " + getSgvLevel());
+            Log.d("ModernWatchface", "sgv level : " + getSgvLevel());
 
             setSgvString(dataMap.getString("sgvString"));
             setDelta(dataMap.getString("delta"));
             setDatetime(dataMap.getDouble("timestamp"));
+            addToWatchSet(dataMap);
 
-            //start animation?
-            if (sharedPrefs.getBoolean("animation", false) && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
-
-                startAnimation();
-
-            }
-
-            wakeLock.release();
             prepareLayout();
             prepareDrawTime();
+
             invalidate();
+            wakeLock.release();
         }
+    }
+
+    public void addToWatchSet(DataMap dataMap) {
+        ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
+        if (entries != null) {
+            for (DataMap entry : entries) {
+                double sgv = entry.getDouble("sgvDouble");
+                double high = entry.getDouble("high");
+                double low = entry.getDouble("low");
+                double timestamp = entry.getDouble("timestamp");
+
+                final int size = bgDataList.size();
+                if (size > 0) {
+                    if (bgDataList.get(bgDataList.size() - 1).timestamp == timestamp)
+                        continue; // Ignore duplicates.
+                }
+                bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
+            }
+        } else {
+            double sgv = dataMap.getDouble("sgvDouble");
+            double high = dataMap.getDouble("high");
+            double low = dataMap.getDouble("low");
+            double timestamp = dataMap.getDouble("timestamp");
+
+            final int size = bgDataList.size();
+            if (size > 0) {
+                if (bgDataList.get(bgDataList.size() - 1).timestamp == timestamp)
+                    return; // Ignore duplicates.
+            }
+            bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
+        }
+
+        for (int i = 0; i < bgDataList.size(); i++) {
+            if (bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()))) {
+                bgDataList.remove(i);
+            }
+        }
+    }
+
+    public static int darken(int color, double fraction) {
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+        red = darkenColor(red, fraction);
+        green = darkenColor(green, fraction);
+        blue = darkenColor(blue, fraction);
+        int alpha = Color.alpha(color);
+
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    private static int darkenColor(int color, double fraction) {
+        return (int)Math.max(color - (color * fraction), 0);
+    }
+
+
+    public void addArch(Canvas canvas, float offset, int color, float size) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, 270, size, true, paint);
+    }
+
+    public void addArch(Canvas canvas, float start, float offset, int color, float size) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, start+270, size, true, paint);
+    }
+
+    public void addIndicator(Canvas canvas, float bg, int color) {
+        float convertedBg;
+        if(bg > 100){
+            convertedBg = (((bg - 100f) / 300f) * 225f) + 135;
+        } else {
+            convertedBg = ((bg / 100) * 135);
+        }
+        convertedBg += 270;
+        Paint paint = new Paint();
+        paint.setColor(color);
+        float offset = 9;
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, convertedBg, 2, true, paint);
+    }
+
+    public void addReading2(Canvas canvas, BgWatchData entry, int i) {
+        double size;
+        int color = Color.DKGRAY;
+        int indicatorColor = Color.LTGRAY;
+        int barColor = Color.GRAY;
+        if(entry.sgv >= entry.high) {
+            indicatorColor = getHighColor();
+            barColor = darken(getHighColor(), .5);
+        } else if (entry.sgv <= entry.low) {
+            indicatorColor = getLowColor();
+            barColor =  darken(getLowColor(), .5);
+        }
+        float offsetMultiplier = (((displaySize.x / 2f) - PADDING) / 12f);
+        float offset = (float) Math.max(1,Math.ceil((new Date().getTime() - entry.timestamp)/(1000 * 60 * 5)));
+        if(entry.sgv > 100){
+            size = (((entry.sgv - 100f) / 300f) * 225f) + 135;
+        } else {
+            size = ((entry.sgv / 100) * 135);
+        }
+        addArch(canvas, offset * offsetMultiplier + 11, barColor, (float) size - 2); // Dark Color Bar
+        addArch(canvas, (float) size - 2, offset * offsetMultiplier + 11, indicatorColor, 2f); // Indicator at end of bar
+        addArch(canvas, (float) size, offset * offsetMultiplier + 11, color, (float) (360f - size)); // Dark fill
+        addArch(canvas, (offset + .8f) * offsetMultiplier + 11, getBackgroundColor(), 360);
     }
 
 
