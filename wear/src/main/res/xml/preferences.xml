@@ -24,6 +24,11 @@
             android:summary="Show BG. (Just Circle Watchface)"
             android:key="showBG" />
 
+        <CheckBoxPreference android:title="Show Big Numbers"
+            android:defaultValue="false"
+            android:summary="Show big numbers. (Just Circle Watchface)"
+            android:key="showBigNumbers" />
+
         <CheckBoxPreference android:title="Show Animations"
             android:defaultValue="false"
             android:summary="Show Animations. (Just Circle Watchface)"

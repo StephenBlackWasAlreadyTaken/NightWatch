@@ -17,6 +17,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -144,6 +145,13 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.VISIBLE);
             ((TextView) myLayout.findViewById(R.id.agoString)).setText(minutes);
             ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
+
+            if(sharedPrefs.getBoolean("showBigNumbers", false)){
+                ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+            }
+
+
+
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.GONE);
@@ -152,6 +160,16 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             ((TextView) myLayout.findViewById(R.id.deltaString)).setVisibility(View.VISIBLE);
             ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
             ((TextView) myLayout.findViewById(R.id.deltaString)).setTextColor(getTextColor());
+            if(sharedPrefs.getBoolean("showBigNumbers", false)) {
+                ((TextView) myLayout.findViewById(R.id.deltaString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+                if(delta.endsWith(" mg/dl")) {
+                    ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta().substring(0, delta.length()-6));
+                } else if (delta.endsWith(" mmol")) {
+                    ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta().substring(0, delta.length()-5));
+                }
+            } else {
+                ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
+            }
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
             ((TextView) myLayout.findViewById(R.id.deltaString)).setVisibility(View.GONE);
@@ -372,7 +390,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     private void setDelta(String delta) {
-        this.delta = delta;
+            this.delta = delta;
     }
 
 
