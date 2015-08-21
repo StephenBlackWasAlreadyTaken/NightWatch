@@ -126,6 +126,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
+        //delete CanvasgetHighColor
+        canvas.drawColor(getBackgroundColor());
         drawTime(canvas);
         drawOtherStuff(canvas);
         myLayout.draw(canvas);
@@ -198,10 +200,6 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     private void drawTime(Canvas canvas) {
-
-        //delete CanvasgetHighColor
-        canvas.drawColor(getBackgroundColor());
-
 
         //draw circle
         circlePaint.setColor(color);
@@ -541,7 +539,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         }
     }
 
-    public static int darken(int color, double fraction) {
+    public int darken(int color, double fraction) {
         int red = Color.red(color);
         int green = Color.green(color);
         int blue = Color.blue(color);
@@ -553,8 +551,13 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         return Color.argb(alpha, red, green, blue);
     }
 
-    private static int darkenColor(int color, double fraction) {
-        return (int)Math.max(color - (color * fraction), 0);
+    private int darkenColor(int color, double fraction) {
+
+        //if (sharedPrefs.getBoolean("dark", false)) {
+            return (int) Math.max(color - (color * fraction), 0);
+        //}
+
+       // return (int)Math.min(color + (color * fraction), 255);
     }
 
 
@@ -592,9 +595,18 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
         Log.d("CircleWatchface", "addReadingSoft");
         double size;
-        int color = Color.DKGRAY;
+
+        int color = Color.LTGRAY;
+
+        if (sharedPrefs.getBoolean("dark", false)) {
+            color = Color.DKGRAY;
+        }
+
         float offsetMultiplier = (((displaySize.x / 2f) - PADDING) / 12f);
         float offset = (float) Math.max(1, Math.ceil((new Date().getTime() - entry.timestamp) / (1000 * 60 * 5)));
+        // TODO what if 2 readings are not exactly 5 minutes apart? How about:
+        //float offset = (float) Math.max(1, Math.round((new Date().getTime() - entry.timestamp) / (1000f * 60 * 5)));
+
         if(entry.sgv > 100){
             size = (((entry.sgv - 100f) / 300f) * 225f) + 135;
         } else {
@@ -609,8 +621,15 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         Log.d("CircleWatchface", "addReading");
 
         double size;
-        int color = Color.DKGRAY;
-        int indicatorColor = Color.LTGRAY;
+        int color = Color.LTGRAY;
+        int indicatorColor = Color.DKGRAY;
+
+        if (sharedPrefs.getBoolean("dark", false)) {
+            color = Color.DKGRAY;
+            indicatorColor = Color.LTGRAY;
+        }
+
+
         int barColor = Color.GRAY;
         if(entry.sgv >= entry.high) {
             indicatorColor = getHighColor();

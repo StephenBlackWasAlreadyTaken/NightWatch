@@ -5,19 +5,9 @@
         android:key="category"
         android:selectable="false">
     <CheckBoxPreference android:title="Dark"
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:summary="Use dark Watchface"
         android:key="dark" />
-
-        <CheckBoxPreference android:title="Show Ring History"
-            android:defaultValue="false"
-            android:summary="Graphical history. (Just Circle Watchface)"
-            android:key="showRingHistory" />
-
-        <CheckBoxPreference android:title="Soft Ring History"
-            android:defaultValue="false"
-            android:summary="Softer appearance on Ring History. (Just Circle Watchface)"
-            android:key="softRingHistory" />
 
         <CheckBoxPreference android:title="Show Ago"
             android:defaultValue="true"
@@ -38,6 +28,17 @@
             android:defaultValue="false"
             android:summary="Show big numbers. (Just Circle Watchface)"
             android:key="showBigNumbers" />
+
+        <CheckBoxPreference android:title="Show Ring History"
+            android:defaultValue="false"
+            android:summary="Graphical history. (Just Circle Watchface)"
+            android:key="showRingHistory" />
+
+        <CheckBoxPreference android:title="Soft Ring History"
+            android:defaultValue="false"
+            android:summary="Softer appearance on Ring History. (Just Circle Watchface)"
+            android:key="softRingHistory" />
+
 
         <CheckBoxPreference android:title="Show Animations"
             android:defaultValue="false"
