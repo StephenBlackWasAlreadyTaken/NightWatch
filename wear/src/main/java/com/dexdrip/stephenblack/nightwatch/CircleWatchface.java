@@ -125,13 +125,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected synchronized void onDraw(Canvas canvas) {
         drawTime(canvas);
+        drawOtherStuff(canvas);
         myLayout.draw(canvas);
 
     }
 
-    private void prepareLayout() {
+    private synchronized void prepareLayout() {
         // prepare fields
 
 
@@ -198,8 +199,9 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
     private void drawTime(Canvas canvas) {
 
-        //delete Canvas
+        //delete CanvasgetHighColor
         canvas.drawColor(getBackgroundColor());
+
 
         //draw circle
         circlePaint.setColor(color);
@@ -223,10 +225,10 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             canvas.drawArc(rect, angleBig, (float) BIG_HAND_WIDTH, false, removePaint);
             canvas.drawArc(rect, angleSMALL, (float) SMALL_HAND_WIDTH, false, removePaint);
         }
-        drawOtherStuff(canvas);
+
     }
 
-    private void prepareDrawTime() {
+    private synchronized void prepareDrawTime() {
         hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 12;
         minute = Calendar.getInstance().get(Calendar.MINUTE);
         angleBig = (((hour + minute / 60f) / 12f * 360) - 90 - BIG_HAND_WIDTH / 2f + 360) % 360;
@@ -360,7 +362,27 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         }
     }
 
-    public void drawOtherStuff(Canvas canvas) {}
+    public void drawOtherStuff(Canvas canvas) {
+
+        if (sharedPrefs.getBoolean("showRingHistory", true)) {
+            //Perfect low and High indicators
+            if (bgDataList.size() > 0) {
+                addIndicator(canvas, 100, Color.LTGRAY);
+                addIndicator(canvas, (float) bgDataList.get(bgDataList.size() - 1).low, getLowColor());
+                addIndicator(canvas, (float) bgDataList.get(bgDataList.size() - 1).high, getHighColor());
+            }
+
+            if(sharedPrefs.getBoolean("softRingHistory", true)){
+                for(int i=bgDataList.size(); i > 0; i--) {
+                    addReadingSoft(canvas, bgDataList.get(i - 1), i);
+                }
+            } else {
+                for (int i = bgDataList.size(); i > 0; i--) {
+                     addReading(canvas, bgDataList.get(i - 1), i);
+                }
+            }
+        }
+    }
     public int holdInMemory() { return 6;}
 
     //getters & setters
@@ -455,6 +477,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
 
+
+
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -480,7 +504,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         }
     }
 
-    public void addToWatchSet(DataMap dataMap) {
+    public synchronized void addToWatchSet(DataMap dataMap) {
         ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
         if (entries != null) {
             for (DataMap entry : entries) {
@@ -563,7 +587,27 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         canvas.drawArc(rectTemp, convertedBg, 2, true, paint);
     }
 
-    public void addReading2(Canvas canvas, BgWatchData entry, int i) {
+
+    public void addReadingSoft(Canvas canvas, BgWatchData entry, int i) {
+
+        Log.d("CircleWatchface", "addReadingSoft");
+        double size;
+        int color = Color.DKGRAY;
+        float offsetMultiplier = (((displaySize.x / 2f) - PADDING) / 12f);
+        float offset = (float) Math.max(1, Math.ceil((new Date().getTime() - entry.timestamp) / (1000 * 60 * 5)));
+        if(entry.sgv > 100){
+            size = (((entry.sgv - 100f) / 300f) * 225f) + 135;
+        } else {
+            size = ((entry.sgv / 100) * 135);
+        }
+        addArch(canvas, offset * offsetMultiplier + 10, color, (float) size);
+        addArch(canvas, (float) size, offset * offsetMultiplier + 10, getBackgroundColor(), (float) (360 - size));
+        addArch(canvas, (offset + .8f) * offsetMultiplier + 10, getBackgroundColor(), 360);
+    }
+
+    public void addReading(Canvas canvas, BgWatchData entry, int i) {
+        Log.d("CircleWatchface", "addReading");
+
         double size;
         int color = Color.DKGRAY;
         int indicatorColor = Color.LTGRAY;
