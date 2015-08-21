@@ -496,6 +496,13 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             setDatetime(dataMap.getDouble("timestamp"));
             addToWatchSet(dataMap);
 
+            //start animation?
+            if (sharedPrefs.getBoolean("animation", false) && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
+
+                startAnimation();
+
+            }
+
             prepareLayout();
             prepareDrawTime();
 
