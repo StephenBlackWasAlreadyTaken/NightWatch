@@ -56,32 +56,6 @@
         </service>
 
 
-        <service
-            android:name=".ModernWatchfaceRings"
-            android:allowEmbedded="true"
-            android:label="NW-Rings"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <meta-data android:name="android.service.wallpaper"
-                android:resource="@xml/watch_face"/>
-            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".ModernWatchfaceRingsDark"
-            android:allowEmbedded="true"
-            android:label="NW-RingsDark"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <meta-data android:name="android.service.wallpaper"
-                android:resource="@xml/watch_face"/>
-            <meta-data android:name="com.google.android.wearable.watchface.preview" android:resource="@drawable/ic_launcher" />
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
-            </intent-filter>
-        </service>
         <service android:name=".ListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />

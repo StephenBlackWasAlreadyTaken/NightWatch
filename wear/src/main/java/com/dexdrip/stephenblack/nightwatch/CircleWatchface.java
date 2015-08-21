@@ -151,13 +151,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
         if (sharedPrefs.getBoolean("showAgo", true)) {
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.VISIBLE);
-            ((TextView) myLayout.findViewById(R.id.agoString)).setText(getMinutes());
-            ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
 
             if(sharedPrefs.getBoolean("showBigNumbers", false)){
                 ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+            } else {
+                ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
             }
-
+            ((TextView) myLayout.findViewById(R.id.agoString)).setText(getMinutes());
+            ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
 
 
         } else {
@@ -176,6 +177,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                     ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta().substring(0, delta.length()-5));
                 }
             } else {
+                ((TextView) myLayout.findViewById(R.id.deltaString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
                 ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
             }
         } else {
@@ -487,7 +489,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             setSgvLevel((int) dataMap.getLong("sgvLevel"));
-            Log.d("ModernWatchface", "sgv level : " + getSgvLevel());
+            Log.d("CircleWatchface", "sgv level : " + getSgvLevel());
 
             setSgvString(dataMap.getString("sgvString"));
             setDelta(dataMap.getString("delta"));
