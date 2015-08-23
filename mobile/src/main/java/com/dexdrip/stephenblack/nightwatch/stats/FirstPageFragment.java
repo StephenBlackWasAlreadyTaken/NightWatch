@@ -12,8 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.dexdrip.stephenblack.nightwatch.Constants;
-import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.Constants;
-import com.eveningoutpost.dexdrip.R;
+import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.List;
 
