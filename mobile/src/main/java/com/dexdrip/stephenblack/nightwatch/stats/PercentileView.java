@@ -14,8 +14,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
-import com.eveningoutpost.dexdrip.R;
-import com.eveningoutpost.dexdrip.UtilityModels.Constants;
+import com.dexdrip.stephenblack.nightwatch.Constants;
+import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.Calendar;
 import java.util.Collections;
