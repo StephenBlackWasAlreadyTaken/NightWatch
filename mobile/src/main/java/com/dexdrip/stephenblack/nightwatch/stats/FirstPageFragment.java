@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import com.dexdrip.stephenblack.nightwatch.Constants;
 import com.eveningoutpost.dexdrip.ImportedLibraries.dexcom.Constants;
 import com.eveningoutpost.dexdrip.R;
 
@@ -91,7 +91,7 @@ public class FirstPageFragment extends Fragment {
                     updateText(localView, medianView, Math.round(median * 10) / 10d + " mg/dl");
 
                 } else {
-                    updateText(localView, medianView, Math.round(median * Constants.MG_DL_TO_MMOL_L * 100) / 100d + " mmol/l");
+                    updateText(localView, medianView, Math.round(median * Constants.MGDL_TO_MMOLL * 100) / 100d + " mmol/l");
 
                 }
 
@@ -107,7 +107,7 @@ public class FirstPageFragment extends Fragment {
                 if (mgdl) {
                     updateText(localView, meanView, (Math.round(mean * 10) / 10d) + " mg/dl");
                 } else {
-                    updateText(localView, meanView, (Math.round(mean * Constants.MG_DL_TO_MMOL_L * 100) / 100d) + " mmol/l");
+                    updateText(localView, meanView, (Math.round(mean * Constants.MGDL_TO_MMOLL * 100) / 100d) + " mmol/l");
 
                 }
                 //update A1c
@@ -125,7 +125,7 @@ public class FirstPageFragment extends Fragment {
                 if (mgdl) {
                     updateText(localView, stdevView, (Math.round(stdev * 10) / 10d) + " mg/dl");
                 } else {
-                    updateText(localView, stdevView, (Math.round(stdev * Constants.MG_DL_TO_MMOL_L * 100) / 100d) + " mmol/l");
+                    updateText(localView, stdevView, (Math.round(stdev * Constants.MGDL_TO_MMOLL * 100) / 100d) + " mmol/l");
                 }
             }
         }
