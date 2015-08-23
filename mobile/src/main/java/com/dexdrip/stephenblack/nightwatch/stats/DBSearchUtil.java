@@ -14,6 +14,8 @@ import com.dexdrip.stephenblack.nightwatch.Constants;
 
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Vector;
@@ -23,10 +25,10 @@ import java.util.Vector;
  */
 public class DBSearchUtil {
 
-    public static final String CUTOFF = "13";
+    public static final double CUTOFF = 13;
 
 
-    public static int noReadingsAboveRange(Context context) {
+    /*public static int noReadingsAboveRange(Context context) {
         Bounds bounds = new Bounds().invoke();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -45,24 +47,43 @@ public class DBSearchUtil {
                 .where("calculated_value > " + high).count();
         Log.d("DrawStats", "High count: " + count);
         return count;
+    }*/
+
+    public static boolean sgvContainsWhiteSpace(String sgv){
+        if(sgv != null){
+            for(int i = 0; i < sgv.length(); i++){
+                if(Character.isWhitespace(sgv.charAt(i))){ return true; }
+            }
+        }
+        return false;
+    }
+
+    public static double doubleFromSgv(String sgv) {
+        if (sgvContainsWhiteSpace(sgv)){
+            return 0;
+        } else if (sgv.startsWith("1") && sgv.length() <= 2) {
+            return 5;
+        } else {
+            return Integer.parseInt(sgv);
+        }
     }
 
 
-    public static List<BgReadingStats> getReadings(boolean ordered) {
+    public static List<BgReadingStats> getReadings() {
         Bounds bounds = new Bounds().invoke();
-
-        String orderBy = ordered ? "calculated_value desc" : null;
-
         SQLiteDatabase db = Cache.openDatabase();
-        Cursor cur = db.query("bgreadings", new String[]{"datetime", "calculated_value"}, "datetime >= ? AND datetime <=  ? AND calculated_value > ?", new String[]{"" + bounds.start, "" + bounds.stop, CUTOFF}, null, null, orderBy);
+        //Cursor cur = db.query("bgreadings", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ? AND calculated_value > ?", new String[]{"" + bounds.start, "" + bounds.stop, CUTOFF}, null, null, orderBy);
+        Cursor cur = db.query("bgreadings", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ?", new String[]{"" + bounds.start, "" + bounds.stop}, null, null, null);
         List<BgReadingStats> readings = new Vector<BgReadingStats>();
         BgReadingStats reading;
         if (cur.moveToFirst()) {
             do {
                 reading = new BgReadingStats();
                 reading.timestamp = (Long.parseLong(cur.getString(0)));
-                reading.calculated_value = (Double.parseDouble(cur.getString(1)));
-                readings.add(reading);
+                reading.calculated_value = doubleFromSgv(cur.getString(1));
+                if(reading.calculated_value >= CUTOFF) {
+                    readings.add(reading);
+                }
             } while (cur.moveToNext());
         }
         return readings;
@@ -70,7 +91,7 @@ public class DBSearchUtil {
     }
 
 
-    public static int noReadingsInRange(Context context) {
+    /*public static int noReadingsInRange(Context context) {
         Bounds bounds = new Bounds().invoke();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -94,9 +115,9 @@ public class DBSearchUtil {
         Log.d("DrawStats", "In count: " + count);
 
         return count;
-    }
+    }*/
 
-    public static int noReadingsBelowRange(Context context) {
+    /*public static int noReadingsBelowRange(Context context) {
         Bounds bounds = new Bounds().invoke();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -117,7 +138,7 @@ public class DBSearchUtil {
         Log.d("DrawStats", "Low count: " + count);
 
         return count;
-    }
+    } */
 
 
     public static long getTodayTimestamp() {
