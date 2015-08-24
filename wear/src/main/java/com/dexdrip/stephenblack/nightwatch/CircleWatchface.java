@@ -236,7 +236,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     private synchronized void prepareDrawTime() {
-        Log.d("CircleWatchface", "start startPrepareDrawTime");
+        Log.d("CircleWatchface", "start prepareDrawTime");
 
         hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 12;
         minute = Calendar.getInstance().get(Calendar.MINUTE);
@@ -288,8 +288,9 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         rect = new RectF(PADDING, PADDING, (float) (displaySize.x - PADDING), (float) (displaySize.y - PADDING));
         rectDelete = new RectF(PADDING - CIRCLE_WIDTH / 2, PADDING - CIRCLE_WIDTH / 2, (float) (displaySize.x - PADDING + CIRCLE_WIDTH / 2), (float) (displaySize.y - PADDING + CIRCLE_WIDTH / 2));
         overlapping = ALWAYS_HIGHLIGT_SMALL || areOverlapping(angleSMALL, angleSMALL + SMALL_HAND_WIDTH + NEAR, angleBig, angleBig + BIG_HAND_WIDTH + NEAR);
-    }
+        Log.d("CircleWatchface", "end prepareDrawTime");
 
+    }
 
     synchronized void animationStep() {
         animationAngle = (animationAngle + 1) % 360;
@@ -473,10 +474,10 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             public void run() {
                 //TODO:Wakelock?
                 setIsAnimated(true);
-                for (int i = 0; i <= 10 * 1000 / 30; i++) {
+                for (int i = 0; i <= 8 * 1000 / 40; i++) {
                     animationStep();
                     try {
-                        Thread.sleep(30);
+                        Thread.sleep(40);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -484,6 +485,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                 setIsAnimated(false);
                 prepareDrawTime();
                 invalidate();
+                System.gc();
             }
         };
 
@@ -573,6 +575,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         }
         bgDataList.removeAll(removeSet);
         Log.d("addToWatchSet", "after bgDataList.size(): " + bgDataList.size());
+        removeSet = null;
+        System.gc();
     }
 
     public int darken(int color, double fraction) {
