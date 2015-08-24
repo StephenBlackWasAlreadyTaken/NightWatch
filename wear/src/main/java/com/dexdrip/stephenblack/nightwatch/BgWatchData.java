@@ -3,7 +3,7 @@ package com.dexdrip.stephenblack.nightwatch;
 /**
  * Created by stephenblack on 1/7/15.
  */
-public class BgWatchData {
+public class BgWatchData implements Comparable<BgWatchData>{
     public double sgv;
     public double high;
     public double low;
@@ -27,5 +27,12 @@ public class BgWatchData {
     @Override
     public int hashCode(){
         return (int) (timestamp%Integer.MAX_VALUE);
+    }
+
+    @Override
+    public int compareTo(BgWatchData that) {
+        if(this.timestamp < that.timestamp) return -1;
+        if(this.timestamp > that.timestamp) return  1;
+        return 0;
     }
 }

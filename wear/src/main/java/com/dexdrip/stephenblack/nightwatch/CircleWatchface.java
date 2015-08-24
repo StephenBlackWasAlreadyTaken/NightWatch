@@ -33,6 +33,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 public class CircleWatchface extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -66,7 +68,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     private double datetime = 0;
     private String direction = "";
     private String delta = "";
-    public HashSet<BgWatchData> bgDataList = new HashSet<BgWatchData>();
+    public TreeSet<BgWatchData> bgDataList = new TreeSet<BgWatchData>();
 
     private View layoutView;
     private int specW;
