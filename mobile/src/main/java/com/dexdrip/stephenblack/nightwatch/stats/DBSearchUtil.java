@@ -79,10 +79,12 @@ public class DBSearchUtil {
         if (cur.moveToFirst()) {
             do {
                 reading = new BgReadingStats();
-                reading.timestamp = (Long.parseLong(cur.getString(0)));
+                //reading.timestamp = (long)(Double.parseDouble(cur.getString(0)));
+                reading.timestamp = (long)cur.getDouble(0);
                 reading.calculated_value = doubleFromSgv(cur.getString(1));
                 if(reading.calculated_value >= CUTOFF) {
                     readings.add(reading);
+                    Log.d("Double timestamp", "" + reading.timestamp + " | " + cur.getString(0));
                 }
             } while (cur.moveToNext());
         }
