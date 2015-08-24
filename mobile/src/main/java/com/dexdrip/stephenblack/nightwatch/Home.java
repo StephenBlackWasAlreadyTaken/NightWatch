@@ -19,6 +19,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import com.crashlytics.android.Crashlytics;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
+import com.dexdrip.stephenblack.nightwatch.stats.StatsActivity;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -143,6 +144,8 @@ public class Home extends Activity {
             case R.id.action_settings:
                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
                 return true;
+            case R.id.action_statistics:
+                startActivity(new Intent(getApplicationContext(), StatsActivity.class));
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
                 return true;

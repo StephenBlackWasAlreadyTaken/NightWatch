@@ -73,7 +73,7 @@ public class DBSearchUtil {
         Bounds bounds = new Bounds().invoke();
         SQLiteDatabase db = Cache.openDatabase();
         //Cursor cur = db.query("bgreadings", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ? AND calculated_value > ?", new String[]{"" + bounds.start, "" + bounds.stop, CUTOFF}, null, null, orderBy);
-        Cursor cur = db.query("bgreadings", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ?", new String[]{"" + bounds.start, "" + bounds.stop}, null, null, null);
+        Cursor cur = db.query("Bg", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ?", new String[]{"" + bounds.start, "" + bounds.stop}, null, null, null);
         List<BgReadingStats> readings = new Vector<BgReadingStats>();
         BgReadingStats reading;
         if (cur.moveToFirst()) {

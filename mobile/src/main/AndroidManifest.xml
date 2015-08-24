@@ -40,6 +40,10 @@
             android:label="Settings" >
         </activity>
         <activity
+            android:name=".stats.StatsActivity"
+            android:label="Statistics" >
+        </activity>
+        <activity
             android:name=".LicenseAgreementActivity"
             android:label="End User License Agreement" >
         </activity>

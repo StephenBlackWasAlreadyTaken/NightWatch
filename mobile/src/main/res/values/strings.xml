@@ -6,6 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_resend_to_watch">Resend glucose to watch</string>
     <string name="action_open_watch_setting">Open Settings on Wear</string>
+    <string name="action_statistics">Statistics</string>
     <string name="action_fetch_missing_records">Fetch missing records</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
