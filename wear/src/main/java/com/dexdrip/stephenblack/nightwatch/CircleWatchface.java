@@ -365,14 +365,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     public void drawOtherStuff(Canvas canvas) {
-
+        if(isAnimated()) return; // too many repaints when animated
         if (sharedPrefs.getBoolean("showRingHistory", true)) {
             //Perfect low and High indicators
-            if (bgDataList.size() > 0) {
+            if (bgDataList.size() > 1) { //start with 2 values to avoid startup overload
                 addIndicator(canvas, 100, Color.LTGRAY);
                 addIndicator(canvas, (float) bgDataList.get(bgDataList.size() - 1).low, getLowColor());
                 addIndicator(canvas, (float) bgDataList.get(bgDataList.size() - 1).high, getHighColor());
-            }
+
 
             if(sharedPrefs.getBoolean("softRingHistory", true)){
                 for(int i=bgDataList.size(); i > 0; i--) {
@@ -382,6 +382,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                 for (int i = bgDataList.size(); i > 0; i--) {
                      addReading(canvas, bgDataList.get(i - 1), i);
                 }
+            }
             }
         }
     }
@@ -492,18 +493,18 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             DataMap dataMap = DataMap.fromBundle(intent.getBundleExtra("data"));
             setSgvLevel((int) dataMap.getLong("sgvLevel"));
             Log.d("CircleWatchface", "sgv level : " + getSgvLevel());
-
             setSgvString(dataMap.getString("sgvString"));
+            Log.d("CircleWatchface", "sgv string : " + getSgvString());
             setDelta(dataMap.getString("delta"));
             setDatetime(dataMap.getDouble("timestamp"));
             addToWatchSet(dataMap);
 
             //start animation?
-            if (sharedPrefs.getBoolean("animation", false) && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
+            //if (sharedPrefs.getBoolean("animation", false) && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
 
                 startAnimation();
 
-            }
+            //}
 
             prepareLayout();
             prepareDrawTime();
