@@ -15,4 +15,17 @@ public class BgWatchData {
         this.low = aLow;
         this.timestamp = aTimestamp;
     }
+
+    @Override
+    public boolean equals(Object that){
+        if(! (that instanceof BgWatchData)){
+            return  false;
+        }
+        return this.timestamp == ((BgWatchData) that).timestamp;
+    }
+
+    @Override
+    public int hashCode(){
+        return (int) (timestamp%Integer.MAX_VALUE);
+    }
 }

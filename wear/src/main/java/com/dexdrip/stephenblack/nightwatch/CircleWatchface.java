@@ -66,7 +66,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     private double datetime = 0;
     private String direction = "";
     private String delta = "";
-    public ArrayList<BgWatchData> bgDataList = new ArrayList<>();
+    public HashSet<BgWatchData> bgDataList = new HashSet<BgWatchData>();
 
     private View layoutView;
     private int specW;
@@ -380,17 +380,17 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             //Perfect low and High indicators
             if (bgDataList.size() > 1) { //start with 2 values to avoid startup overload
                 addIndicator(canvas, 100, Color.LTGRAY);
-                addIndicator(canvas, (float) bgDataList.get(bgDataList.size() - 1).low, getLowColor());
-                addIndicator(canvas, (float) bgDataList.get(bgDataList.size() - 1).high, getHighColor());
+                addIndicator(canvas, (float) bgDataList.iterator().next().low, getLowColor());
+                addIndicator(canvas, (float) bgDataList.iterator().next().high, getHighColor());
 
 
             if(sharedPrefs.getBoolean("softRingHistory", true)){
-                for(int i=bgDataList.size(); i > 0; i--) {
-                    addReadingSoft(canvas, bgDataList.get(i - 1), i);
+                for (BgWatchData data :bgDataList){
+                    addReadingSoft(canvas, data);
                 }
             } else {
-                for (int i = bgDataList.size(); i > 0; i--) {
-                     addReading(canvas, bgDataList.get(i - 1), i);
+                for (BgWatchData data :bgDataList){
+                    addReading(canvas, data);
                 }
             }
             }
@@ -513,11 +513,12 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             addToWatchSet(dataMap);
 
             //start animation?
-            //if (sharedPrefs.getBoolean("animation", false) && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
+            // dataMap.getDataMapArrayList("entries") == null -> not on "resend data".
+            if (sharedPrefs.getBoolean("animation", false) && dataMap.getDataMapArrayList("entries") == null && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
 
                 startAnimation();
 
-            //}
+            }
 
             prepareLayout();
             prepareDrawTime();
@@ -530,7 +531,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     public synchronized void addToWatchSet(DataMap dataMap) {
         Log.d("CircleWatchface", "start addToWatchSet");
         ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
-        if (entries != null) {
+        if (entries == null) {
+            double sgv = dataMap.getDouble("sgvDouble");
+            double high = dataMap.getDouble("high");
+            double low = dataMap.getDouble("low");
+            double timestamp = dataMap.getDouble("timestamp");
+            bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
+        } else if (! sharedPrefs.getBoolean("animation", false)){
+            // don't load history at once if animations are set (less resource consumption)
             Log.d("addToWatchSet", "entries.size(): " + entries.size());
 
             for (DataMap entry : entries) {
@@ -538,39 +546,17 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                 double high = entry.getDouble("high");
                 double low = entry.getDouble("low");
                 double timestamp = entry.getDouble("timestamp");
-
-                final int size = bgDataList.size();
-                if (size > 0) {
-                    if (bgDataList.get(bgDataList.size() - 1).timestamp == timestamp)
-                        continue; // Ignore duplicates.
-                }
                 bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
             }
-        } else {
-            double sgv = dataMap.getDouble("sgvDouble");
-            double high = dataMap.getDouble("high");
-            double low = dataMap.getDouble("low");
-            double timestamp = dataMap.getDouble("timestamp");
-
-            final int size = bgDataList.size();
-            if (size > 0) {
-                if (bgDataList.get(bgDataList.size() - 1).timestamp == timestamp)
-                    return; // Ignore duplicates.
-            }
-            bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
-        }
+        } else
 
         Log.d("addToWatchSet", "start removing bgDataList.size(): " + bgDataList.size());
         HashSet removeSet = new HashSet();
-        for (int i = 0; i < bgDataList.size(); i++) {
+        double threshold =  (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()));
+        for (BgWatchData data :bgDataList){
+            if (data.timestamp < threshold) {
+                removeSet.add(data);
 
-            if (bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()))) {
-                removeSet.add(bgDataList.get(i));
-                //bgDataList.remove(i);
-                //Log.d("addToWatchSet", "removed one bgDataList.size(): " + bgDataList.size());
-
-            } else {
-                Log.d("Not Removed", " " + bgDataList.get(i).timestamp );
             }
         }
         bgDataList.removeAll(removeSet);
@@ -631,7 +617,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
 
-    public void addReadingSoft(Canvas canvas, BgWatchData entry, int i) {
+    public void addReadingSoft(Canvas canvas, BgWatchData entry) {
 
         Log.d("CircleWatchface", "addReadingSoft");
         double size;
@@ -657,7 +643,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         addArch(canvas, (offset + .8f) * offsetMultiplier + 10, getBackgroundColor(), 360);
     }
 
-    public void addReading(Canvas canvas, BgWatchData entry, int i) {
+    public void addReading(Canvas canvas, BgWatchData entry) {
         Log.d("CircleWatchface", "addReading");
 
         double size;
