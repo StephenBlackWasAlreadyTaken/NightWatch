@@ -380,7 +380,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         if(isAnimated()) return; // too many repaints when animated
         if (sharedPrefs.getBoolean("showRingHistory", true)) {
             //Perfect low and High indicators
-            if (bgDataList.size() > 1) { //start with 2 values to avoid startup overload
+            if (bgDataList.size() > 0) {
                 addIndicator(canvas, 100, Color.LTGRAY);
                 addIndicator(canvas, (float) bgDataList.iterator().next().low, getLowColor());
                 addIndicator(canvas, (float) bgDataList.iterator().next().high, getHighColor());
