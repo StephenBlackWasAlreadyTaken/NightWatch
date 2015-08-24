@@ -102,7 +102,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         myLayout = inflater.inflate(R.layout.modern_layout, null);
         prepareLayout();
         prepareDrawTime();
-        ListenerService.requestData(this);
+        //ListenerService.requestData(this);
 
         wakeLock.release();
     }
@@ -126,7 +126,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
-        //delete CanvasgetHighColor
+        Log.d("CircleWatchface", "start onDraw");
         canvas.drawColor(getBackgroundColor());
         drawTime(canvas);
         drawOtherStuff(canvas);
@@ -135,6 +135,9 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     private synchronized void prepareLayout() {
+
+        Log.d("CircleWatchface", "start startPrepareLayout");
+
         // prepare fields
 
 
@@ -231,6 +234,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     private synchronized void prepareDrawTime() {
+        Log.d("CircleWatchface", "start startPrepareDrawTime");
+
         hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 12;
         minute = Calendar.getInstance().get(Calendar.MINUTE);
         angleBig = (((hour + minute / 60f) / 12f * 360) - 90 - BIG_HAND_WIDTH / 2f + 360) % 360;
@@ -365,6 +370,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     public void drawOtherStuff(Canvas canvas) {
+        Log.d("CircleWatchface", "start onDrawOtherStuff. bgDataList.size(): " + bgDataList.size());
+
         if(isAnimated()) return; // too many repaints when animated
         if (sharedPrefs.getBoolean("showRingHistory", true)) {
             //Perfect low and High indicators
@@ -456,6 +463,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     void startAnimation() {
+        Log.d("CircleWatchface", "start startAnimation");
+
         Thread animator = new Thread() {
 
 
@@ -515,6 +524,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     public synchronized void addToWatchSet(DataMap dataMap) {
+        Log.d("CircleWatchface", "start addToWatchSet");
         ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
         if (entries != null) {
             for (DataMap entry : entries) {
