@@ -31,6 +31,8 @@ import com.ustwo.clockwise.WatchFaceTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class CircleWatchface extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -527,6 +529,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         Log.d("CircleWatchface", "start addToWatchSet");
         ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
         if (entries != null) {
+            Log.d("addToWatchSet", "entries.size(): " + entries.size());
+
             for (DataMap entry : entries) {
                 double sgv = entry.getDouble("sgvDouble");
                 double high = entry.getDouble("high");
@@ -554,11 +558,21 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
         }
 
+        Log.d("addToWatchSet", "start removing bgDataList.size(): " + bgDataList.size());
+        HashSet removeSet = new HashSet();
         for (int i = 0; i < bgDataList.size(); i++) {
+
             if (bgDataList.get(i).timestamp < (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()))) {
-                bgDataList.remove(i);
+                removeSet.add(bgDataList.get(i));
+                //bgDataList.remove(i);
+                //Log.d("addToWatchSet", "removed one bgDataList.size(): " + bgDataList.size());
+
+            } else {
+                Log.d("Not Removed", " " + bgDataList.get(i).timestamp );
             }
         }
+        bgDataList.removeAll(removeSet);
+        Log.d("addToWatchSet", "after bgDataList.size(): " + bgDataList.size());
     }
 
     public int darken(int color, double fraction) {
