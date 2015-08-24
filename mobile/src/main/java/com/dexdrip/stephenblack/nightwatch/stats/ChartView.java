@@ -1,14 +1,20 @@
 package com.dexdrip.stephenblack.nightwatch.stats;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+
+import com.dexdrip.stephenblack.nightwatch.Constants;
+
+import java.util.List;
 
 /**
  * Created by adrian on 30/06/15.
@@ -99,9 +105,25 @@ public class ChartView extends View {
                 public void run() {
                     super.run();
                     RangeData rd = new RangeData();
-                    rd.aboveRange = DBSearchUtil.noReadingsAboveRange(getContext());
-                    rd.belowRange = DBSearchUtil.noReadingsBelowRange(getContext());
-                    rd.inRange = DBSearchUtil.noReadingsInRange(getContext());
+                    rd.aboveRange = 0;
+                    rd.belowRange = 0;
+                    rd.inRange = 0;
+
+                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    double high = Double.parseDouble(settings.getString("highValue", "170"));
+                    double low = Double.parseDouble(settings.getString("lowValue", "70"));
+
+                    List<BgReadingStats> bgList = DBSearchUtil.getReadings();
+
+                    for (BgReadingStats reading : bgList){
+                        if (reading.calculated_value>high){
+                            rd.aboveRange++;
+                        } else if (reading.calculated_value < low){
+                            rd.belowRange++;
+                        } else {
+                            rd.inRange++;
+                        }
+                    }
                     setRangeData(rd);
                 }
             };

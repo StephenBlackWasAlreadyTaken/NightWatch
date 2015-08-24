@@ -87,8 +87,9 @@ public class DBSearchUtil {
             } while (cur.moveToNext());
         }
         return readings;
-
     }
+
+
 
 
     /*public static int noReadingsInRange(Context context) {

@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 import com.dexdrip.stephenblack.nightwatch.R;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -65,10 +67,29 @@ public class FirstPageFragment extends Fragment {
                 return;
             }
 
+            List<BgReadingStats> bgList = DBSearchUtil.getReadings();
+
+
             //Ranges
-            long aboveRange = DBSearchUtil.noReadingsAboveRange(context);
-            long belowRange = DBSearchUtil.noReadingsBelowRange(context);
-            long inRange = DBSearchUtil.noReadingsInRange(context);
+            long aboveRange = 0;
+            long belowRange = 0;
+            long inRange = 0;
+
+            double high = Double.parseDouble(settings.getString("highValue", "170"));
+            double low = Double.parseDouble(settings.getString("lowValue", "70"));
+
+
+            for (BgReadingStats reading : bgList){
+                if (reading.calculated_value>high){
+                    aboveRange++;
+                } else if (reading.calculated_value < low){
+                    belowRange++;
+                } else {
+                    inRange++;
+                }
+            }
+
+
             long total = aboveRange + belowRange + inRange;
 
             if (total == 0) {
@@ -81,8 +102,13 @@ public class FirstPageFragment extends Fragment {
             updateText(localView, rangespercent, inRange * 100 / total + "%/" + aboveRange * 100 / total + "%/" + belowRange * 100 / total + "%");
             updateText(localView, rangesabsolute, inRange + "/" + aboveRange + "/" + belowRange);
 
-            List<BgReadingStats> bgList = DBSearchUtil.getReadings(true);
-            //TODO: sort (or better: get doubles first)
+            Collections.sort(bgList, new Comparator<BgReadingStats>() {
+                @Override
+                public int compare(BgReadingStats lhs, BgReadingStats rhs) {
+
+                   return Double.compare(lhs.calculated_value, rhs.calculated_value);
+                }
+            });
             if (bgList.size() > 0) {
                 double median = bgList.get(bgList.size() / 2).calculated_value;
                 TextView medianView = (TextView) localView.findViewById(R.id.textView_median);
