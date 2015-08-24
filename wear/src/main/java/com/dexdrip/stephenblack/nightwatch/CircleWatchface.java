@@ -142,6 +142,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             ((TextView) myLayout.findViewById(R.id.sgvString)).setVisibility(View.VISIBLE);
             ((TextView) myLayout.findViewById(R.id.sgvString)).setText(getSgvString());
             ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
+
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
             ((TextView) myLayout.findViewById(R.id.sgvString)).setVisibility(View.GONE);
@@ -153,12 +154,13 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.VISIBLE);
 
             if(sharedPrefs.getBoolean("showBigNumbers", false)){
-                ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+                ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
             } else {
                 ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
             }
             ((TextView) myLayout.findViewById(R.id.agoString)).setText(getMinutes());
             ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
+
 
 
         } else {
