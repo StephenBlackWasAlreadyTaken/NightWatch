@@ -27,28 +27,6 @@ public class DBSearchUtil {
 
     public static final double CUTOFF = 13;
 
-
-    /*public static int noReadingsAboveRange(Context context) {
-        Bounds bounds = new Bounds().invoke();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean mgdl = "mgdl".equals(settings.getString("units", "mgdl"));
-
-        double high = Double.parseDouble(settings.getString("highValue", "170"));
-        if (!mgdl) {
-            high *= Constants.MMOLL_TO_MGDL;
-        }
-
-        int count = new Select()
-                .from(Bg.class)
-                .where("datetime >= " + bounds.start)
-                .where("datetime <= " + bounds.stop)
-                .where("calculated_value > " + CUTOFF)
-                .where("calculated_value > " + high).count();
-        Log.d("DrawStats", "High count: " + count);
-        return count;
-    }*/
-
     public static boolean sgvContainsWhiteSpace(String sgv){
         if(sgv != null){
             for(int i = 0; i < sgv.length(); i++){
@@ -90,59 +68,6 @@ public class DBSearchUtil {
         }
         return readings;
     }
-
-
-
-
-    /*public static int noReadingsInRange(Context context) {
-        Bounds bounds = new Bounds().invoke();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean mgdl = "mgdl".equals(settings.getString("units", "mgdl"));
-
-        double high = Double.parseDouble(settings.getString("highValue", "170"));
-        double low = Double.parseDouble(settings.getString("lowValue", "70"));
-        if (!mgdl) {
-            high *= Constants.MMOLL_TO_MGDL;
-            low *= Constants.MMOLL_TO_MGDL;
-
-        }
-        int count = new Select()
-                .from(Bg.class)
-                .where("datetime >= " + bounds.start)
-                .where("datetime <= " + bounds.stop)
-                .where("calculated_value > " + CUTOFF)
-                .where("calculated_value <= " + high)
-                .where("calculated_value >= " + low)
-                .count();
-        Log.d("DrawStats", "In count: " + count);
-
-        return count;
-    }*/
-
-    /*public static int noReadingsBelowRange(Context context) {
-        Bounds bounds = new Bounds().invoke();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean mgdl = "mgdl".equals(settings.getString("units", "mgdl"));
-
-        double low = Double.parseDouble(settings.getString("lowValue", "70"));
-        if (!mgdl) {
-            low *= Constants.MMOLL_TO_MGDL;
-
-        }
-        int count = new Select()
-                .from(Bg.class)
-                .where("datetime >= " + bounds.start)
-                .where("datetime <= " + bounds.stop)
-                .where("calculated_value > " + CUTOFF)
-                .where("calculated_value < " + low)
-                .count();
-        Log.d("DrawStats", "Low count: " + count);
-
-        return count;
-    } */
-
 
     public static long getTodayTimestamp() {
         Calendar date = new GregorianCalendar();

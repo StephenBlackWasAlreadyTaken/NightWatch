@@ -4,7 +4,7 @@
         android:title="NightWatch Settings"
         android:key="category"
         android:selectable="false">
-        
+
     <CheckBoxPreference android:title="Dark"
         android:defaultValue="true"
         android:summary="Dark theme"
