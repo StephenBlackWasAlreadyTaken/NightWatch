@@ -148,7 +148,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
-            textView.setVisibility(View.GONE);
+            textView.setVisibility(View.INVISIBLE);
         }
         ;
 
@@ -165,7 +165,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             textView.setTextColor(getTextColor());
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
-            textView.setVisibility(View.GONE);
+            textView.setVisibility(View.INVISIBLE);
         }
 
         textView = (TextView) myLayout.findViewById(R.id.deltaString);
@@ -186,7 +186,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             }
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
-            textView.setVisibility(View.GONE);
+            textView.setVisibility(View.INVISIBLE);
         }
         //TODO: add more view elements?
 
