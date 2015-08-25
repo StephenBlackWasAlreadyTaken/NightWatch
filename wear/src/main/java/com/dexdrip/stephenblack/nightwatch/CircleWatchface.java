@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 
@@ -106,16 +104,12 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         myLayout = inflater.inflate(R.layout.modern_layout, null);
         prepareLayout();
         prepareDrawTime();
-        //ListenerService.requestData(this);
+
+        //ListenerService.requestData(this); //usually connection is not set up yet
 
         wakeLock.release();
     }
 
-    /*@Override
-    protected void onLayout(WatchShape shape, Rect screenBounds, WindowInsets screenInsets) {
-        super.onLayout(shape, screenBounds, screenInsets);
-        layoutView.onApplyWindowInsets(screenInsets);
-    }*/
 
     @Override
     public void onDestroy() {
@@ -144,63 +138,62 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
         // prepare fields
 
+        TextView textView = null;
 
+        textView = (TextView) myLayout.findViewById(R.id.sgvString);
         if (sharedPrefs.getBoolean("showBG", true)) {
-            ((TextView) myLayout.findViewById(R.id.sgvString)).setVisibility(View.VISIBLE);
-            ((TextView) myLayout.findViewById(R.id.sgvString)).setText(getSgvString());
-            ((TextView) myLayout.findViewById(R.id.sgvString)).setTextColor(getTextColor());
+            textView.setVisibility(View.VISIBLE);
+            textView.setText(getSgvString());
+            textView.setTextColor(getTextColor());
 
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
-            ((TextView) myLayout.findViewById(R.id.sgvString)).setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
         }
         ;
 
-
+        textView = (TextView) myLayout.findViewById(R.id.agoString);
         if (sharedPrefs.getBoolean("showAgo", true)) {
-            ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
 
-            if(sharedPrefs.getBoolean("showBigNumbers", false)){
-                ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
+            if (sharedPrefs.getBoolean("showBigNumbers", false)) {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
             } else {
                 ((TextView) myLayout.findViewById(R.id.agoString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
             }
-            ((TextView) myLayout.findViewById(R.id.agoString)).setText(getMinutes());
-            ((TextView) myLayout.findViewById(R.id.agoString)).setTextColor(getTextColor());
-
-
-
+            textView.setText(getMinutes());
+            textView.setTextColor(getTextColor());
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
-            ((TextView) myLayout.findViewById(R.id.agoString)).setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
         }
+
+        textView = (TextView) myLayout.findViewById(R.id.deltaString);
         if (sharedPrefs.getBoolean("showDelta", true)) {
-            ((TextView) myLayout.findViewById(R.id.deltaString)).setVisibility(View.VISIBLE);
-            ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
-            ((TextView) myLayout.findViewById(R.id.deltaString)).setTextColor(getTextColor());
-            if(sharedPrefs.getBoolean("showBigNumbers", false)) {
-                ((TextView) myLayout.findViewById(R.id.deltaString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-                if(delta.endsWith(" mg/dl")) {
-                    ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta().substring(0, delta.length()-6));
+            textView.setVisibility(View.VISIBLE);
+            textView.setText(getDelta());
+            textView.setTextColor(getTextColor());
+            if (sharedPrefs.getBoolean("showBigNumbers", false)) {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+                if (delta.endsWith(" mg/dl")) {
+                    textView.setText(getDelta().substring(0, delta.length() - 6));
                 } else if (delta.endsWith(" mmol")) {
-                    ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta().substring(0, delta.length()-5));
+                    textView.setText(getDelta().substring(0, delta.length() - 5));
                 }
             } else {
-                ((TextView) myLayout.findViewById(R.id.deltaString)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                ((TextView) myLayout.findViewById(R.id.deltaString)).setText(getDelta());
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                textView.setText(getDelta());
             }
         } else {
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
-            ((TextView) myLayout.findViewById(R.id.deltaString)).setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
         }
         //TODO: add more view elements?
-
 
         myLayout.measure(specW, specH);
         myLayout.layout(0, 0, myLayout.getMeasuredWidth(),
                 myLayout.getMeasuredHeight());
     }
-
 
     public String getMinutes() {
         String minutes = "--\'";
@@ -331,10 +324,8 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     public int getLowColor() {
         if (sharedPrefs.getBoolean("dark", false)) {
             return Color.argb(255, 255, 120, 120);
-
         } else {
             return Color.argb(255, 255, 80, 80);
-
         }
     }
 
@@ -377,7 +368,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     public void drawOtherStuff(Canvas canvas) {
         Log.d("CircleWatchface", "start onDrawOtherStuff. bgDataList.size(): " + bgDataList.size());
 
-        if(isAnimated()) return; // too many repaints when animated
+        if (isAnimated()) return; // too many repaints when animated
         if (sharedPrefs.getBoolean("showRingHistory", true)) {
             //Perfect low and High indicators
             if (bgDataList.size() > 0) {
@@ -386,19 +377,22 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
                 addIndicator(canvas, (float) bgDataList.iterator().next().high, getHighColor());
 
 
-            if(sharedPrefs.getBoolean("softRingHistory", true)){
-                for (BgWatchData data :bgDataList){
-                    addReadingSoft(canvas, data);
+                if (sharedPrefs.getBoolean("softRingHistory", true)) {
+                    for (BgWatchData data : bgDataList) {
+                        addReadingSoft(canvas, data);
+                    }
+                } else {
+                    for (BgWatchData data : bgDataList) {
+                        addReading(canvas, data);
+                    }
                 }
-            } else {
-                for (BgWatchData data :bgDataList){
-                    addReading(canvas, data);
-                }
-            }
             }
         }
     }
-    public int holdInMemory() { return 6;}
+
+    public int holdInMemory() {
+        return 6;
+    }
 
     //getters & setters
 
@@ -448,7 +442,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     private void setDelta(String delta) {
-            this.delta = delta;
+        this.delta = delta;
     }
 
 
@@ -495,8 +489,6 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
 
-
-
     public class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -517,14 +509,11 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             //start animation?
             // dataMap.getDataMapArrayList("entries") == null -> not on "resend data".
             if (sharedPrefs.getBoolean("animation", false) && dataMap.getDataMapArrayList("entries") == null && (getSgvString().equals("100") || getSgvString().equals("5.5") || getSgvString().equals("5,5"))) {
-
                 startAnimation();
-
             }
 
             prepareLayout();
             prepareDrawTime();
-
             invalidate();
             wakeLock.release();
         }
@@ -539,7 +528,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             double low = dataMap.getDouble("low");
             double timestamp = dataMap.getDouble("timestamp");
             bgDataList.add(new BgWatchData(sgv, high, low, timestamp));
-        } else if (! sharedPrefs.getBoolean("animation", false)){
+        } else if (!sharedPrefs.getBoolean("animation", false)) {
             // don't load history at once if animations are set (less resource consumption)
             Log.d("addToWatchSet", "entries.size(): " + entries.size());
 
@@ -552,10 +541,10 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             }
         } else
 
-        Log.d("addToWatchSet", "start removing bgDataList.size(): " + bgDataList.size());
+            Log.d("addToWatchSet", "start removing bgDataList.size(): " + bgDataList.size());
         HashSet removeSet = new HashSet();
-        double threshold =  (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()));
-        for (BgWatchData data :bgDataList){
+        double threshold = (new Date().getTime() - (1000 * 60 * 5 * holdInMemory()));
+        for (BgWatchData data : bgDataList) {
             if (data.timestamp < threshold) {
                 removeSet.add(data);
 
@@ -582,40 +571,43 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     private int darkenColor(int color, double fraction) {
 
         //if (sharedPrefs.getBoolean("dark", false)) {
-            return (int) Math.max(color - (color * fraction), 0);
+        return (int) Math.max(color - (color * fraction), 0);
         //}
-
-       // return (int)Math.min(color + (color * fraction), 255);
+        // return (int)Math.min(color + (color * fraction), 255);
     }
 
 
     public void addArch(Canvas canvas, float offset, int color, float size) {
         Paint paint = new Paint();
         paint.setColor(color);
-        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2), (displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
         canvas.drawArc(rectTemp, 270, size, true, paint);
     }
 
     public void addArch(Canvas canvas, float start, float offset, int color, float size) {
         Paint paint = new Paint();
         paint.setColor(color);
-        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
-        canvas.drawArc(rectTemp, start+270, size, true, paint);
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2), (displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        canvas.drawArc(rectTemp, start + 270, size, true, paint);
     }
 
     public void addIndicator(Canvas canvas, float bg, int color) {
         float convertedBg;
-        if(bg > 100){
-            convertedBg = (((bg - 100f) / 300f) * 225f) + 135;
-        } else {
-            convertedBg = ((bg / 100) * 135);
-        }
+        convertedBg = bgToAngle(bg);
         convertedBg += 270;
         Paint paint = new Paint();
         paint.setColor(color);
         float offset = 9;
-        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2),(displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
+        RectF rectTemp = new RectF(PADDING + offset - CIRCLE_WIDTH / 2, PADDING + offset - CIRCLE_WIDTH / 2, (displaySize.x - PADDING - offset + CIRCLE_WIDTH / 2), (displaySize.y - PADDING - offset + CIRCLE_WIDTH / 2));
         canvas.drawArc(rectTemp, convertedBg, 2, true, paint);
+    }
+
+    private float bgToAngle(float bg) {
+        if (bg > 100) {
+            return (((bg - 100f) / 300f) * 225f) + 135;
+        } else {
+            return ((bg / 100) * 135);
+        }
     }
 
 
@@ -623,23 +615,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
         Log.d("CircleWatchface", "addReadingSoft");
         double size;
-
         int color = Color.LTGRAY;
-
         if (sharedPrefs.getBoolean("dark", false)) {
             color = Color.DKGRAY;
         }
 
         float offsetMultiplier = (((displaySize.x / 2f) - PADDING) / 12f);
         float offset = (float) Math.max(1, Math.ceil((new Date().getTime() - entry.timestamp) / (1000 * 60 * 5)));
-        // TODO what if 2 readings are not exactly 5 minutes apart? How about:
-        //float offset = (float) Math.max(1, Math.round((new Date().getTime() - entry.timestamp) / (1000f * 60 * 5)));
-
-        if(entry.sgv > 100){
-            size = (((entry.sgv - 100f) / 300f) * 225f) + 135;
-        } else {
-            size = ((entry.sgv / 100) * 135);
-        }
+        size = bgToAngle((float) entry.sgv);
         addArch(canvas, offset * offsetMultiplier + 10, color, (float) size);
         addArch(canvas, (float) size, offset * offsetMultiplier + 10, getBackgroundColor(), (float) (360 - size));
         addArch(canvas, (offset + .8f) * offsetMultiplier + 10, getBackgroundColor(), 360);
@@ -651,33 +634,24 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         double size;
         int color = Color.LTGRAY;
         int indicatorColor = Color.DKGRAY;
-
         if (sharedPrefs.getBoolean("dark", false)) {
             color = Color.DKGRAY;
             indicatorColor = Color.LTGRAY;
         }
-
-
         int barColor = Color.GRAY;
-        if(entry.sgv >= entry.high) {
+        if (entry.sgv >= entry.high) {
             indicatorColor = getHighColor();
             barColor = darken(getHighColor(), .5);
         } else if (entry.sgv <= entry.low) {
             indicatorColor = getLowColor();
-            barColor =  darken(getLowColor(), .5);
+            barColor = darken(getLowColor(), .5);
         }
         float offsetMultiplier = (((displaySize.x / 2f) - PADDING) / 12f);
-        float offset = (float) Math.max(1,Math.ceil((new Date().getTime() - entry.timestamp)/(1000 * 60 * 5)));
-        if(entry.sgv > 100){
-            size = (((entry.sgv - 100f) / 300f) * 225f) + 135;
-        } else {
-            size = ((entry.sgv / 100) * 135);
-        }
+        float offset = (float) Math.max(1, Math.ceil((new Date().getTime() - entry.timestamp) / (1000 * 60 * 5)));
+        size = bgToAngle((float) entry.sgv);
         addArch(canvas, offset * offsetMultiplier + 11, barColor, (float) size - 2); // Dark Color Bar
         addArch(canvas, (float) size - 2, offset * offsetMultiplier + 11, indicatorColor, 2f); // Indicator at end of bar
         addArch(canvas, (float) size, offset * offsetMultiplier + 11, color, (float) (360f - size)); // Dark fill
         addArch(canvas, (offset + .8f) * offsetMultiplier + 11, getBackgroundColor(), 360);
     }
-
-
 }
