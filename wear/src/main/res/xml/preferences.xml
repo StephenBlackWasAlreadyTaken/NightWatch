@@ -31,7 +31,7 @@
             android:key="showBigNumbers" />
 
         <CheckBoxPreference android:title="Show Ring History"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="Graphical history. (Circle WF)"
             android:key="showRingHistory" />
 

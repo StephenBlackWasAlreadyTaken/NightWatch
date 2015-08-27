@@ -369,7 +369,7 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         Log.d("CircleWatchface", "start onDrawOtherStuff. bgDataList.size(): " + bgDataList.size());
 
         if (isAnimated()) return; // too many repaints when animated
-        if (sharedPrefs.getBoolean("showRingHistory", true)) {
+        if (sharedPrefs.getBoolean("showRingHistory", false)) {
             //Perfect low and High indicators
             if (bgDataList.size() > 0) {
                 addIndicator(canvas, 100, Color.LTGRAY);
@@ -520,6 +520,12 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
     }
 
     public synchronized void addToWatchSet(DataMap dataMap) {
+
+        if(!sharedPrefs.getBoolean("showRingHistory", false)){
+            bgDataList.clear();
+            return;
+        }
+
         Log.d("CircleWatchface", "start addToWatchSet");
         ArrayList<DataMap> entries = dataMap.getDataMapArrayList("entries");
         if (entries == null) {
