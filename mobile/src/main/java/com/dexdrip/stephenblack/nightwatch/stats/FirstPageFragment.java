@@ -78,6 +78,11 @@ public class FirstPageFragment extends Fragment {
             double high = Double.parseDouble(settings.getString("highValue", "170"));
             double low = Double.parseDouble(settings.getString("lowValue", "70"));
 
+            if(!mgdl){
+                high = high*Constants.MMOLL_TO_MGDL;
+                low = low*Constants.MMOLL_TO_MGDL;
+            }
+
 
             for (BgReadingStats reading : bgList){
                 if (reading.calculated_value>high){

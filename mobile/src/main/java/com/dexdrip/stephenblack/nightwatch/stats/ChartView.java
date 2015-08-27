@@ -110,8 +110,14 @@ public class ChartView extends View {
                     rd.inRange = 0;
 
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    boolean mgdl = "mgdl".equals(settings.getString("units", "mgdl"));
                     double high = Double.parseDouble(settings.getString("highValue", "170"));
                     double low = Double.parseDouble(settings.getString("lowValue", "70"));
+
+                    if(!mgdl){
+                        high = high*Constants.MMOLL_TO_MGDL;
+                        low = low*Constants.MMOLL_TO_MGDL;
+                    }
 
                     List<BgReadingStats> bgList = DBSearchUtil.getReadings();
 
