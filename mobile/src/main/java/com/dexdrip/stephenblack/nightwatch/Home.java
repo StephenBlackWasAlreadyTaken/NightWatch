@@ -158,7 +158,7 @@ public class Home extends Activity {
     }
 
     public void setupCharts() {
-
+        bgGraphBuilder  = new BgGraphBuilder(this);
         updateStuff = false;
         chart = (LineChartView) findViewById(R.id.chart);
         chart.setZoomType(ZoomType.HORIZONTAL);
