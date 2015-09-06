@@ -1,19 +1,17 @@
 package com.dexdrip.stephenblack.nightwatch;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.*;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -126,8 +124,7 @@ public class WatchUpdaterService extends WearableListenerService implements
                 new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(bg.dataMap(mPrefs));
             }
             if(pebble_integration) {
-                PebbleSync pebbleSync = new PebbleSync();
-                pebbleSync.sendData(getApplicationContext(), bg);
+                getApplicationContext().startService(new Intent(getApplicationContext(), PebbleSync.class));
             }
             getApplicationContext().startService(new Intent(getApplicationContext(), WidgetUpdateService.class));
         }

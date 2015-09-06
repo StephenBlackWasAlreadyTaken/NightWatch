@@ -12,6 +12,9 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/" }
+    maven { url "https://jitpack.io" }
+    maven { url "https://oss.sonatype.org/content/groups/public/" }
 }
 
 
@@ -43,7 +46,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.google.android.gms:play-services:7.3.0'
     compile 'com.google.code.gson:gson:2.3'
-    compile 'com.getpebble:pebblekit:2.6.0@aar'
+    compile 'com.getpebble:pebblekit:3.0.0'
+    compile 'com.github.lecho:hellocharts-android:v1.5.5'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
         transitive = true;
     }

@@ -18,9 +18,9 @@
             android:summary="Send data to Android Wear Watchface."
             android:defaultValue="false" />
         <CheckBoxPreference
-            android:key="pebble_sync"
+            android:key="broadcast_to_pebble"
             android:title="Pebble Integration"
-            android:summary="Send data to Pebble Camping Mode Watchface."
+            android:summary="Send data to Pebble xDrip Watchface."
             android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -10,21 +10,20 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 
-import io.fabric.sdk.android.Fabric;
-import java.text.DecimalFormat;
 import java.util.Date;
 
-import lecho.lib.hellocharts.ViewportChangeListener;
+import io.fabric.sdk.android.Fabric;
 import lecho.lib.hellocharts.gesture.ZoomType;
+import lecho.lib.hellocharts.listener.ViewportChangeListener;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
 import lecho.lib.hellocharts.view.PreviewLineChartView;
@@ -54,6 +53,7 @@ public class Home extends Activity {
         Fabric.with(this, new Crashlytics());
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         checkEula();
+        new IdempotentMigrations(getApplicationContext()).performAll();
 
         startService(new Intent(getApplicationContext(), DataCollectionService.class));
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -147,7 +147,7 @@ public class Home extends Activity {
             if (!updatingPreviewViewport) {
                 updatingChartViewport = true;
                 previewChart.setZoomType(ZoomType.HORIZONTAL);
-                previewChart.setCurrentViewport(newViewport, false);
+                previewChart.setCurrentViewport(newViewport);
                 updatingChartViewport = false;
             }
         }
@@ -159,7 +159,7 @@ public class Home extends Activity {
             if (!updatingChartViewport) {
                 updatingPreviewViewport = true;
                 chart.setZoomType(ZoomType.HORIZONTAL);
-                chart.setCurrentViewport(newViewport, false);
+                chart.setCurrentViewport(newViewport);
                 tempViewport = newViewport;
                 updatingPreviewViewport = false;
             }
@@ -171,9 +171,9 @@ public class Home extends Activity {
 
     public void setViewport() {
         if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right  >= (new Date().getTime())) {
-            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart), false);
+            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart));
         } else {
-            previewChart.setCurrentViewport(holdViewport, false);
+            previewChart.setCurrentViewport(holdViewport);
         }
     }
 
