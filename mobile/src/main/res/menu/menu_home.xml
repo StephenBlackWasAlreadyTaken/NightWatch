@@ -8,8 +8,18 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_statistics"
+        android:orderInCategory="101"
+        android:title="@string/action_statistics"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_resend_last_bg"
         android:orderInCategory="100"
         android:title="@string/action_resend_to_watch"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_open_watch_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_open_watch_setting"
         app:showAsAction="never" />
 </menu>
