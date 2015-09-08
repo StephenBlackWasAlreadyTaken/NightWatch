@@ -30,6 +30,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".stats.StatsActivity"
+            android:label="Statistics" >
+        </activity>
         <activity android:name=".SettingsActivity" android:label="Settings" />
         <activity android:name=".LicenseAgreementActivity" android:label="End User License Agreement" />
         <activity android:name=".AlertsCode.EditAlertActivity" android:label="Edit Alert" />

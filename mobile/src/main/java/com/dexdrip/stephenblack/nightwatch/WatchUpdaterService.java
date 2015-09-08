@@ -10,6 +10,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -21,10 +23,12 @@ public class WatchUpdaterService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     public static final String ACTION_RESEND = WatchUpdaterService.class.getName().concat(".Resend");
+    public static final String ACTION_OPEN_SETTINGS = WatchUpdaterService.class.getName().concat(".OpenSettings");
 
     private GoogleApiClient googleApiClient;
-    public String WEARABLE_DATA_PATH = "/nightscout_watch_data";
-    public String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
+    public static final String WEARABLE_DATA_PATH = "/nightscout_watch_data";
+    public static final String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
+    private static final String OPEN_SETTINGS_PATH = "/openwearsettings";
 
     boolean wear_integration = false;
     boolean pebble_integration = false;
@@ -36,7 +40,9 @@ public class WatchUpdaterService extends WearableListenerService implements
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         listenForChangeInSettings();
         setSettings();
-        if(wear_integration) { googleApiConnect(); }
+        if (wear_integration) {
+            googleApiConnect();
+        }
     }
 
     public void listenForChangeInSettings() {
@@ -51,7 +57,9 @@ public class WatchUpdaterService extends WearableListenerService implements
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
-        if(wear_integration) { googleApiConnect(); }
+        if (wear_integration) {
+            googleApiConnect();
+        }
     }
 
     public void googleApiConnect() {
@@ -71,7 +79,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         double timestamp = 0;
-        if(intent != null) {
+        if (intent != null) {
             timestamp = intent.getDoubleExtra("timestamp", 0);
         }
 
@@ -82,8 +90,11 @@ public class WatchUpdaterService extends WearableListenerService implements
 
         if (wear_integration) {
             if (googleApiClient.isConnected()) {
+                //TODO Adrian: ACTION_OPEN_MENU?
                 if (ACTION_RESEND.equals(action)) {
                     resendData();
+                } else if (ACTION_OPEN_SETTINGS.equals(action)) {
+                    sendNotification();
                 } else {
                     sendData(timestamp);
                 }
@@ -92,7 +103,7 @@ public class WatchUpdaterService extends WearableListenerService implements
             }
         }
 
-        if(pebble_integration) {
+        if (pebble_integration) {
             sendData(timestamp);
         }
         return START_STICKY;
@@ -107,20 +118,20 @@ public class WatchUpdaterService extends WearableListenerService implements
     @Override
     public void onMessageReceived(MessageEvent event) {
         if (wear_integration) {
-            if(event != null && event.getPath().equals(WEARABLE_RESEND_PATH))
+            if (event != null && event.getPath().equals(WEARABLE_RESEND_PATH))
                 resendData();
         }
     }
 
     public void sendData(double timestamp) {
         Bg bg;
-        if(timestamp > 0) {
-           bg = Bg.findByTimestamp(timestamp);
+        if (timestamp > 0) {
+            bg = Bg.findByTimestamp(timestamp);
         } else {
             bg = Bg.last();
         }
         if (bg != null) {
-            if(wear_integration) {
+            if (wear_integration) {
                 new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(bg.dataMap(mPrefs));
             }
             if(pebble_integration) {
@@ -140,25 +151,42 @@ public class WatchUpdaterService extends WearableListenerService implements
             for (Bg bg : graph_bgs) {
                 dataMaps.add(bg.dataMap(mPrefs));
             }
-            entries.putDataMapArrayList("entries",dataMaps);
+            entries.putDataMapArrayList("entries", dataMaps);
 
             new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(entries);
         }
     }
+
+
+    private void sendNotification() {
+        if (googleApiClient.isConnected()) {
+            PutDataMapRequest dataMapRequest = PutDataMapRequest.create(OPEN_SETTINGS_PATH);
+            //unique content
+            dataMapRequest.getDataMap().putDouble("timestamp", System.currentTimeMillis());
+            dataMapRequest.getDataMap().putString("openSettings", "openSettings");
+            PutDataRequest putDataRequest = dataMapRequest.asPutDataRequest();
+            Wearable.DataApi.putDataItem(googleApiClient, putDataRequest);
+        } else {
+            Log.e("OpenSettings", "No connection to wearable available!");
+        }
+    }
+
 
     @Override
     public void onDestroy() {
         if (googleApiClient != null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
-        if(mPrefs != null && mPreferencesListener != null) {
+        if (mPrefs != null && mPreferencesListener != null) {
             mPrefs.unregisterOnSharedPreferenceChangeListener(mPreferencesListener);
         }
     }
 
     @Override
-    public void onConnectionSuspended(int cause) { }
+    public void onConnectionSuspended(int cause) {
+    }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) { }
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
 }
