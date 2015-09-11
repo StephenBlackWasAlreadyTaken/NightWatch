@@ -24,7 +24,6 @@ import com.dexdrip.stephenblack.nightwatch.R;
 import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
 import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
-import com.dexdrip.stephenblack.nightwatch.stats.StatsActivity;
 
 import java.util.Date;
 
@@ -153,11 +152,6 @@ public class Home extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                return true;
-            case R.id.action_statistics:
-                startActivity(new Intent(getApplicationContext(), StatsActivity.class));
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
                 return true;
