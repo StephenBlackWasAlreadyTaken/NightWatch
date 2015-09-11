@@ -1,6 +1,5 @@
 package com.dexdrip.stephenblack.nightwatch.AlertsCode;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -32,10 +31,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
+import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 import com.dexdrip.stephenblack.nightwatch.R;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -43,8 +43,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class EditAlertActivity extends Activity {
-    public static String menu_name = "Edit Alert";
+public class EditAlertActivity extends BaseActivity {
+    public static final String MENU_NAME = "Edit Alert";
 
     private TextView viewHeader;
 
@@ -93,6 +93,17 @@ public class EditAlertActivity extends Activity {
 
     private final static String TAG = AlertPlayer.class.getSimpleName();
 
+    @Override
+    public String getMenuName() {
+        return MENU_NAME;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_edit_alert;
+    }
+
+
     String getExtra(Bundle savedInstanceState, String paramName) {
         String newString;
         if (savedInstanceState == null) {
@@ -112,7 +123,6 @@ public class EditAlertActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
-        setContentView(R.layout.activity_edit_alert);
 
         viewHeader = (TextView) findViewById(R.id.view_alert_header);
 

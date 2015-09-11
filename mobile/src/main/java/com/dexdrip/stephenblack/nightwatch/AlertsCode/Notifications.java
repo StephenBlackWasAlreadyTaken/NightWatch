@@ -25,7 +25,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.Bg;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
-import com.dexdrip.stephenblack.nightwatch.Home;
+import com.dexdrip.stephenblack.nightwatch.Activities.Home;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.Calendar;

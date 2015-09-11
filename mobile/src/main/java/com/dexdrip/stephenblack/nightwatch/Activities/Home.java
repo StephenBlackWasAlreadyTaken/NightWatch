@@ -1,11 +1,11 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.Activities;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -14,16 +14,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import com.crashlytics.android.Crashlytics;
+import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
+import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
+import com.dexdrip.stephenblack.nightwatch.LicenseAgreementActivity;
+import com.dexdrip.stephenblack.nightwatch.R;
 import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
+import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 import com.dexdrip.stephenblack.nightwatch.stats.StatsActivity;
 
-import io.fabric.sdk.android.Fabric;
-
-import java.text.DecimalFormat;
 import java.util.Date;
 
 import io.fabric.sdk.android.Fabric;
@@ -34,8 +36,8 @@ import lecho.lib.hellocharts.view.LineChartView;
 import lecho.lib.hellocharts.view.PreviewLineChartView;
 
 
-public class Home extends Activity {
-    private String menu_name = "DexDrip";
+public class Home extends BaseActivity {
+    public static final String MENU_NAME = "DexDrip";
     private LineChartView chart;
     private PreviewLineChartView previewChart;
     Viewport tempViewport = new Viewport();
@@ -52,6 +54,16 @@ public class Home extends Activity {
     BroadcastReceiver _broadcastReceiver;
     BroadcastReceiver newDataReceiver;
     OnSharedPreferenceChangeListener preferenceChangeListener;
+
+    @Override
+    public String getMenuName() {
+        return MENU_NAME;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_home;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +85,6 @@ public class Home extends Activity {
         };
 
         prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-
-        setContentView(R.layout.activity_home);
     }
 
     public void checkEula() {

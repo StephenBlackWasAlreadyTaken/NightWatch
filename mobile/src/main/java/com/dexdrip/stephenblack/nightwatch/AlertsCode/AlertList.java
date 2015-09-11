@@ -1,6 +1,5 @@
 package com.dexdrip.stephenblack.nightwatch.AlertsCode;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +14,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class AlertList extends Activity {
-    public static String menu_name = "BG Level Alerts";
+public class AlertList extends BaseActivity {
+    public static final String MENU_NAME = "BG Level Alerts";
     ListView listViewLow;
     ListView listViewHigh;
     Button createLowAlert;
@@ -38,6 +38,10 @@ public class AlertList extends Activity {
     final int EDIT_ALERT = 2;
     SharedPreferences prefs;
     private final static String TAG = AlertPlayer.class.getSimpleName();
+
+    public String getMenuName() { return MENU_NAME; }
+
+    public int getLayoutId() { return R.layout.activity_alert_list; }
 
     String stringTimeFromAlert(AlertType alert) {
         if(alert.all_day) { return "all day"; }
@@ -97,7 +101,6 @@ public class AlertList extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alert_list);
         mContext = getApplicationContext();
         listViewLow = (ListView) findViewById(R.id.listView_low);
         listViewHigh = (ListView) findViewById(R.id.listView_high);

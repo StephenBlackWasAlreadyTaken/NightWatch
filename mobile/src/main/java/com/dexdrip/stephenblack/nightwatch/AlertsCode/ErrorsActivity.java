@@ -1,11 +1,11 @@
 package com.dexdrip.stephenblack.nightwatch.AlertsCode;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.ArrayList;
@@ -14,9 +14,8 @@ import java.util.List;
 /**
  * Created by stephenblack on 8/3/15.
  */
-public class ErrorsActivity extends Activity {
-    public static String menu_name = "Errors";
-    public String getMenuName() { return  menu_name; }
+public class ErrorsActivity extends BaseActivity {
+    public static final String MENU_NAME = "Errors";
     private CheckBox highCheckboxView;
     private CheckBox mediumCheckboxView;
     private CheckBox lowCheckboxView;
@@ -25,9 +24,19 @@ public class ErrorsActivity extends Activity {
     private ErrorListAdapter adapter;
 
     @Override
+    public String getMenuName() {
+        return MENU_NAME;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_errors;
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_errors);
 
         highCheckboxView = (CheckBox) findViewById(R.id.highSeverityCheckbox);
         mediumCheckboxView = (CheckBox) findViewById(R.id.midSeverityCheckbox);

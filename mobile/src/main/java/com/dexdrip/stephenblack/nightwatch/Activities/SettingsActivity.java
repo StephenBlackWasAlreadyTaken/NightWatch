@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +16,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+
+import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
+import com.dexdrip.stephenblack.nightwatch.PebbleSync;
+import com.dexdrip.stephenblack.nightwatch.R;
 
 public class SettingsActivity extends PreferenceActivity {
     public static SharedPreferences prefs;

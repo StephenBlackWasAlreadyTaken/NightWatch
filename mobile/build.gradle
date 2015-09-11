@@ -48,6 +48,9 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.getpebble:pebblekit:3.0.0'
     compile 'com.github.lecho:hellocharts-android:v1.5.5'
+
+    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:recyclerview-v7:22.0.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
         transitive = true;
     }

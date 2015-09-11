@@ -1,6 +1,5 @@
 package com.dexdrip.stephenblack.nightwatch.AlertsCode;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,15 +11,16 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
+import com.dexdrip.stephenblack.nightwatch.Activities.Home;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
-import com.dexdrip.stephenblack.nightwatch.Home;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.text.DateFormat;
 import java.util.Date;
 
-public class SnoozeActivity extends Activity {
-    public static String menu_name = "Snooze Alert";
+public class SnoozeActivity extends BaseActivity {
+    public static final String MENU_NAME = "Snooze Alert";
 
     TextView alertStatus;
     Button buttonSnooze;
@@ -30,6 +30,16 @@ public class SnoozeActivity extends Activity {
     boolean doMgdl;
 
     NumberPicker snoozeValue;
+
+    @Override
+    public String getMenuName() {
+        return MENU_NAME;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_snooze;
+    }
 
     static final int snoozeValues[] = new int []{5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 105, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600};
 
@@ -89,7 +99,6 @@ public class SnoozeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_snooze);
         alertStatus = (TextView) findViewById(R.id.alert_status);
         snoozeValue = (NumberPicker) findViewById(R.id.snooze);
 
