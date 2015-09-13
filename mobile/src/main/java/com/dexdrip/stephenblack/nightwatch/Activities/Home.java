@@ -154,13 +154,10 @@ public class Home extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
-                return true;
             case R.id.action_open_watch_settings:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
-                return true;
-            default:
-                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void setupCharts() {
