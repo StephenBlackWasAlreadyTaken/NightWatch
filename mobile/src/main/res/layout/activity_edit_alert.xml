@@ -9,18 +9,11 @@
     tools:context=".MainActivity">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:layout_height="35dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:background="?attr/colorPrimary"
         android:gravity="center"
-        android:height="35dp"
         android:elevation="4dp"/>
-    <com.shopkeep.pocketandroid.LayoutAdapters.SlidingTabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:background="@color/sk_dk_blue"/>
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"

@@ -18,8 +18,6 @@ import java.util.List;
  */
 public abstract class BaseActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private int menu_position;
-    private String menu_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +35,9 @@ public abstract class BaseActivity extends ActionBarActivity implements Navigati
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getMenuName());
+
         setSupportActionBar(toolbar);
+
     }
 
     private void initializeNavDrawer() {
@@ -68,7 +68,7 @@ public abstract class BaseActivity extends ActionBarActivity implements Navigati
         NavDrawerBuilder navDrawerBuilder = new NavDrawerBuilder(getApplicationContext());
         List<String> menu_option_list = navDrawerBuilder.nav_drawer_options;
         List<Intent> intent_list = navDrawerBuilder.nav_drawer_intents;
-        if (position != menu_position) {
+        if (!getMenuName().equals(menu_option_list.get(position))) {
             startActivity(intent_list.get(position));
             //do not close activity if it is the Launcher or "Home".
             if (!getMenuName().equalsIgnoreCase(Home.MENU_NAME)) {

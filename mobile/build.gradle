@@ -43,14 +43,14 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.2.0'
     testCompile 'com.squareup.okhttp:mockwebserver:2.2.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.google.android.gms:play-services:7.3.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.getpebble:pebblekit:3.0.0'
     compile 'com.github.lecho:hellocharts-android:v1.5.5'
 
     compile 'com.android.support:support-v4:22.2.0'
-    compile 'com.android.support:recyclerview-v7:22.0.0'
+    compile 'com.android.support:recyclerview-v7:22.2.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
         transitive = true;
     }

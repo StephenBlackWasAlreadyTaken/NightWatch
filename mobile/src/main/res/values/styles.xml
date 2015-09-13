@@ -1,16 +1,24 @@
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo">
-
-        <item name="android:background">#212121</item>
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">#212121</item>
+        <item name="colorPrimaryDark">#212222</item>
+        <item name="colorAccent">#33B5E5</item>
     </style>
 
-    <!-- ActionBar styles -->
-    <style name="MyActionBar"
-        parent="@android:style/Widget.Holo.ActionBar">
-        <item name="android:background">#212121</item>
-        <!--<item name="android:color">#616161</item>-->
-    </style>
+    <!--<style name="navDrawer" parent="Theme.AppCompat.NoActionBar">-->
+        <!--<item name="android:textSize">18sp</item>-->
+        <!--<item name="android:background">@color/transparent_sk_dk_blue</item>-->
+    <!--</style>-->
+    <!-- -->
+    <!-- -->
+        <!--<item name="android:background">#212121</item>-->
+        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
+    <!--</style>-->
+
+    <!--&lt;!&ndash; ActionBar styles &ndash;&gt;-->
+    <!--<style name="MyActionBar"-->
+        <!--parent="@android:style/Widget.Holo.ActionBar">-->
+        <!--<item name="android:background">#212121</item>-->
+        <!--&lt;!&ndash;<item name="android:color">#616161</item>&ndash;&gt;-->
+    <!--</style>-->
 </resources>

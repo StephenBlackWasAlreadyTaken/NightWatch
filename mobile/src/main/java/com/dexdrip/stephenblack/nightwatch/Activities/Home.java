@@ -36,7 +36,7 @@ import lecho.lib.hellocharts.view.PreviewLineChartView;
 
 
 public class Home extends BaseActivity {
-    public static final String MENU_NAME = "DexDrip";
+    public static final String MENU_NAME = "NightWatch";
     private LineChartView chart;
     private PreviewLineChartView previewChart;
     Viewport tempViewport = new Viewport();

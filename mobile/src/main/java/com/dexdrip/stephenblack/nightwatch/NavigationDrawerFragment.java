@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError;
 import com.dexdrip.stephenblack.nightwatch.Utils.NavDrawerBuilder;
 
 import java.util.List;
@@ -50,17 +51,17 @@ public class NavigationDrawerFragment extends android.app.Fragment {
             }
         });
 
-        navDrawerBuilder = new NavDrawerBuilder(getActivity());
-        List<String> menu_option_list = navDrawerBuilder.nav_drawer_options;
-        String[] menu_options = menu_option_list.toArray(new String[menu_option_list.size()]);
-        intent_list = navDrawerBuilder.nav_drawer_intents;
-
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                menu_options
-        ));
+//        navDrawerBuilder = new NavDrawerBuilder(getActivity());
+//        List<String> menu_option_list = navDrawerBuilder.nav_drawer_options;
+//        String[] menu_options = menu_option_list.toArray(new String[menu_option_list.size()]);
+//        intent_list = navDrawerBuilder.nav_drawer_intents;
+////
+//        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+//                getActionBar().getThemedContext(),
+//                android.R.layout.simple_list_item_activated_1,
+//                android.R.id.text1,
+//                menu_options
+//        ));
         return mDrawerListView;
     }
 
@@ -70,6 +71,8 @@ public class NavigationDrawerFragment extends android.app.Fragment {
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         android.support.v7.app.ActionBar actionBar = getActionBar();
+        if (actionBar != null)
+            UserError.Log.e("OPEN", "GOT BAR");
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
@@ -77,6 +80,8 @@ public class NavigationDrawerFragment extends android.app.Fragment {
         List<String> menu_option_list = navDrawerBuilder.nav_drawer_options;
         String[] menu_options = menu_option_list.toArray(new String[menu_option_list.size()]);
         intent_list = navDrawerBuilder.nav_drawer_intents;
+        if (actionBar != null)
+            UserError.Log.e("OPEN", "Setting adapter");
 
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
@@ -85,15 +90,18 @@ public class NavigationDrawerFragment extends android.app.Fragment {
                 menu_options
         ));
 
+        if( mDrawerListView.getAdapter() != null)
+            UserError.Log.e("OPEN", "addapter isnt null");
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),
                 mDrawerLayout,
-                R.drawable.ic_drawer,
+                R.drawable.ic_launcher,
                 R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close
         ) {
             @Override
             public void onDrawerClosed(View drawerView) {
+                UserError.Log.e("OPEN", "CLOSE");
                 super.onDrawerClosed(drawerView);
                 if (!isAdded()) { return; }
                 getActivity().invalidateOptionsMenu();
@@ -101,6 +109,7 @@ public class NavigationDrawerFragment extends android.app.Fragment {
 
             @Override
             public void onDrawerOpened(View drawerView) {
+                UserError.Log.e("OPEN", "OPEN");
                 super.onDrawerOpened(drawerView);
                 if (!isAdded()) { return; }
                 getActivity().invalidateOptionsMenu();
@@ -151,13 +160,14 @@ public class NavigationDrawerFragment extends android.app.Fragment {
         }
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     private android.support.v7.app.ActionBar getActionBar() {
-        return ((ActionBarActivity) getActivity()).getSupportActionBar();
+        return ((AppCompatActivity) getActivity()).getSupportActionBar();
     }
 
     public boolean isDrawerOpen() {
