@@ -35,7 +35,7 @@ public abstract class BaseActivity extends ActionBarActivity implements Navigati
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getMenuName());
-
+        toolbar.setNavigationIcon(R.drawable.ic_drawer);
         setSupportActionBar(toolbar);
 
     }
