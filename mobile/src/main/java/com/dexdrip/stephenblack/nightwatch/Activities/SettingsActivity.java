@@ -80,6 +80,7 @@ public class SettingsActivity extends PreferenceActivity {
             addPreferencesFromResource(R.xml.pref_watch_integration);
             final Preference pebbleSync = findPreference("broadcast_to_pebble");
 
+            addPreferencesFromResource(R.xml.pref_other);
 
 
             bindPreferenceSummaryToValue(findPreference("dex_collection_method"));

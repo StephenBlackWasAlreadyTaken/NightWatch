@@ -63,6 +63,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     public void googleApiConnect() {
+        if(googleApiClient.isConnected() || googleApiClient.isConnecting()) { googleApiClient.disconnect(); }
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -131,6 +132,7 @@ public class WatchUpdaterService extends WearableListenerService implements
             bg = Bg.last();
         }
         if (bg != null) {
+            if(!googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
             if (wear_integration) {
                 new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(bg.dataMap(mPrefs));
             }
@@ -142,6 +144,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     private void resendData() {
+        if(!googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
         double startTime = new Date().getTime() - (60000 * 60 * 24);
         Bg last_bg = Bg.last();
         List<Bg> graph_bgs = Bg.latestForGraph(60, startTime);
