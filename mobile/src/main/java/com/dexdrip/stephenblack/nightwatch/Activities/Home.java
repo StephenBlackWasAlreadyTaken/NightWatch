@@ -154,6 +154,7 @@ public class Home extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
+                break;
             case R.id.action_open_watch_settings:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
         }
