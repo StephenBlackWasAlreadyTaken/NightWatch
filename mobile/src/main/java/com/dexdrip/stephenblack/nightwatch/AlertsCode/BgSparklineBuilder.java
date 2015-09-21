@@ -1,11 +1,13 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.AlertsCode;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
+
+import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
+import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,27 +25,28 @@ public class BgSparklineBuilder {
     private Context mContext;
 
     private static final String TAG = "BgSparklineBuilder";
-    private static final int NOTIFICATION_WIDTH_DP = 460; // 476 width minus 8 padding on each side
-    private static final int NOTIFICATION_HEIGHT_DP = 256;
+    private static final int NOTIFICATION_WIDTH_DP = 230; // 476 width minus 8 padding on each side is the native
+                                                          // resolution, but use less for lower memory requirements
+    private static final int NOTIFICATION_HEIGHT_DP = 128;
 
     private int width;
     private int height;
     private BgGraphBuilder bgGraphBuilder;
     private LineChartView chart;
-    private float end = new Date().getTime() / (float) BgGraphBuilder.fuzz;
-    private float start = end - (60000*180 / (float) BgGraphBuilder.fuzz); // 3h
+    private long end = new Date().getTime() / (long)BgGraphBuilder.fuzz;
+    private long start = end - (60000*180 /(long)BgGraphBuilder.fuzz); // 3h
     private boolean showLowLine = false;
     private boolean showHighLine = false;
     private boolean showAxes = false;
-    private boolean useSmallDots = false;
+    private boolean useSmallDots = true;
 
     public BgSparklineBuilder setStart(long start) {
-        this.start = start / (float) BgGraphBuilder.fuzz;
+        this.start = start /(long)BgGraphBuilder.fuzz;
         return this;
     }
 
     public BgSparklineBuilder setEnd(long end) {
-        this.end = end / (float) BgGraphBuilder.fuzz;
+        this.end = end /(long)BgGraphBuilder.fuzz;
         return this;
     }
 
@@ -108,7 +111,7 @@ public class BgSparklineBuilder {
         return this;
     }
 
-    BgSparklineBuilder(Context context) {
+    public BgSparklineBuilder(Context context) {
         mContext = context;
         chart = new LineChartView(mContext);
         width = convertDpToPixel(NOTIFICATION_WIDTH_DP);
@@ -157,7 +160,7 @@ public class BgSparklineBuilder {
         return px;
     }
 
-    Bitmap build() {
+    public Bitmap build() {
         List<Line> lines = new ArrayList<>();
         bgGraphBuilder.defaultLines();
         lines.add(bgGraphBuilder.inRangeValuesLine());
@@ -169,7 +172,7 @@ public class BgSparklineBuilder {
             lines.add(bgGraphBuilder.highLine());
         if (useSmallDots) {
             for(Line line: lines)
-                line.setPointRadius(1);
+                line.setPointRadius(2);
         }
         LineChartData lineData = new LineChartData(lines);
         if (showAxes) {
@@ -184,7 +187,7 @@ public class BgSparklineBuilder {
         chart.setViewportCalculationEnabled(false);
         chart.setInteractive(false);
         chart.setCurrentViewport(viewport);
-        chart.setPadding(0,0,0,0);
+        chart.setPadding(0, 0, 0, 0);
         chart.setLeft(0);
         chart.setTop(0);
         chart.setRight(width);

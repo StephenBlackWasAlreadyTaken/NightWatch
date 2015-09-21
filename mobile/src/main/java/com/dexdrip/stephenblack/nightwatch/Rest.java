@@ -2,18 +2,14 @@ package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.DateTypeAdapter;
-
-import java.util.Date;
-import java.util.ListIterator;
 
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
 import retrofit.converter.GsonConverter;
 
 /**
@@ -24,6 +20,7 @@ public class Rest {
     private String mUrl;
     private static final String UNITS = "mgdl";
     SharedPreferences prefs;
+    PowerManager.WakeLock wakeLock;
     public static Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
             .create();
@@ -32,10 +29,13 @@ public class Rest {
         mContext = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         mUrl = prefs.getString("dex_collection_method", "https://{yoursite}.azurewebsites.net");
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        this.wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "rest wakelock");
     }
 
-    public boolean getBgData(int count) {
+    public boolean getBg(int count) {
         if (!prefs.getBoolean("nightscout_poll", false) && mUrl.compareTo("") != 0 && mUrl.compareTo("https://{yoursite}.azurewebsites.net") != 0) {
+            if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); }
             return false;
         }
         try {
@@ -55,17 +55,18 @@ public class Rest {
                 }
             }
             Log.d("REST CALL SUCCESS: ", "HORRAY");
+            if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); }
             return newData;
         } catch (Exception e) {
-
             Log.d("REST CALL ERROR: ", e.getMessage());
             e.printStackTrace();
+            if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); }
             return false;
         }
     }
 
-    public boolean getBgData() {
-        return getBgData(1);
+    public boolean getBg() {
+        return getBg(1);
     }
 
     private PebbleEndpointInterface pebbleEndpointInterface() {

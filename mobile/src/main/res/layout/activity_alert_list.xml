@@ -1,0 +1,100 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_layout"
+    tools:context=".MainActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:gravity="center"
+        android:elevation="4dp"/>
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:showDividers="middle">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_weight=".46"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:weightSum="1">
+            <Button
+                android:id="@+id/button_create_low"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Create low alert" />
+            <ListView
+                android:id="@+id/listView_low"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="bottom"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_weight=".46"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/button_create_high"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Create high alert"/>
+            <ListView
+                android:id="@+id/listView_high"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_weight=".08"
+            android:layout_height="0dp"
+            android:gravity="center_horizontal"
+            android:showDividers="middle">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="(Long Press an existing alert to edit)"
+                android:textSize="12sp"
+                android:gravity="center_horizontal" />
+        </LinearLayout>
+
+    </LinearLayout>
+        </LinearLayout>
+        <fragment
+            android:id="@+id/navigation_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:name="com.dexdrip.stephenblack.nightwatch.NavigationDrawerFragment"
+            tools:layout="@layout/fragment_navigation_drawer" />
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

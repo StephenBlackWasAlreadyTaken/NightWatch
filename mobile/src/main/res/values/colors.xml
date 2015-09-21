@@ -3,4 +3,18 @@
     <color name="percentile_outer">#005882</color>
     <color name="percentile_inner">#2d95c2</color>
     <color name="percentile_median">#bce6ff</color>
+
+    <item name="sk_dk_blue" type="color">#FF1B2838</item>
+    <item name="sk_lt_blue" type="color">#FF00BBE1</item>
+    <item name="sk_lt_lt_blue" type="color">#FF28CFF3</item>
+    <item name="sk_slate" type="color">#FF31384A</item>
+    <item name="sk_red" type="color">#FFFF6666</item>
+    <item name="sk_green" type="color">#FF75B691</item>
+
+    <item name="transparent_black" type="color">#88000000</item>
+    <item name="transparent_white" type="color">#CCffffff</item>
+    <item name="transparent_sk_dk_blue" type="color">#CC1B2838</item>
+
+    <item name="black" type="color">#FC000000</item>
+    <item name="white" type="color">#FCffffff</item>
 </resources>

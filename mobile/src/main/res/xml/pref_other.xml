@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="other_category"
+        android:title="Other Settings">
+        <Preference
+            android:title="View Recent Errors/Warnings"
+            android:key="recent_errors">
+            <intent
+                android:action="android.intent.action.MAIN"
+                android:targetPackage="com.dexdrip.stephenblack.nightwatch"
+                android:targetClass="com.dexdrip.stephenblack.nightwatch.AlertsCode.ErrorsActivity"/>
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

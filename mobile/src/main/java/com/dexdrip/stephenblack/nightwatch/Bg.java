@@ -1,10 +1,7 @@
 package com.dexdrip.stephenblack.nightwatch;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
@@ -12,6 +9,8 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.dexdrip.stephenblack.nightwatch.AlertsCode.Notifications;
+import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
 import com.google.android.gms.wearable.DataMap;
 import com.google.gson.annotations.Expose;
 
@@ -26,6 +25,7 @@ import java.util.List;
 @Table(name = "Bg", id = BaseColumns._ID)
 public class Bg extends Model {
     public SharedPreferences prefs;
+    public static String TAG_ALERT = "ALERTS";
 
     @Expose
     @Column(name = "sgv")
@@ -323,5 +323,226 @@ public class Bg extends Model {
             return false;
         }
     }
+
+    public static Long getTimeSinceLastReading() {
+        Bg bgReading = Bg.last();
+        if (bgReading != null) {
+            return (long)(new Date().getTime() - bgReading.datetime);
+        }
+        return (long) 0;
+    }
+
+    public String displayValue(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String unit = prefs.getString("units", "mgdl");
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(0);
+        double calculated_value = sgv_double();
+        if (sgv_double() >= 400) {
+            return "HIGH";
+        } else if (calculated_value >= 40) {
+            if(unit.compareTo("mgdl") == 0) {
+                df.setMaximumFractionDigits(0);
+                return df.format(calculated_value);
+            } else {
+                df.setMaximumFractionDigits(1);
+                return df.format(calculated_value_mmol());
+            }
+        } else if (calculated_value > 12) {
+            return "LOW";
+        } else {
+            switch((int)calculated_value) {
+                case 0:
+                    return "??0";
+                case 1:
+                    return "?SN";
+                case 2:
+                    return "??2";
+                case 3:
+                    return "?NA";
+                case 5:
+                    return "?NC";
+                case 6:
+                    return "?CD";
+                case 9:
+                    return "?AD";
+                case 12:
+                    return "?RF";
+                default:
+                    return "???";
+            }
+        }
+    }
+
+    public double calculated_value_mmol() {
+        return mmolConvert(sgv_double());
+    }
+
+    public static void checkForRisingAllert(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Boolean rising_alert = prefs.getBoolean("rising_alert", false);
+        if(!rising_alert) {
+            return;
+        }
+        if(prefs.getLong("alerts_disabled_until", 0) > new Date().getTime()){
+            Log.i("NOTIFICATIONS", "checkForRisingAllert: Notifications are currently disabled!!");
+            return;
+        }
+
+        String riseRate = prefs.getString("rising_bg_val", "2");
+        float friseRate = 2;
+
+        try
+        {
+            friseRate = Float.parseFloat(riseRate);
+        }
+        catch (NumberFormatException nfe)
+        {
+            Log.e(TAG_ALERT, "checkForRisingAllert reading falling_bg_val failed, continuing with 2", nfe);
+        }
+        Log.d(TAG_ALERT, "checkForRisingAllert will check for rate of " + friseRate);
+
+        boolean riseAlert = checkForDropRiseAllert(friseRate, false);
+        Notifications.RisingAlert(context, riseAlert);
+    }
+
+
+    public static void checkForDropAllert(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Boolean falling_alert = prefs.getBoolean("falling_alert", false);
+        if(!falling_alert) {
+            return;
+        }
+        if(prefs.getLong("alerts_disabled_until", 0) > new Date().getTime()){
+            Log.w("NOTIFICATIONS", "checkForDropAllert: Notifications are currently disabled!!");
+            return;
+        }
+
+        String dropRate = prefs.getString("falling_bg_val", "2");
+        float fdropRate = 2;
+
+        try
+        {
+            fdropRate = Float.parseFloat(dropRate);
+        }
+        catch (NumberFormatException nfe)
+        {
+            Log.w(TAG_ALERT, "reading falling_bg_val failed, continuing with 2", nfe);
+        }
+        Log.i(TAG_ALERT, "checkForDropAllert will check for rate of " + fdropRate);
+
+        boolean dropAlert = checkForDropRiseAllert(fdropRate, true);
+        Notifications.DropAlert(context, dropAlert);
+    }
+
+    // true say, alert is on.
+    private static boolean checkForDropRiseAllert(float MaxSpeed, boolean drop) {
+        Log.d(TAG_ALERT, "checkForDropRiseAllert called drop=" + drop);
+        List<Bg> latest = getXRecentPoints(4);
+        if(latest == null) {
+            Log.d(TAG_ALERT, "checkForDropRiseAllert we don't have enough points from the last 15 minutes, returning false");
+            return false;
+        }
+        float time3 = (float)(latest.get(0).datetime - latest.get(3).datetime) / 60000;
+        double bg_diff3 = latest.get(3).sgv_double() - latest.get(0).sgv_double();
+        if (!drop) {
+            bg_diff3 *= (-1);
+        }
+        Log.i(TAG_ALERT, "bg_diff3=" + bg_diff3 + " time3 = " + time3);
+        if(bg_diff3 < time3 * MaxSpeed) {
+            Log.d(TAG_ALERT, "checkForDropRiseAllert for latest 4 points not fast enough, returning false");
+            return false;
+        }
+        // we should alert here, but if the last measurement was less than MaxSpeed / 2, I won't.
+
+
+        float time1 = (float)(latest.get(0).datetime - latest.get(1).datetime) / 60000;
+        double bg_diff1 = latest.get(1).sgv_double() - latest.get(0).sgv_double();
+        if (!drop) {
+            bg_diff1 *= (-1);
+        }
+
+        if(time1 > 7.0) {
+            Log.d(TAG_ALERT, "checkForDropRiseAllert the two points are not close enough, returning true");
+            return true;
+        }
+        if(bg_diff1 < time1 * MaxSpeed /2) {
+            Log.d(TAG_ALERT, "checkForDropRiseAllert for latest 2 points not fast enough, returning false");
+            return false;
+        }
+        Log.d(TAG_ALERT, "checkForDropRiseAllert returning true speed is " + (bg_diff3 / time3));
+        return true;
+    }
+
+    public static List<Bg> getXRecentPoints(int NumReadings) {
+        List<Bg> latest = Bg.latest(NumReadings);
+        if (latest == null || latest.size() != NumReadings) {
+            // for less than NumReadings readings, we can't tell what the situation
+            //
+            Log.d(TAG_ALERT, "getXRecentPoints we don't have enough readings, returning null");
+            return null;
+        }
+        // So, we have at least three values...
+        for(Bg bgReading : latest) {
+            Log.d(TAG_ALERT, "getXRecentPoints - reading: time = " + bgReading.datetime + " calculated_value " + bgReading.sgv_double());
+        }
+
+        // now let's check that they are relevant. the last reading should be from the last 5 minutes,
+        // x-1 more readings should be from the last (x-1)*5 minutes. we will allow 5 minutes for the last
+        // x to allow one packet to be missed.
+        if (new Date().getTime() - latest.get(NumReadings - 1).datetime > (NumReadings * 5 + 6) * 60 * 1000) {
+            Log.d(TAG_ALERT, "getXRecentPoints we don't have enough points from the last " + (NumReadings * 5 + 6) + " minutes, returning null");
+            return null;
+        }
+        return latest;
+
+    }
+    public static boolean trendingToAlertEnd(Context context, boolean above) {
+        // TODO: check if we are not in an UnclerTime.
+        Log.d(TAG_ALERT, "trendingToAlertEnd called");
+
+        List<Bg> latest = getXRecentPoints(3);
+        if(latest == null) {
+            Log.d(TAG_ALERT, "trendingToAlertEnd we don't have enough points from the last 15 minutes, returning false");
+            return false;
+        }
+
+        if(above == false) {
+            // This is a low alert, we should be going up
+            if((latest.get(0).sgv_double() - latest.get(1).sgv_double() > 4) ||
+                    (latest.get(0).sgv_double() - latest.get(2).sgv_double() > 10)) {
+                Log.d(TAG_ALERT, "trendingToAlertEnd returning true for low alert");
+                return true;
+            }
+        } else {
+            // This is a high alert we should be heading down
+            if((latest.get(1).sgv_double() - latest.get(0).sgv_double() > 4) ||
+                    (latest.get(2).sgv_double() - latest.get(0).sgv_double() > 10)) {
+                Log.d(TAG_ALERT, "trendingToAlertEnd returning true for high alert");
+                return true;
+            }
+        }
+        Log.d(TAG_ALERT, "trendingToAlertEnd returning false, not in the right direction (or not fast enough)");
+        return false;
+
+    }
+
+    public static double currentSlope(){
+        List<Bg> last_2 = Bg.latest(2);
+        if (last_2.size() == 2) {
+            return calculateSlope(last_2.get(0), last_2.get(1));
+        } else{
+            return 0d;
+        }
+    }
+
+    public static double calculateSlope(Bg current, Bg last) {
+        if (current.datetime == last.datetime || current.sgv_double() == last.sgv_double()) {
+            return 0;
+        } else {
+            return (last.sgv_double() - current.sgv_double()) / (last.datetime - current.datetime);
+        }
+    }
+
 
 }

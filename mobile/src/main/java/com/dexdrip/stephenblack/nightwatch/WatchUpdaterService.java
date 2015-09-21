@@ -1,19 +1,19 @@
 package com.dexdrip.stephenblack.nightwatch;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.*;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,12 +25,10 @@ public class WatchUpdaterService extends WearableListenerService implements
     public static final String ACTION_RESEND = WatchUpdaterService.class.getName().concat(".Resend");
     public static final String ACTION_OPEN_SETTINGS = WatchUpdaterService.class.getName().concat(".OpenSettings");
 
-
     private GoogleApiClient googleApiClient;
     public static final String WEARABLE_DATA_PATH = "/nightscout_watch_data";
     public static final String WEARABLE_RESEND_PATH = "/nightscout_watch_data_resend";
     private static final String OPEN_SETTINGS_PATH = "/openwearsettings";
-
 
     boolean wear_integration = false;
     boolean pebble_integration = false;
@@ -65,6 +63,7 @@ public class WatchUpdaterService extends WearableListenerService implements
     }
 
     public void googleApiConnect() {
+        if(googleApiClient.isConnected() || googleApiClient.isConnecting()) { googleApiClient.disconnect(); }
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -133,18 +132,19 @@ public class WatchUpdaterService extends WearableListenerService implements
             bg = Bg.last();
         }
         if (bg != null) {
+            if(!googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
             if (wear_integration) {
                 new SendToDataLayerThread(WEARABLE_DATA_PATH, googleApiClient).execute(bg.dataMap(mPrefs));
             }
-            if (pebble_integration) {
-                PebbleSync pebbleSync = new PebbleSync();
-                pebbleSync.sendData(getApplicationContext(), bg);
+            if(pebble_integration) {
+                getApplicationContext().startService(new Intent(getApplicationContext(), PebbleSync.class));
             }
             getApplicationContext().startService(new Intent(getApplicationContext(), WidgetUpdateService.class));
         }
     }
 
     private void resendData() {
+        if(!googleApiClient.isConnected() && !googleApiClient.isConnecting()) { googleApiConnect(); }
         double startTime = new Date().getTime() - (60000 * 60 * 24);
         Bg last_bg = Bg.last();
         List<Bg> graph_bgs = Bg.latestForGraph(60, startTime);

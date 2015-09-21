@@ -1,14 +1,12 @@
 package com.dexdrip.stephenblack.nightwatch.stats;
 
 
-import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -21,11 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 
-public class StatsActivity extends FragmentActivity {
-
+public class StatsActivity extends BaseActivity {
     public static final String MENU_NAME = "Statistics";
     public static final int TODAY = 0;
     public static final int YESTERDAY = 1;
@@ -43,11 +41,13 @@ public class StatsActivity extends FragmentActivity {
     private Button button30d;
     private Button button90d;
 
+    public String getMenuName() { return MENU_NAME; }
+
+    public int getLayoutId() { return R.layout.activity_statistics; }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_statistics);
         assignButtonNames();
         initPagerAndIndicator();
         setButtonColors();

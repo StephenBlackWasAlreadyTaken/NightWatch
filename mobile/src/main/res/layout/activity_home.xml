@@ -1,13 +1,31 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    tools:context="com.dexdrip.stephenblack.nightwatch.Home">
-
-    <!-- As the main content view, the view below consumes the entire
-         space available using match_parent in both dimensions. -->
-    <FrameLayout android:id="@+id/container" android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </FrameLayout>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_layout"
+    tools:context=".MainActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:gravity="center"
+        android:elevation="4dp"/>
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <LinearLayout
             android:orientation="vertical"
@@ -31,8 +49,8 @@
                     android:textColor="#C30909"
                     android:id="@+id/notices"
                     android:background="#07000000"
-                    android:paddingEnd="10dp"
-                    android:paddingStart="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
                     android:gravity="left|top"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
@@ -42,6 +60,8 @@
                     android:id="@+id/chart"
                     android:layout_width="match_parent"
                     android:layout_alignParentStart="false"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentRight="false"
                     android:layout_alignParentEnd="true"
                     android:layout_height="match_parent"
                     android:layout_marginTop="55dp">
@@ -54,7 +74,9 @@
                     android:id="@+id/currentBgValueRealTime"
                     android:gravity="right"
                     android:layout_alignParentEnd="true"
-                    android:paddingEnd="20dp"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentRight="false"
+                    android:paddingRight="20dp"
                     android:textSize="50dp"
                     android:paddingTop="0dp" />
             </RelativeLayout>
@@ -64,10 +86,20 @@
                 android:layout_width="wrap_content"
                 android:layout_weight=".20"
                 android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentRight="false"
                 android:layout_alignParentStart="true"
                 android:layout_height="0dp">
             </lecho.lib.hellocharts.view.PreviewLineChartView>
 
         </LinearLayout>
-</android.support.v4.widget.DrawerLayout>
-
+        </LinearLayout>
+        <fragment
+            android:id="@+id/navigation_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:name="com.dexdrip.stephenblack.nightwatch.NavigationDrawerFragment"
+            tools:layout="@layout/fragment_navigation_drawer" />
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

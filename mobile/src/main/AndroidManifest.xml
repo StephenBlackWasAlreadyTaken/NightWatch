@@ -19,95 +19,61 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <meta-data
-            android:name="AA_DB_NAME"
-            android:value="NightWatch.db" />
-        <meta-data
-            android:name="AA_DB_VERSION"
-            android:value="3" />
 
-        <activity
-            android:name=".Home"
-            android:label="@string/app_name" >
+        <meta-data android:name="AA_DB_NAME" android:value="NightWatch.db" />
+        <meta-data android:name="AA_DB_VERSION" android:value="4" />
+
+        <activity android:name=".Activities.Home" android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="Settings" >
-        </activity>
+
         <activity
             android:name=".stats.StatsActivity"
             android:label="Statistics" >
         </activity>
-        <activity
-            android:name=".LicenseAgreementActivity"
-            android:label="End User License Agreement" >
-        </activity>
+        <activity android:name=".Activities.SettingsActivity" android:label="Settings" />
+        <activity android:name=".LicenseAgreementActivity" android:label="End User License Agreement" />
+        <activity android:name=".AlertsCode.EditAlertActivity" android:label="Edit Alert" />
+        <activity android:name=".AlertsCode.AlertList" android:label="Alert List" />
+        <activity android:name=".AlertsCode.SnoozeActivity" android:label="Snooze" />
+        <activity android:name=".AlertsCode.ErrorsActivity" android:label="Errors" />
+
+
+        <service android:name=".DataCollectionService" android:exported="true" />
+        <service android:name=".AlertsCode.Notifications" android:exported="true" />
+        <service android:name=".AlertsCode.SnoozeOnNotificationDismissService" android:exported="true" />
+        <service android:name=".AlertsCode.MissedReadingService" android:exported="true" />
+        <service android:name=".PebbleSync" android:exported="true" />
+        <service android:name=".integration.dexdrip.IntentService" android:exported="false" />
+        <service android:name=".WidgetUpdateService" android:exported="true" />
+
+        <service android:name=".WatchUpdaterService" android:exported="true" >
+            <intent-filter> <action android:name="com.google.android.gms.wearable.BIND_LISTENER" /> </intent-filter>
+        </service>
+
 
         <receiver android:name=".AutoStart" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
+            <intent-filter> <action android:name="android.intent.action.BOOT_COMPLETED" /> </intent-filter>
         </receiver>
 
-        <service
-            android:name=".DataCollectionService"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
-        <service
-            android:name=".WatchUpdaterService"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
-            </intent-filter>
-        </service>
-
-        <receiver
-            android:name=".integration.dexdrip.DataReceiver"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="com.eveningoutpost.dexdrip.BgEstimate" />
-            </intent-filter>
+        <receiver android:name=".integration.dexdrip.DataReceiver" android:exported="true" >
+            <intent-filter> <action android:name="com.eveningoutpost.dexdrip.BgEstimate" /> </intent-filter>
         </receiver>
-
-        <service
-            android:name=".integration.dexdrip.IntentService"
-            android:exported="false" />
 
         <receiver android:name=".NightWatchWidget" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/night_watch_widget_small_info" />
+            <intent-filter> <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/night_watch_widget_small_info" />
         </receiver>
-
-        <service
-            android:name=".WidgetUpdateService"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
 
         <receiver android:name=".NightWatchWidgetWide" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/night_watch_widget_wide_info"/>
+            <intent-filter> <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/night_watch_widget_wide_info"/>
         </receiver>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="193dbc121e25e5f3e71bb98164ec074378e339df" />
-    </application>
 
+
+        <meta-data android:name="io.fabric.ApiKey" android:value="193dbc121e25e5f3e71bb98164ec074378e339df" />
+    </application>
 </manifest>

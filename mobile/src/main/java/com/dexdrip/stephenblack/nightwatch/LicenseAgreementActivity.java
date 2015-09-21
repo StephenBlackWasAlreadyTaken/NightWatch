@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.dexdrip.stephenblack.nightwatch.Activities.Home;
+
 
 public class LicenseAgreementActivity extends Activity {
     boolean IUnderstand;

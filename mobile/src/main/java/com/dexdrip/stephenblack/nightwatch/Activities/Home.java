@@ -1,40 +1,42 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.Activities;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import com.crashlytics.android.Crashlytics;
+import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
+import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
+import com.dexdrip.stephenblack.nightwatch.LicenseAgreementActivity;
+import com.dexdrip.stephenblack.nightwatch.R;
+import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
+import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
-import com.dexdrip.stephenblack.nightwatch.stats.StatsActivity;
 
-import io.fabric.sdk.android.Fabric;
-
-import java.text.DecimalFormat;
 import java.util.Date;
 
-import lecho.lib.hellocharts.ViewportChangeListener;
+import io.fabric.sdk.android.Fabric;
 import lecho.lib.hellocharts.gesture.ZoomType;
+import lecho.lib.hellocharts.listener.ViewportChangeListener;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
 import lecho.lib.hellocharts.view.PreviewLineChartView;
 
 
-public class Home extends Activity {
-    private String menu_name = "DexDrip";
+public class Home extends BaseActivity {
+    public static final String MENU_NAME = "NightWatch";
     private LineChartView chart;
     private PreviewLineChartView previewChart;
     Viewport tempViewport = new Viewport();
@@ -53,11 +55,22 @@ public class Home extends Activity {
     OnSharedPreferenceChangeListener preferenceChangeListener;
 
     @Override
+    public String getMenuName() {
+        return MENU_NAME;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_home;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         checkEula();
+        new IdempotentMigrations(getApplicationContext()).performAll();
 
         startService(new Intent(getApplicationContext(), DataCollectionService.class));
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -71,8 +84,6 @@ public class Home extends Activity {
         };
 
         prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-
-        setContentView(R.layout.activity_home);
     }
 
     public void checkEula() {
@@ -141,20 +152,12 @@ public class Home extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                return true;
-            case R.id.action_statistics:
-                startActivity(new Intent(getApplicationContext(), StatsActivity.class));
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
-                return true;
             case R.id.action_open_watch_settings:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
-                return true;
-            default:
-                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void setupCharts() {
@@ -183,7 +186,7 @@ public class Home extends Activity {
             if (!updatingPreviewViewport) {
                 updatingChartViewport = true;
                 previewChart.setZoomType(ZoomType.HORIZONTAL);
-                previewChart.setCurrentViewport(newViewport, false);
+                previewChart.setCurrentViewport(newViewport);
                 updatingChartViewport = false;
             }
         }
@@ -195,7 +198,7 @@ public class Home extends Activity {
             if (!updatingChartViewport) {
                 updatingPreviewViewport = true;
                 chart.setZoomType(ZoomType.HORIZONTAL);
-                chart.setCurrentViewport(newViewport, false);
+                chart.setCurrentViewport(newViewport);
                 tempViewport = newViewport;
                 updatingPreviewViewport = false;
             }
@@ -206,10 +209,10 @@ public class Home extends Activity {
     }
 
     public void setViewport() {
-        if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right >= (new Date().getTime())) {
-            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart), false);
+        if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right  >= (new Date().getTime())) {
+            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart));
         } else {
-            previewChart.setCurrentViewport(holdViewport, false);
+            previewChart.setCurrentViewport(holdViewport);
         }
     }
 
