@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.AlertsCode;
+package com.dexdrip.stephenblack.nightwatch.alerts;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.Date;

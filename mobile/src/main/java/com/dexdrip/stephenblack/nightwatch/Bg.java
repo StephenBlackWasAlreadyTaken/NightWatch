@@ -9,8 +9,8 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.Notifications;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
+import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
 import com.google.android.gms.wearable.DataMap;
 import com.google.gson.annotations.Expose;
 

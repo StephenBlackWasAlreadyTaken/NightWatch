@@ -1,18 +1,11 @@
-package com.dexdrip.stephenblack.nightwatch.ShareModels;
+package com.dexdrip.stephenblack.nightwatch.sharemodels;
 
-import com.dexdrip.stephenblack.nightwatch.PebbleEndpoint;
-
-import java.util.HashMap;
 import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
-import retrofit.http.FieldMap;
-import retrofit.http.GET;
 import retrofit.http.POST;
-import retrofit.http.Path;
-import retrofit.http.Query;
 import retrofit.http.QueryMap;
 
 /**
