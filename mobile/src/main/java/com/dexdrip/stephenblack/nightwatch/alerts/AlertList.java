@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.AlertsCode;
+package com.dexdrip.stephenblack.nightwatch.alerts;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +14,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
+import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.text.ParseException;

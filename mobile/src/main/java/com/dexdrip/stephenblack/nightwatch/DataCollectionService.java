@@ -12,9 +12,9 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.dexdrip.stephenblack.nightwatch.ShareModels.ShareRest;
+import com.dexdrip.stephenblack.nightwatch.sharemodels.ShareRest;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.Notifications;
+import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
 
 import java.util.Calendar;
 import java.util.Date;

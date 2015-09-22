@@ -1,6 +1,5 @@
 package com.dexdrip.stephenblack.nightwatch;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
-import com.dexdrip.stephenblack.nightwatch.Activities.Home;
+import com.dexdrip.stephenblack.nightwatch.activities.Home;
 
 
 public class LicenseAgreementActivity extends ActionBarActivity {
