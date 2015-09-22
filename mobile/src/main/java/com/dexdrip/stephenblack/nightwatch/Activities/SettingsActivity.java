@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +16,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
-import android.util.Log;
 
-import java.util.List;
+import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
+import com.dexdrip.stephenblack.nightwatch.PebbleSync;
+import com.dexdrip.stephenblack.nightwatch.R;
 
 public class SettingsActivity extends PreferenceActivity {
     public static SharedPreferences prefs;
@@ -60,13 +61,28 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_license);
+
+            //General
             addPreferencesFromResource(R.xml.pref_general);
-            addPreferencesFromResource(R.xml.pref_bg_notification);
+            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("highValue"));
+            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("lowValue"));
+
+            //Notifications
+            addPreferencesFromResource(R.xml.pref_notifications);
+            bindPreferenceSummaryToValue(findPreference("bg_alert_profile"));
+            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("bg_missed_minutes"));
+            bindPreferenceSummaryToValue(findPreference("falling_bg_val"));
+            bindPreferenceSummaryToValue(findPreference("rising_bg_val"));
+            bindPreferenceSummaryToValue(findPreference("other_alerts_sound"));
+            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("other_alerts_snooze"));
+
             addPreferencesFromResource(R.xml.pref_data_source);
             addPreferencesFromResource(R.xml.pref_watch_integration);
+            final Preference pebbleSync = findPreference("broadcast_to_pebble");
 
-            bindPreferenceSummaryToValue(findPreference("highValue"));
-            bindPreferenceSummaryToValue(findPreference("lowValue"));
+            addPreferencesFromResource(R.xml.pref_other);
+
+
             bindPreferenceSummaryToValue(findPreference("dex_collection_method"));
             bindPreferenceSummaryToValue(findPreference("units"));
             bindPreferenceSummaryToValue(findPreference("dexcom_account_name"));
@@ -129,8 +145,33 @@ public class SettingsActivity extends PreferenceActivity {
             dexcom_account_name.setOnPreferenceChangeListener(collectionPrefValueListener);
             dexcom_account_password.setOnPreferenceChangeListener(collectionPrefValueListener);
             dex_collection_method.setOnPreferenceChangeListener(collectionPrefValueListener);
+
+            pebbleSync.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Context context = preference.getContext();
+                    if ((Boolean) newValue) {
+                        context.startService(new Intent(context, PebbleSync.class));
+                    } else {
+                        context.stopService(new Intent(context, PebbleSync.class));
+                    }
+                    return true;
+                }
+            });
         }
     }
+
+    private static Preference.OnPreferenceChangeListener sBindNumericPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+            String stringValue = value.toString();
+            if (isNumeric(stringValue)) {
+                preference.setSummary(stringValue);
+                return true;
+            }
+            return false;
+        }
+    };
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
@@ -166,12 +207,30 @@ public class SettingsActivity extends PreferenceActivity {
         }
     };
 
+
     private static void bindPreferenceSummaryToValue(Preference preference) {
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+    }
+
+    private static void bindPreferenceSummaryToValueAndEnsureNumeric(Preference preference) {
+        preference.setOnPreferenceChangeListener(sBindNumericPreferenceSummaryToValueListener);
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getString(preference.getKey(), ""));
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+        } catch(NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
 }

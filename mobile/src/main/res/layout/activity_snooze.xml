@@ -1,0 +1,110 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_layout"
+    tools:context=".MainActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:gravity="center"
+        android:elevation="4dp"/>
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:showDividers="middle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".3"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/button_snooze"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text="Snooze Alert"
+                android:layout_margin="20dp"
+                android:textSize="30sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".3"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/snooze"
+                android:layout_gravity="center_horizontal"
+                android:descendantFocusability="blocksDescendants"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".3"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:id="@+id/alert_status"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="replace dynamically (alert status)"
+                android:textSize="20sp"/>
+            </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/button_disable_alerts"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Disable All alerts"/>
+            <Button
+                android:id="@+id/enable_alerts"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Re-Enable Alerts"/>
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+        </LinearLayout>
+        <fragment
+            android:id="@+id/navigation_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:name="com.dexdrip.stephenblack.nightwatch.NavigationDrawerFragment"
+            tools:layout="@layout/fragment_navigation_drawer" />
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

@@ -8,12 +8,14 @@ import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import lecho.lib.hellocharts.model.Axis;
@@ -22,7 +24,7 @@ import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.util.Utils;
+import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.Chart;
 
 /**
@@ -99,7 +101,7 @@ public class BgGraphBuilder {
 
     public Line highValuesLine() {
         Line highValuesLine = new Line(highValues);
-        highValuesLine.setColor(Utils.COLOR_ORANGE);
+        highValuesLine.setColor(ChartUtils.COLOR_ORANGE);
         highValuesLine.setHasLines(false);
         highValuesLine.setPointRadius(3);
         highValuesLine.setHasPoints(true);
@@ -117,7 +119,7 @@ public class BgGraphBuilder {
 
     public Line inRangeValuesLine() {
         Line inRangeValuesLine = new Line(inRangeValues);
-        inRangeValuesLine.setColor(Utils.COLOR_BLUE);
+        inRangeValuesLine.setColor(ChartUtils.COLOR_BLUE);
         inRangeValuesLine.setHasLines(false);
         inRangeValuesLine.setPointRadius(3);
         inRangeValuesLine.setHasPoints(true);
@@ -147,7 +149,7 @@ public class BgGraphBuilder {
         Line highLine = new Line(highLineValues);
         highLine.setHasPoints(false);
         highLine.setStrokeWidth(1);
-        highLine.setColor(Utils.COLOR_ORANGE);
+        highLine.setColor(ChartUtils.COLOR_ORANGE);
         return highLine;
     }
 
@@ -166,8 +168,8 @@ public class BgGraphBuilder {
 
     public Line maxShowLine() {
         List<PointValue> maxShowValues = new ArrayList<PointValue>();
-        maxShowValues.add(new PointValue((float)start_time, (float)defaultMaxY));
-        maxShowValues.add(new PointValue((float)end_time, (float)defaultMaxY));
+        maxShowValues.add(new PointValue((float) start_time, (float) defaultMaxY));
+        maxShowValues.add(new PointValue((float) end_time, (float) defaultMaxY));
         Line maxShowLine = new Line(maxShowValues);
         maxShowLine.setHasLines(false);
         maxShowLine.setHasPoints(false);
@@ -326,4 +328,50 @@ public class BgGraphBuilder {
     public double mmolConvert(double mgdl) {
         return mgdl * Constants.MGDL_TO_MMOLL;
     }
+
+    static public boolean isXLargeTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    public String unitizedDeltaString(boolean showUnit, boolean highGranularity) {
+
+        List<Bg> last2 = Bg.latest(2);
+        if(last2.size() < 2 || last2.get(0).datetime - last2.get(1).datetime > 20 * 60 * 1000){
+            // don't show delta if there are not enough values or the values are more than 20 mintes apart
+            return "???";
+        }
+
+        double value = Bg.currentSlope() * 5*60*1000;
+
+        if(Math.abs(value) > 100){
+            // a delta > 100 will not happen with real BG values -> problematic sensor data
+            return "ERR";
+        }
+
+        // TODO: allow localization from os settings once pebble doesn't require english locale
+        DecimalFormat df = new DecimalFormat("#", new DecimalFormatSymbols(Locale.ENGLISH));
+        String delta_sign = "";
+        if (value > 0) { delta_sign = "+"; }
+        if(doMgdl) {
+
+            if(highGranularity){
+                df.setMaximumFractionDigits(1);
+            } else {
+                df.setMaximumFractionDigits(0);
+            }
+
+            return delta_sign + df.format(unitized(value)) +  (showUnit?" mg/dl":"");
+        } else {
+
+            if(highGranularity){
+                df.setMaximumFractionDigits(2);
+            } else {
+                df.setMaximumFractionDigits(1);
+            }
+            df.setMinimumFractionDigits(1);
+            df.setMinimumIntegerDigits(1);
+            return delta_sign + df.format(unitized(value)) + (showUnit?" mmol/l":"");
+        }
+    }
+
 }

@@ -1,37 +1,42 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.Activities;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
+import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
+import com.dexdrip.stephenblack.nightwatch.LicenseAgreementActivity;
+import com.dexdrip.stephenblack.nightwatch.R;
+import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
+import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 
-import io.fabric.sdk.android.Fabric;
-import java.text.DecimalFormat;
 import java.util.Date;
 
-import lecho.lib.hellocharts.ViewportChangeListener;
+import io.fabric.sdk.android.Fabric;
 import lecho.lib.hellocharts.gesture.ZoomType;
+import lecho.lib.hellocharts.listener.ViewportChangeListener;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
 import lecho.lib.hellocharts.view.PreviewLineChartView;
 
 
-public class Home extends Activity {
-    private String menu_name = "DexDrip";
+public class Home extends BaseActivity {
+    public static final String MENU_NAME = "NightWatch";
     private LineChartView chart;
     private PreviewLineChartView previewChart;
     Viewport tempViewport = new Viewport();
@@ -47,6 +52,17 @@ public class Home extends Activity {
     public BgGraphBuilder bgGraphBuilder;
     BroadcastReceiver _broadcastReceiver;
     BroadcastReceiver newDataReceiver;
+    OnSharedPreferenceChangeListener preferenceChangeListener;
+
+    @Override
+    public String getMenuName() {
+        return MENU_NAME;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_home;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +70,20 @@ public class Home extends Activity {
         Fabric.with(this, new Crashlytics());
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         checkEula();
+        new IdempotentMigrations(getApplicationContext()).performAll();
 
         startService(new Intent(getApplicationContext(), DataCollectionService.class));
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_bg_notification, false);
-        setContentView(R.layout.activity_home);
+
+        preferenceChangeListener = new OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                invalidateOptionsMenu();
+            }
+        };
+
+        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
     public void checkEula() {
@@ -71,7 +96,7 @@ public class Home extends Activity {
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         bgGraphBuilder = new BgGraphBuilder(getApplicationContext());
         _broadcastReceiver = new BroadcastReceiver() {
@@ -100,9 +125,26 @@ public class Home extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (preferenceChangeListener != null) {
+            prefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_home, menu);
+
+        if (!prefs.getBoolean("watch_sync", false)) {
+            menu.removeItem(R.id.action_open_watch_settings);
+        }
+        if (!prefs.getBoolean("watch_sync", false) && !prefs.getBoolean("pebble_sync", false)) {
+            menu.removeItem(R.id.action_resend_last_bg);
+
+        }
         return true;
     }
 
@@ -110,19 +152,17 @@ public class Home extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                return true;
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
-                return true;
-            default:
-                return true;
+                break;
+            case R.id.action_open_watch_settings:
+                startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void setupCharts() {
-
+        bgGraphBuilder  = new BgGraphBuilder(this);
         updateStuff = false;
         chart = (LineChartView) findViewById(R.id.chart);
         chart.setZoomType(ZoomType.HORIZONTAL);
@@ -147,7 +187,7 @@ public class Home extends Activity {
             if (!updatingPreviewViewport) {
                 updatingChartViewport = true;
                 previewChart.setZoomType(ZoomType.HORIZONTAL);
-                previewChart.setCurrentViewport(newViewport, false);
+                previewChart.setCurrentViewport(newViewport);
                 updatingChartViewport = false;
             }
         }
@@ -159,7 +199,7 @@ public class Home extends Activity {
             if (!updatingChartViewport) {
                 updatingPreviewViewport = true;
                 chart.setZoomType(ZoomType.HORIZONTAL);
-                chart.setCurrentViewport(newViewport, false);
+                chart.setCurrentViewport(newViewport);
                 tempViewport = newViewport;
                 updatingPreviewViewport = false;
             }
@@ -171,9 +211,9 @@ public class Home extends Activity {
 
     public void setViewport() {
         if (tempViewport.left == 0.0 || holdViewport.left == 0.0 || holdViewport.right  >= (new Date().getTime())) {
-            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart), false);
+            previewChart.setCurrentViewport(bgGraphBuilder.advanceViewport(chart, previewChart));
         } else {
-            previewChart.setCurrentViewport(holdViewport, false);
+            previewChart.setCurrentViewport(holdViewport);
         }
     }
 
@@ -183,14 +223,14 @@ public class Home extends Activity {
         if (_broadcastReceiver != null) {
             unregisterReceiver(_broadcastReceiver);
         }
-        if(newDataReceiver != null) {
+        if (newDataReceiver != null) {
             unregisterReceiver(newDataReceiver);
         }
     }
 
     public void displayCurrentInfo() {
-        final TextView currentBgValueText = (TextView)findViewById(R.id.currentBgValueRealTime);
-        final TextView notificationText = (TextView)findViewById(R.id.notices);
+        final TextView currentBgValueText = (TextView) findViewById(R.id.currentBgValueRealTime);
+        final TextView notificationText = (TextView) findViewById(R.id.notices);
         if ((currentBgValueText.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) {
             currentBgValueText.setPaintFlags(currentBgValueText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
@@ -206,9 +246,9 @@ public class Home extends Activity {
                 notificationText.setTextColor(Color.WHITE);
             }
             double estimate = lastBgreading.sgv_double();
-            if(bgGraphBuilder.unitized(estimate) <= bgGraphBuilder.lowMark) {
+            if (bgGraphBuilder.unitized(estimate) <= bgGraphBuilder.lowMark) {
                 currentBgValueText.setTextColor(Color.parseColor("#C30909"));
-            } else if(bgGraphBuilder.unitized(estimate) >= bgGraphBuilder.highMark) {
+            } else if (bgGraphBuilder.unitized(estimate) >= bgGraphBuilder.highMark) {
                 currentBgValueText.setTextColor(Color.parseColor("#FFBB33"));
             } else {
                 currentBgValueText.setTextColor(Color.WHITE);

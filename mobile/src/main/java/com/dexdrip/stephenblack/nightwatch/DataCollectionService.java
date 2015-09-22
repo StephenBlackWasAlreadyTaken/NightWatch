@@ -8,11 +8,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.dexdrip.stephenblack.nightwatch.ShareModels.ShareRest;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
+import com.dexdrip.stephenblack.nightwatch.AlertsCode.Notifications;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -41,9 +43,11 @@ public class DataCollectionService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "collector");
         setFailoverTimer();
         setSettings();
-        if(endpoint_set) { doService(); }
+        if(endpoint_set) { doService(wakeLock); } else { if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); } }
         setAlarm();
         return START_STICKY;
     }
@@ -66,8 +70,8 @@ public class DataCollectionService extends Service {
             endpoint_set = false;
         }
     }
-    public void setFailoverTimer() { //Sometimes it gets stuck in limbo on 4.4, this should make it try again
-        long retry_in = (1000 * 60 * 7);
+    public void setFailoverTimer() {
+        long retry_in = (1000 * 60 * 6);
         Log.d("DataCollectionService", "Fallover Restarting in: " + (retry_in / (60 * 1000)) + " minutes");
         Calendar calendar = Calendar.getInstance();
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -87,10 +91,10 @@ public class DataCollectionService extends Service {
         };
         mPrefs.registerOnSharedPreferenceChangeListener(mPreferencesListener);
     }
-    public void doService() { doService(1);}
-    public void doService(int count) {
+    public void doService(PowerManager.WakeLock wakeLock) { doService(1, wakeLock);}
+    public void doService(int count, PowerManager.WakeLock wakeLock) {
         Log.d("Performing data fetch: ", "Wish me luck");
-        dataFetcher = new DataFetcher(getApplicationContext());
+        dataFetcher = new DataFetcher(getApplicationContext(), wakeLock);
         dataFetcher.execute(count);
     }
 
@@ -118,7 +122,8 @@ public class DataCollectionService extends Service {
 
     public class DataFetcher extends AsyncTask<Integer, Void, Boolean> {
         Context mContext;
-        DataFetcher(Context context) { mContext = context; }
+        PowerManager.WakeLock mWakeLock;
+        DataFetcher(Context context, PowerManager.WakeLock wakeLock) { mContext = context; mWakeLock = wakeLock; }
 
         @Override
         protected Boolean doInBackground(Integer... params) {
@@ -129,22 +134,24 @@ public class DataCollectionService extends Service {
             try {
                 if(mPrefs.getBoolean("nightscout_poll", false)) {
                     Log.d("NightscoutPoll", "fetching " + requestCount);
-                    boolean success = new Rest(mContext).getBgData(requestCount);
+                    boolean success = new Rest(mContext).getBg(requestCount);
                     Thread.sleep(10000);
                     if (success) {
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
-                    Notifications.notificationSetter(mContext);
+                    getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
+                    if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
                     return true;
                 }
                 if(mPrefs.getBoolean("share_poll", false)) {
                     Log.d("ShareRest", "fetching " + requestCount);
-                    boolean success = new ShareRest(mContext).getBgData(requestCount);
+                    boolean success = new ShareRest(mContext).getBg(requestCount);
                     Thread.sleep(10000);
                     if (success) {
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
-                    Notifications.notificationSetter(mContext);
+                    getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
+                    if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
                     return true;
                 }
                 return true;
@@ -152,11 +159,15 @@ public class DataCollectionService extends Service {
             catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
             catch (InterruptedException exx) { Log.d("Interruption Error: ", "BOOOO"); }
             catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
+            if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
             return false;
         }
     }
 
     public static void newDataArrived(Context context, boolean success, Bg bg) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "collector data arived");
         Log.d("NewDataArrived", "New Data Arrived");
         if (success && bg != null) {
             Intent intent = new Intent(context, WatchUpdaterService.class);
@@ -166,7 +177,8 @@ public class DataCollectionService extends Service {
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
             context.sendBroadcast(updateIntent);
         }
-        Notifications.notificationSetter(context);
+        context.startService(new Intent(context, Notifications.class));
+        if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); }
     }
     public int requestCount() {
         Bg bg = Bg.last();

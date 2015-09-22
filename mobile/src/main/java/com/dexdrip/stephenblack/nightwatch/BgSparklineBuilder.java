@@ -6,14 +6,15 @@ import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.view.LineChartView;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.LineChartView;
 
 /**
  * Created by matthiasgranberry on 5/4/15.
@@ -182,7 +183,7 @@ public class BgSparklineBuilder {
         viewport.right = end;
         chart.setViewportCalculationEnabled(false);
         chart.setInteractive(false);
-        chart.setCurrentViewport(viewport, false);
+        chart.setCurrentViewport(viewport);
         chart.setPadding(0,0,0,0);
         chart.setLeft(0);
         chart.setTop(0);

@@ -1,16 +1,12 @@
 package com.dexdrip.stephenblack.nightwatch.ShareModels;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.dexdrip.stephenblack.nightwatch.Bg;
-import com.dexdrip.stephenblack.nightwatch.Notifications;
-import com.dexdrip.stephenblack.nightwatch.Rest;
-import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
@@ -61,7 +57,7 @@ public class ShareRest {
         password = prefs.getString("dexcom_account_password", "");
     }
 
-    public boolean getBgData(int count) {
+    public boolean getBg(int count) {
         if(count > maxCount) {
             requestCount = 20;
         } else {
@@ -75,29 +71,24 @@ public class ShareRest {
     }
 
     private boolean loginAndGetData() {
-        try {
-            dexcomShareAuthorizeInterface().getSessionId(new ShareAuthenticationBody(password, login), new Callback() {
-                @Override
-                public void success(Object o, Response response) {
-                    Log.d("ShareRest", "Success!! got a response on auth.");
-                    String returnedSessionId = new String(((TypedByteArray) response.getBody()).getBytes()).replace("\"", "");
+        dexcomShareAuthorizeInterface().getSessionId(new ShareAuthenticationBody(password, login), new Callback() {
+            @Override
+            public void success(Object o, Response response) {
+                Log.d("ShareRest", "Success!! got a response on auth.");
+                String returnedSessionId = new String(((TypedByteArray) response.getBody()).getBytes()).replace("\"", "");
 
-                    getBgData(returnedSessionId);
-                }
+                getBg(returnedSessionId);
+            }
 
-                @Override
-                public void failure(RetrofitError retrofitError) {
-                    Log.e("RETROFIT ERROR: ", ""+retrofitError.toString());
-                }
-            });
-            return true;
-        } catch (Exception e) {
-                Log.e("REST CALL ERROR: ", "BOOOO");
-                    return false;
-        }
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Log.e("RETROFIT ERROR: ", ""+retrofitError.toString());
+            }
+        });
+        return true;
     }
 
-    private void getBgData(String sessionId) {
+    private void getBg(String sessionId) {
         DataFetcher dataFetcher = new DataFetcher(mContext, sessionId);
         dataFetcher.execute((Void) null);
     }

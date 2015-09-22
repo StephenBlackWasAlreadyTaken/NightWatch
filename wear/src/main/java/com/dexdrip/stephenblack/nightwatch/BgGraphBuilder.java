@@ -42,13 +42,13 @@ public class BgGraphBuilder {
     private List<PointValue> lowValues = new ArrayList<PointValue>();
     public Viewport viewport;
 
-    public BgGraphBuilder(Context context, List<BgWatchData> aBgDataList, int aPointSize, int aMidColor) {
+    public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aMidColor) {
         end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
         start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
-        this.bgDataList = aBgDataList;
+        this.bgDataList = aBgList;
         this.context = context;
-        this.highMark = aBgDataList.get(aBgDataList.size() - 1).high;
-        this.lowMark = aBgDataList.get(aBgDataList.size() - 1).low;
+        this.highMark = aBgList.get(aBgList.size() - 1).high;
+        this.lowMark = aBgList.get(aBgList.size() - 1).low;
         this.pointSize = aPointSize;
         this.singleLine = true;
         this.midColor = aMidColor;
@@ -56,13 +56,13 @@ public class BgGraphBuilder {
         this.highColor = aMidColor;
     }
 
-    public BgGraphBuilder(Context context, List<BgWatchData> aBgDataList, int aPointSize, int aHighColor, int aLowColor, int aMidColor) {
+    public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aHighColor, int aLowColor, int aMidColor) {
         end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
         start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
-        this.bgDataList = aBgDataList;
+        this.bgDataList = aBgList;
         this.context = context;
-        this.highMark = aBgDataList.get(aBgDataList.size() - 1).high;
-        this.lowMark = aBgDataList.get(aBgDataList.size() - 1).low;
+        this.highMark = aBgList.get(aBgList.size() - 1).high;
+        this.lowMark = aBgList.get(aBgList.size() - 1).low;
         this.pointSize = aPointSize;
         this.highColor = aHighColor;
         this.lowColor = aLowColor;
