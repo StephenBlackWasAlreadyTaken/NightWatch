@@ -23,7 +23,7 @@
         <meta-data android:name="AA_DB_NAME" android:value="NightWatch.db" />
         <meta-data android:name="AA_DB_VERSION" android:value="4" />
 
-        <activity android:name=".activities.Home" android:label="@string/app_name" >
+        <activity android:name=".activities.Home" android:label="@string/app_name" android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
