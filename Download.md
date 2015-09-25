@@ -1,6 +1,6 @@
 ***
-## Version 2.0.1a  (9/24/2015)
-### Download: [NightWatch-v2.0.1.apk](http://bit.ly/NightWatch201)
+## Version 2.0.2a  (9/24/2015)
+### Download: [NightWatch-v2.0.2.apk](http://bit.ly/NightWatch202)
 * consider this an alpha version to hold people over who are having trouble with funnel cake and nightwatch, full changelog to come
 * TONS of amazing work by [AdrianLxM](https://github.com/AdrianLxM)
  * updated all watch images
