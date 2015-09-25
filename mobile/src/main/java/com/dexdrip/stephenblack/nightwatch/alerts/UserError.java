@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.AlertsCode;
+package com.dexdrip.stephenblack.nightwatch.alerts;
 
 import android.os.AsyncTask;
 import android.provider.BaseColumns;

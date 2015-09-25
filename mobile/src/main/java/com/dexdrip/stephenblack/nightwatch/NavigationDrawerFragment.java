@@ -17,8 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError;
-import com.dexdrip.stephenblack.nightwatch.Utils.NavDrawerBuilder;
+import com.dexdrip.stephenblack.nightwatch.utils.NavDrawerBuilder;
 
 import java.util.List;
 

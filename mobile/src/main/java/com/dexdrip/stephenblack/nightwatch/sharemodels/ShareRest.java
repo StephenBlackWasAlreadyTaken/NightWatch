@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.ShareModels;
+package com.dexdrip.stephenblack.nightwatch.sharemodels;
 
 import android.content.Context;
 import android.content.SharedPreferences;

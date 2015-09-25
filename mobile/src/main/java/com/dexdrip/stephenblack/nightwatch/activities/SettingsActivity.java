@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.Activities;
+package com.dexdrip.stephenblack.nightwatch.activities;
 
 import android.content.Context;
 import android.content.Intent;
