@@ -1,9 +1,8 @@
-package com.dexdrip.stephenblack.nightwatch.ShareModels;
+package com.dexdrip.stephenblack.nightwatch.sharemodels;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -13,10 +12,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.dexdrip.stephenblack.nightwatch.Bg;
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
-import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 import com.google.gson.annotations.Expose;
-
-import java.util.Date;
 
 /**
  * Created by stephenblack on 3/16/15.

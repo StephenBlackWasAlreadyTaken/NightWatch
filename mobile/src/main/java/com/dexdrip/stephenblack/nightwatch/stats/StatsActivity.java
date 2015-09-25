@@ -10,16 +10,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
+import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 
@@ -35,11 +35,11 @@ public class StatsActivity extends BaseActivity {
     StatisticsPageAdapter mStatisticsPageAdapter;
     ViewPager mViewPager;
     TextView[] indicationDots;
-    private Button buttonTD;
-    private Button buttonYTD;
-    private Button button7d;
-    private Button button30d;
-    private Button button90d;
+    private AppCompatButton buttonTD;
+    private AppCompatButton buttonYTD;
+    private AppCompatButton button7d;
+    private AppCompatButton button30d;
+    private AppCompatButton button90d;
 
     public String getMenuName() { return MENU_NAME; }
 
@@ -77,11 +77,11 @@ public class StatsActivity extends BaseActivity {
     }
 
     private void assignButtonNames() {
-        buttonTD = (Button) findViewById(R.id.button_stats_today);
-        buttonYTD = (Button) findViewById(R.id.button_stats_yesterday);
-        button7d = (Button) findViewById(R.id.button_stats_7d);
-        button30d = (Button) findViewById(R.id.button_stats_30d);
-        button90d = (Button) findViewById(R.id.button_stats_90d);
+        buttonTD = (AppCompatButton) findViewById(R.id.button_stats_today);
+        buttonYTD = (AppCompatButton) findViewById(R.id.button_stats_yesterday);
+        button7d = (AppCompatButton) findViewById(R.id.button_stats_7d);
+        button30d = (AppCompatButton) findViewById(R.id.button_stats_30d);
+        button90d = (AppCompatButton) findViewById(R.id.button_stats_90d);
     }
 
     private void initPagerAndIndicator() {
@@ -129,29 +129,29 @@ public class StatsActivity extends BaseActivity {
 
     void setButtonColors() {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             ColorStateList csl = new ColorStateList(new int[][]{new int[0]}, new int[]{0xFF606060});
-            buttonTD.setBackgroundTintList(csl);
-            buttonYTD.setBackgroundTintList(csl);
-            button7d.setBackgroundTintList(csl);
-            button30d.setBackgroundTintList(csl);
-            button90d.setBackgroundTintList(csl);
+            buttonTD.setSupportBackgroundTintList(csl);
+            buttonYTD.setSupportBackgroundTintList(csl);
+            button7d.setSupportBackgroundTintList(csl);
+            button30d.setSupportBackgroundTintList(csl);
+            button90d.setSupportBackgroundTintList(csl);
             csl = new ColorStateList(new int[][]{new int[0]}, new int[]{0xFFAA0000});
             switch (state) {
                 case TODAY:
-                    buttonTD.setBackgroundTintList(csl);
+                    buttonTD.setSupportBackgroundTintList(csl);
                     break;
                 case YESTERDAY:
-                    buttonYTD.setBackgroundTintList(csl);
+                    buttonYTD.setSupportBackgroundTintList(csl);
                     break;
                 case D7:
-                    button7d.setBackgroundTintList(csl);
+                    button7d.setSupportBackgroundTintList(csl);
                     break;
                 case D30:
-                    button30d.setBackgroundTintList(csl);
+                    button30d.setSupportBackgroundTintList(csl);
                     break;
                 case D90:
-                    button90d.setBackgroundTintList(csl);
+                    button90d.setSupportBackgroundTintList(csl);
                     break;
             }
         } else {

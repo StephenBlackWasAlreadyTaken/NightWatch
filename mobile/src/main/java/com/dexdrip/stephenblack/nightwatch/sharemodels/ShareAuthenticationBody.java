@@ -1,9 +1,6 @@
-package com.dexdrip.stephenblack.nightwatch.ShareModels;
+package com.dexdrip.stephenblack.nightwatch.sharemodels;
 
 import com.google.gson.annotations.Expose;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by stephenblack on 3/16/15.

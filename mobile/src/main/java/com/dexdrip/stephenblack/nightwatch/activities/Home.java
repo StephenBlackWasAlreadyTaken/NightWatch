@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.Activities;
+package com.dexdrip.stephenblack.nightwatch.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,7 +21,7 @@ import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import com.dexdrip.stephenblack.nightwatch.LicenseAgreementActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
-import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
+import com.dexdrip.stephenblack.nightwatch.utils.IdempotentMigrations;
 import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 
@@ -154,6 +154,7 @@ public class Home extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_resend_last_bg:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_RESEND));
+                break;
             case R.id.action_open_watch_settings:
                 startService(new Intent(this, WatchUpdaterService.class).setAction(WatchUpdaterService.ACTION_OPEN_SETTINGS));
         }

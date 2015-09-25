@@ -8,8 +8,12 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.OkHttpClient;
+
+import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 
 /**
@@ -78,8 +82,13 @@ public class Rest {
     }
 
     private RestAdapter.Builder adapterBuilder() {
+        final OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setReadTimeout(1, TimeUnit.MINUTES);
+        okHttpClient.setConnectTimeout(1, TimeUnit.MINUTES);
+
         RestAdapter.Builder adapterBuilder = new RestAdapter.Builder();
         adapterBuilder
+                .setClient(new OkClient(okHttpClient))
                 .setEndpoint(mUrl)
                 .setConverter(new GsonConverter(new GsonBuilder()
                         .excludeFieldsWithoutExposeAnnotation()

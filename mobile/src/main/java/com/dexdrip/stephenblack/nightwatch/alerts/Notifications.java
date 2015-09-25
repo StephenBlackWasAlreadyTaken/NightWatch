@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.AlertsCode;
+package com.dexdrip.stephenblack.nightwatch.alerts;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
@@ -22,10 +22,10 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.Bg;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
-import com.dexdrip.stephenblack.nightwatch.Activities.Home;
+import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.Calendar;

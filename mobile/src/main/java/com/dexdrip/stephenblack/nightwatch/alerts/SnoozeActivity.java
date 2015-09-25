@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.AlertsCode;
+package com.dexdrip.stephenblack.nightwatch.alerts;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
-import com.dexdrip.stephenblack.nightwatch.Activities.Home;
+import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
+import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.R;
 
