@@ -15,13 +15,14 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import com.dexdrip.stephenblack.nightwatch.PebbleSync;
 import com.dexdrip.stephenblack.nightwatch.R;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends ActionBarActivity {
     public static SharedPreferences prefs;
 
     @Override
@@ -36,24 +37,6 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-    }
-
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        if (AllPrefsFragment.class.getName().equals(fragmentName)) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this);
-    }
-
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     public static class AllPrefsFragment extends PreferenceFragment {
