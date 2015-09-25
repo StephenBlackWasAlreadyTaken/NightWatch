@@ -1,11 +1,11 @@
-package com.dexdrip.stephenblack.nightwatch.Utils;
+package com.dexdrip.stephenblack.nightwatch.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.AlertType;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.SnoozeActivity;
+import com.dexdrip.stephenblack.nightwatch.alerts.AlertType;
+import com.dexdrip.stephenblack.nightwatch.alerts.SnoozeActivity;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 
 /**
