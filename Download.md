@@ -1,6 +1,5 @@
 ***
 
-https://drive.google.com/file/d/0B9-XAGxWboTmRmZ0elU3WEQyTHc/view?usp=sharing
 ## Version 2.0.3a  (9/24/2015)
 ### Download: [NightWatch-v2.0.3.apk](https://drive.google.com/file/d/0B9-XAGxWboTmRmZ0elU3WEQyTHc/view?usp=sharing)
 * Fixed issue where persistant notification was not showing
