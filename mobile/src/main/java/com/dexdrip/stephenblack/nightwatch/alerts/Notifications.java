@@ -108,7 +108,7 @@ public class Notifications extends IntentService {
         doMgdl = (prefs.getString("units", "mgdl").compareTo("mgdl") == 0);
         smart_snoozing = prefs.getBoolean("smart_snoozing", true);
         smart_alerting = prefs.getBoolean("smart_alerting", true);
-        bg_ongoing = prefs.getBoolean("run_service_in_foreground", false);
+        bg_ongoing = prefs.getBoolean("bg_ongoing", false);
     }
 
 /*
@@ -233,8 +233,6 @@ public class Notifications extends IntentService {
 
         List<Bg> bgReadings = Bg.latest(3);
         if(bgReadings == null || bgReadings.size() < 3) { return; }
-        Bg bgReading = bgReadings.get(0);
-
     }
 
     private void  ArmTimer() {

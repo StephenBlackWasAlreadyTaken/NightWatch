@@ -86,6 +86,7 @@ public class DataCollectionService extends Service {
     public void listenForChangeInSettings() {
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
                 setSettings();
             }
         };
