@@ -1,4 +1,10 @@
 ***
+
+https://drive.google.com/file/d/0B9-XAGxWboTmRmZ0elU3WEQyTHc/view?usp=sharing
+## Version 2.0.3a  (9/24/2015)
+### Download: [NightWatch-v2.0.3.apk](https://drive.google.com/file/d/0B9-XAGxWboTmRmZ0elU3WEQyTHc/view?usp=sharing)
+* Fixed issue where persistant notification was not showing
+
 ## Version 2.0.2a  (9/24/2015)
 ### Download: [NightWatch-v2.0.2.apk](http://bit.ly/NightWatch202)
 * consider this an alpha version to hold people over who are having trouble with funnel cake and nightwatch, full changelog to come
