@@ -63,6 +63,10 @@ public class Bg extends Model {
     @Column(name = "noise")
     public double noise;
 
+    @Expose
+    @Column(name = "raw")
+    public double raw; //Calibrated raw value
+
     public String unitized_string() {
         double value = sgv_double();
         DecimalFormat df = new DecimalFormat("#");
