@@ -197,11 +197,10 @@ public class Bg extends Model {
         dataMap.putString("battery", battery);
         dataMap.putLong("sgvLevel", sgvLevel(prefs));
         dataMap.putInt("batteryLevel", batteryLevel());
-
         dataMap.putDouble("sgvDouble", sgv_double());
         dataMap.putDouble("high", inMgdl(highMark));
         dataMap.putDouble("low", inMgdl(lowMark));
-        dataMap.putString("rawstring", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
+        dataMap.putString("rawString", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
         return dataMap;
     }
 
