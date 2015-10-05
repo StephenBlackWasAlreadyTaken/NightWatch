@@ -201,6 +201,7 @@ public class Bg extends Model {
         dataMap.putDouble("sgvDouble", sgv_double());
         dataMap.putDouble("high", inMgdl(highMark));
         dataMap.putDouble("low", inMgdl(lowMark));
+        dataMap.putString("rawstring", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
         return dataMap;
     }
 
