@@ -314,19 +314,19 @@ public class Bg extends Model {
                 .executeSingle();
     }
 
-    public static String threeRaw(){
+    public static String threeRaw(boolean doMgdl){
         StringBuilder sb = new StringBuilder();
         List<Bg> bgs = latest(3);
         long now = System.currentTimeMillis();
-        sb.append(addRaw(bgs, 2, now));
+        sb.append(addRaw(bgs, 2, now, doMgdl));
         sb.append(" | ");
-        sb.append(addRaw(bgs, 1, now));
+        sb.append(addRaw(bgs, 1, now, doMgdl));
         sb.append(" | ");
-        sb.append(addRaw(bgs, 0, now));
+        sb.append(addRaw(bgs, 0, now, doMgdl));
         return sb.toString();
     }
 
-    private static String addRaw(List<Bg> bgs, int number, long now){
+    private static String addRaw(List<Bg> bgs, int number, long now, boolean doMgdl){
         Bg bg;
 
         long to = now - number*(1000*60*5);
@@ -335,7 +335,15 @@ public class Bg extends Model {
         for (int i= 0; i<bgs.size(); i++){
             bg = bgs.get(i);
             if(bg !=null && bg.datetime >=from && bg.datetime< to && bg.raw >0 && bg.raw < 600){
-                return ""+ bg.raw;
+
+                DecimalFormat df = new DecimalFormat("#");
+                if(doMgdl) {
+                    df.setMaximumFractionDigits(0);
+                    return df.format(bg.raw);
+                } else {
+                    df.setMaximumFractionDigits(1);
+                    return df.format(bg.raw*Constants.MGDL_TO_MMOLL);
+                }
             }
         }
 

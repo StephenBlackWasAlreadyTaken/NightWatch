@@ -50,9 +50,27 @@ public class Rest {
                 response =  pebbleEndpointInterface().getPebbleInfo(UNITS, count);
             } else
                 response = pebbleEndpointInterface().getPebbleInfo(UNITS);
+            double slope = 0, intercept = 0, scale = 0;
+            if (response.cals != null && response.cals.size() != 0){
+                Cal cal = response.cals.get(0);
+                slope = cal.slope;
+                intercept = cal.intercept;
+                scale = cal.scale;
+            }
 
             for (Bg returnedBg: response.bgs) {
                 if (Bg.is_new(returnedBg)) {
+
+                    //raw logic from https://github.com/nightscout/cgm-remote-monitor/blob/master/lib/plugins/rawbg.js#L59
+                    if (slope != 0 && intercept != 0 && scale != 0) {
+                        if (returnedBg.filtered == 0 || returnedBg.sgv_double() < 40) {
+                            returnedBg.raw = scale * (returnedBg.unfiltered - intercept) / slope;
+                        } else {
+                            double ratio = scale * (returnedBg.filtered - intercept) / slope / returnedBg.sgv_double();
+                            returnedBg.raw = scale * (returnedBg.unfiltered - intercept) / slope / ratio;
+                        }
+                        returnedBg.raw = ((returnedBg.unfiltered - intercept) / slope) * scale;
+                    }
                     returnedBg.save();
                     DataCollectionService.newDataArrived(mContext, true, returnedBg);
                     newData = true;

@@ -203,7 +203,7 @@ public class Home extends BaseActivity {
                 tempViewport = newViewport;
                 updatingPreviewViewport = false;
             }
-            if (updateStuff == true) {
+            if (updateStuff) {
                 holdViewport.set(newViewport.left, newViewport.top, newViewport.right, newViewport.bottom);
             }
         }
@@ -238,7 +238,7 @@ public class Home extends BaseActivity {
 
         if (lastBgreading != null) {
             //TODO: Adrian: Remove raw string?
-            notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw());
+            notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
             currentBgValueText.setText(bgGraphBuilder.unitized_string(lastBgreading.sgv_double()) + " " + lastBgreading.slopeArrow());
             if ((new Date().getTime()) - (60000 * 16) - lastBgreading.datetime > 0) {
                 notificationText.setTextColor(Color.parseColor("#C30909"));
