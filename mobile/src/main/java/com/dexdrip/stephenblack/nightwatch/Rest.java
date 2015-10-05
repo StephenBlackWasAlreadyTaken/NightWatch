@@ -69,7 +69,6 @@ public class Rest {
                             double ratio = scale * (returnedBg.filtered - intercept) / slope / returnedBg.sgv_double();
                             returnedBg.raw = scale * (returnedBg.unfiltered - intercept) / slope / ratio;
                         }
-                        returnedBg.raw = ((returnedBg.unfiltered - intercept) / slope) * scale;
                     }
                     returnedBg.save();
                     DataCollectionService.newDataArrived(mContext, true, returnedBg);
