@@ -45,6 +45,7 @@ public class DataCollectionService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "collector");
+        wakeLock.acquire();
         setFailoverTimer();
         setSettings();
         if(endpoint_set) { doService(wakeLock); } else { if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); } }
@@ -177,9 +178,6 @@ public class DataCollectionService extends Service {
             context.startService(intent);
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
             context.sendBroadcast(updateIntent);
-            //quick fix: stay awake a bit to handover wakelog
-            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "sendToWatch").acquire(3000);
         }
         context.startService(new Intent(context, Notifications.class));
         if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); }
