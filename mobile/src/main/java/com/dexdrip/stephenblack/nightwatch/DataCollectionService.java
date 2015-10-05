@@ -12,9 +12,9 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.dexdrip.stephenblack.nightwatch.ShareModels.ShareRest;
+import com.dexdrip.stephenblack.nightwatch.sharemodels.ShareRest;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
-import com.dexdrip.stephenblack.nightwatch.AlertsCode.Notifications;
+import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -86,6 +86,7 @@ public class DataCollectionService extends Service {
     public void listenForChangeInSettings() {
         mPreferencesListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
                 setSettings();
             }
         };

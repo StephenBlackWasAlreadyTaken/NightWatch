@@ -10,7 +10,7 @@
             <intent
                 android:action="android.intent.action.MAIN"
                 android:targetPackage="com.dexdrip.stephenblack.nightwatch"
-                android:targetClass="com.dexdrip.stephenblack.nightwatch.AlertsCode.ErrorsActivity"/>
+                android:targetClass="com.dexdrip.stephenblack.nightwatch.alerts.ErrorsActivity"/>
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

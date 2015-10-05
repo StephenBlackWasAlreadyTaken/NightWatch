@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.Activities;
+package com.dexdrip.stephenblack.nightwatch.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,9 +21,9 @@ import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import com.dexdrip.stephenblack.nightwatch.LicenseAgreementActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
-import com.dexdrip.stephenblack.nightwatch.Utils.IdempotentMigrations;
 import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
+import com.dexdrip.stephenblack.nightwatch.utils.IdempotentMigrations;
 
 import java.util.Date;
 

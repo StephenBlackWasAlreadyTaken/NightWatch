@@ -1,11 +1,11 @@
-package com.dexdrip.stephenblack.nightwatch.AlertsCode;
+package com.dexdrip.stephenblack.nightwatch.alerts;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
-import com.dexdrip.stephenblack.nightwatch.Activities.BaseActivity;
+import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.ArrayList;

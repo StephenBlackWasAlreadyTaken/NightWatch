@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.Activities;
+package com.dexdrip.stephenblack.nightwatch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import android.view.KeyEvent;
 
 import com.dexdrip.stephenblack.nightwatch.NavigationDrawerFragment;
 import com.dexdrip.stephenblack.nightwatch.R;
-import com.dexdrip.stephenblack.nightwatch.Utils.NavDrawerBuilder;
+import com.dexdrip.stephenblack.nightwatch.utils.NavDrawerBuilder;
 
 import java.util.List;
 
@@ -36,8 +36,8 @@ public abstract class BaseActivity extends ActionBarActivity implements Navigati
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getMenuName());
         toolbar.setNavigationIcon(R.drawable.ic_drawer);
+        toolbar.setLogo(R.drawable.ic_icon);
         setSupportActionBar(toolbar);
-
     }
 
     private void initializeNavDrawer() {

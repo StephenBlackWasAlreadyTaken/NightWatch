@@ -62,26 +62,26 @@
             </intent-filter>
         </service>
         <activity
-            android:name=".AlertsCode.AlertList"
+            android:name=".alerts.AlertList"
             android:label="Alert List" />
 
         <activity
-            android:name=".AlertsCode.ErrorsActivity"
+            android:name=".alerts.ErrorsActivity"
             android:label="Error List" />
         <activity
-            android:name=".AlertsCode.SnoozeActivity"
+            android:name=".alerts.SnoozeActivity"
             android:label="Alert Snooze" >
         </activity>
         <activity
-            android:name=".AlertsCode.EditAlertActivity"
+            android:name=".alerts.EditAlertActivity"
             android:label="Edit Alert" >
         </activity>
         <service
-            android:name=".AlertsCode.Notifications"
+            android:name=".alerts.Notifications"
             android:exported="false" >
         </service>
         <service
-            android:name=".AlertsCode.PebbleSync"
+            android:name=".alerts.PebbleSync"
             android:enabled="true"
             android:exported="true" >
         </service>
