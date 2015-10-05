@@ -314,6 +314,34 @@ public class Bg extends Model {
                 .executeSingle();
     }
 
+    public static String threeRaw(){
+        StringBuilder sb = new StringBuilder();
+        List<Bg> bgs = latest(3);
+        long now = System.currentTimeMillis();
+        sb.append(addRaw(bgs, 2, now));
+        sb.append(" | ");
+        sb.append(addRaw(bgs, 1, now));
+        sb.append(" | ");
+        sb.append(addRaw(bgs, 0, now));
+        return sb.toString();
+    }
+
+    private static String addRaw(List<Bg> bgs, int number, long now){
+        Bg bg;
+
+        long to = now - number*(1000*60*5);
+        long from = to - (1000*60*5);
+
+        for (int i= 0; i<bgs.size(); i++){
+            bg = bgs.get(i);
+            if(bg !=null && bg.datetime >=from && bg.datetime< to && bg.raw >0 && bg.raw < 600){
+                return ""+ bg.raw;
+            }
+        }
+
+
+        return "x";
+    }
 
     public static boolean alreadyExists(double timestamp) {
         Bg bg = new Select()

@@ -237,7 +237,8 @@ public class Home extends BaseActivity {
         Bg lastBgreading = Bg.last();
 
         if (lastBgreading != null) {
-            notificationText.setText(lastBgreading.readingAge());
+            //TODO: Adrian: Remove raw string?
+            notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw());
             currentBgValueText.setText(bgGraphBuilder.unitized_string(lastBgreading.sgv_double()) + " " + lastBgreading.slopeArrow());
             if ((new Date().getTime()) - (60000 * 16) - lastBgreading.datetime > 0) {
                 notificationText.setTextColor(Color.parseColor("#C30909"));
