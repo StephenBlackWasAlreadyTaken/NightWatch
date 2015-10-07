@@ -35,6 +35,7 @@ public class Rest {
         mUrl = prefs.getString("dex_collection_method", "https://{yoursite}.azurewebsites.net");
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         this.wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "rest wakelock");
+        wakeLock.acquire();
     }
 
     public boolean getBg(int count) {

@@ -22,6 +22,7 @@ import java.util.Date;
 import retrofit.RetrofitError;
 
 public class DataCollectionService extends Service {
+    public static final int TIMEOUT = 15000; // 15 seconds for testing. Lower it afterwards.
     DataFetcher dataFetcher;
     SharedPreferences mPrefs;
     SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
@@ -142,7 +143,7 @@ public class DataCollectionService extends Service {
                     //quick fix: stay awake a bit to handover wakelog
                         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
                         powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                                "quickFix2").acquire(10000);
+                                "quickFix2").acquire(TIMEOUT);
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
                     getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
@@ -157,7 +158,7 @@ public class DataCollectionService extends Service {
                         //test wakelock: stay awake a bit to handover wakelog
                         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
                         powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                                "quickFix3").acquire(10000);
+                                "quickFix3").acquire(TIMEOUT);
 
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
@@ -189,7 +190,7 @@ public class DataCollectionService extends Service {
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
             //test wakelock: stay awake a bit to handover wakelog
             powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "quickFix1").acquire(10000);
+                    "quickFix1").acquire(TIMEOUT);
             context.sendBroadcast(updateIntent);
         }
         context.startService(new Intent(context, Notifications.class));
