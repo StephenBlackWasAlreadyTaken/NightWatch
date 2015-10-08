@@ -46,6 +46,7 @@ public class Home extends BaseWatchFace {
         } else {
             mUploaderBattery.setTextColor(Color.RED);
         }
+        mRaw.setTextColor(Color.BLACK);
         if (chart != null) {
             highColor = Color.YELLOW;
            lowColor = Color.RED;
@@ -88,7 +89,7 @@ public class Home extends BaseWatchFace {
             } else {
                 mUploaderBattery.setTextColor(Color.RED);
             }
-
+            mRaw.setTextColor(Color.WHITE);
             mTime.setTextColor(Color.BLACK);
             if (chart != null) {
                 highColor = Utils.COLOR_ORANGE;
@@ -114,7 +115,7 @@ public class Home extends BaseWatchFace {
                 mDirection.setTextColor(Color.RED);
                 mDelta.setTextColor(Color.RED);
             }
-
+            mRaw.setTextColor(Color.BLACK);
             mUploaderBattery.setTextColor(Color.BLACK);
             mTimestamp.setTextColor(Color.BLACK);
 
