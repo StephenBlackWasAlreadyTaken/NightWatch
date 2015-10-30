@@ -22,12 +22,12 @@
 
         <CheckBoxPreference android:title="Show Raw"
             android:defaultValue="false"
-            android:summary="Show Raw. (Circle WF)"
+            android:summary="Show Raw."
             android:key="showRaw" />
 
         <CheckBoxPreference android:title="Show Raw on ???"
             android:defaultValue="true"
-            android:summary="Show Raw on ???. (Circle WF)"
+            android:summary="Show Raw on ???."
             android:key="showRawNoise" />
 
         <CheckBoxPreference android:title="Show BG"
