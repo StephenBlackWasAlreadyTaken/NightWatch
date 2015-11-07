@@ -42,7 +42,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 public  abstract class BaseWatchFace extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
     public final static IntentFilter INTENT_FILTER;
     public static final long[] vibratePattern = {0,400,300,400,300,400};
-    public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta;
+    public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta, mRaw;
     public RelativeLayout mRelativeLayout;
     public LinearLayout mLinearLayout;
     public long sgvLevel = 0;
@@ -69,6 +69,9 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
     private MessageReceiver messageReceiver;
 
     protected SharedPreferences sharedPrefs;
+    private String rawString = "000 | 000 | 000";
+    private String batteryString = "--";
+    private String sgvString = "--";
 
     @Override
     public void onCreate() {
@@ -108,12 +111,14 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 mSgv = (TextView) stub.findViewById(R.id.sgv);
                 mDirection = (TextView) stub.findViewById(R.id.direction);
                 mTimestamp = (TextView) stub.findViewById(R.id.timestamp);
+                mRaw = (TextView) stub.findViewById(R.id.raw);
                 mUploaderBattery = (TextView) stub.findViewById(R.id.uploader_battery);
                 mDelta = (TextView) stub.findViewById(R.id.delta);
                 mRelativeLayout = (RelativeLayout) stub.findViewById(R.id.main_layout);
                 mLinearLayout = (LinearLayout) stub.findViewById(R.id.secondary_layout);
                 chart = (LineChartView) stub.findViewById(R.id.chart);
                 layoutSet = true;
+                showAgoRawBatt();
                 mRelativeLayout.measure(specW, specH);
                 mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
                         mRelativeLayout.getMeasuredHeight());
@@ -135,13 +140,13 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
         return System.currentTimeMillis() - datetime;
     }
 
-    public String readingAge() {
-        if (datetime == 0) { return "-- Minute ago"; }
+    public String readingAge(boolean shortString) {
+        if (datetime == 0) { return shortString?"--'":"-- Minute ago"; }
         int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
         if (minutesAgo == 1) {
-            return minutesAgo + " Minute ago";
+            return minutesAgo + (shortString?"'":" Minute ago");
         }
-        return minutesAgo + " Minutes ago";
+        return minutesAgo + (shortString?"'":" Minutes ago");
     }
 
     @Override
@@ -175,7 +180,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
             wakeLock.acquire(50);
             final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
             mTime.setText(timeFormat.format(System.currentTimeMillis()));
-            mTimestamp.setText(readingAge());
+            showAgoRawBatt();
 
             if(ageLevel()<=0) {
                 mSgv.setPaintFlags(mSgv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -199,7 +204,9 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 sgvLevel = dataMap.getLong("sgvLevel");
                 batteryLevel = dataMap.getInt("batteryLevel");
                 datetime = dataMap.getDouble("timestamp");
-
+                rawString = dataMap.getString("rawString");
+                sgvString = dataMap.getString("sgvString");
+                batteryString = dataMap.getString("battery");
                 mSgv.setText(dataMap.getString("sgvString"));
 
                 if(ageLevel()<=0) {
@@ -210,13 +217,12 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
 
                 final java.text.DateFormat timeFormat = DateFormat.getTimeFormat(BaseWatchFace.this);
                 mTime.setText(timeFormat.format(System.currentTimeMillis()));
-                mTimestamp.setText(readingAge());
+
+                showAgoRawBatt();
 
                 mDirection.setText(dataMap.getString("slopeArrow"));
-                mUploaderBattery.setText("Uploader: " + dataMap.getString("battery") + "%");
                 mDelta.setText(dataMap.getString("delta"));
 
-                mTimestamp.setText(readingAge());
                 if (chart != null) {
                     addToWatchSet(dataMap);
                     setupCharts();
@@ -229,6 +235,26 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 Log.d("ERROR: ", "DATA IS NOT YET SET");
             }
             setColor();
+        }
+    }
+
+    private void showAgoRawBatt() {
+
+        if(mRaw == null || mTimestamp == null || mUploaderBattery == null){
+            return;
+        }
+
+        if (sharedPrefs.getBoolean("showRaw", false)||
+                (sharedPrefs.getBoolean("showRawNoise", true) && sgvString.equals("???"))
+                ) {
+            mRaw.setVisibility(View.VISIBLE);
+            mRaw.setText("R: " + rawString);
+            mTimestamp.setText(readingAge(true));
+            mUploaderBattery.setText("U: " + batteryString + "%");
+        } else {
+            mRaw.setVisibility(View.GONE);
+            mTimestamp.setText(readingAge(false));
+            mUploaderBattery.setText("Uploader: " + batteryString + "%");
         }
     }
 
@@ -246,6 +272,12 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
         setColor();
+        if(layoutSet){
+            showAgoRawBatt();
+            mRelativeLayout.measure(specW, specH);
+            mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
+                    mRelativeLayout.getMeasuredHeight());
+        }
         invalidate();
     }
 protected abstract void setColorDark();
@@ -253,7 +285,7 @@ protected abstract void setColorDark();
 
 
     public void missedReadingAlert() {
-        int minutes_since = (int) Math.floor(timeSince()/(1000*60));
+        int minutes_since   = (int) Math.floor(timeSince()/(1000*60));
         if(minutes_since >= 16 && ((minutes_since - 16) % 5) == 0) {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext())
                         .setContentTitle("Missed BG Readings")

@@ -63,6 +63,10 @@ public class Bg extends Model {
     @Column(name = "noise")
     public double noise;
 
+    @Expose
+    @Column(name = "raw")
+    public double raw; //Calibrated raw value
+
     public String unitized_string() {
         double value = sgv_double();
         DecimalFormat df = new DecimalFormat("#");
@@ -193,10 +197,10 @@ public class Bg extends Model {
         dataMap.putString("battery", battery);
         dataMap.putLong("sgvLevel", sgvLevel(prefs));
         dataMap.putInt("batteryLevel", batteryLevel());
-
         dataMap.putDouble("sgvDouble", sgv_double());
         dataMap.putDouble("high", inMgdl(highMark));
         dataMap.putDouble("low", inMgdl(lowMark));
+        dataMap.putString("rawString", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
         return dataMap;
     }
 
@@ -310,6 +314,42 @@ public class Bg extends Model {
                 .executeSingle();
     }
 
+    public static String threeRaw(boolean doMgdl){
+        StringBuilder sb = new StringBuilder();
+        List<Bg> bgs = latest(3);
+        long now = System.currentTimeMillis();
+        sb.append(addRaw(bgs, 2, now, doMgdl));
+        sb.append(" | ");
+        sb.append(addRaw(bgs, 1, now, doMgdl));
+        sb.append(" | ");
+        sb.append(addRaw(bgs, 0, now, doMgdl));
+        return sb.toString();
+    }
+
+    private static String addRaw(List<Bg> bgs, int number, long now, boolean doMgdl){
+        Bg bg;
+
+        long to = now - number*(1000*60*5);
+        long from = to - (1000*60*5);
+
+        for (int i= 0; i<bgs.size(); i++){
+            bg = bgs.get(i);
+            if(bg !=null && bg.datetime >=from && bg.datetime< to && bg.raw >0 && bg.raw < 600){
+
+                DecimalFormat df = new DecimalFormat("#");
+                if(doMgdl) {
+                    df.setMaximumFractionDigits(0);
+                    return df.format(bg.raw);
+                } else {
+                    df.setMaximumFractionDigits(1);
+                    return df.format(bg.raw*Constants.MGDL_TO_MMOLL);
+                }
+            }
+        }
+
+
+        return "x";
+    }
 
     public static boolean alreadyExists(double timestamp) {
         Bg bg = new Select()

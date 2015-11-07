@@ -42,6 +42,7 @@ public class IntentService extends android.app.IntentService {
                 bg.bgdelta = (intent.getDoubleExtra(Intents.EXTRA_BG_SLOPE, 0) * 1000 * 60 * 5);
                 bg.datetime = intent.getLongExtra(Intents.EXTRA_TIMESTAMP, new Date().getTime());
                 bg.sgv = Integer.toString((int) bgEstimate, 10);
+                bg.raw = intent.getDoubleExtra(Intents.EXTRA_RAW, 0);
                 bg.save();
 
                 DataCollectionService.newDataArrived(this, true, bg);
