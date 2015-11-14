@@ -20,6 +20,16 @@
             android:summary="Show delta. (Circle WF)"
             android:key="showDelta" />
 
+        <CheckBoxPreference android:title="Show Raw"
+            android:defaultValue="false"
+            android:summary="Show Raw."
+            android:key="showRaw" />
+
+        <CheckBoxPreference android:title="Show Raw on ???"
+            android:defaultValue="true"
+            android:summary="Show Raw on ???."
+            android:key="showRawNoise" />
+
         <CheckBoxPreference android:title="Show BG"
             android:defaultValue="true"
             android:summary="Show BG. (Circle WF)"

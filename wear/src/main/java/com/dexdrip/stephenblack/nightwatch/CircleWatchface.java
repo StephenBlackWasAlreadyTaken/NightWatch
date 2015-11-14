@@ -62,6 +62,9 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
 
     private int sgvLevel = 0;
     private String sgvString = "999";
+    private String rawString = "x | x | x";
+
+
     private int batteryLevel = 0;
     private double datetime = 0;
     private String direction = "";
@@ -150,7 +153,19 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
             textView.setVisibility(View.INVISIBLE);
         }
-        ;
+
+        textView = (TextView) myLayout.findViewById(R.id.rawString);
+        if (sharedPrefs.getBoolean("showRaw", false)||
+                (sharedPrefs.getBoolean("showRawNoise", true) && getSgvString().equals("???"))
+                ) {
+            textView.setVisibility(View.VISIBLE);
+            textView.setText(getRawString());
+            textView.setTextColor(getTextColor());
+
+        } else {
+            //Also possible: View.INVISIBLE instead of View.GONE (no layout change)
+            textView.setVisibility(View.GONE);
+        }
 
         textView = (TextView) myLayout.findViewById(R.id.agoString);
         if (sharedPrefs.getBoolean("showAgo", true)) {
@@ -437,6 +452,14 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
         this.sgvString = sgvString;
     }
 
+    String getRawString() {
+        return rawString;
+    }
+
+    void setRawString(String rawString) {
+        this.rawString = rawString;
+    }
+
     public String getDelta() {
         return delta;
     }
@@ -502,9 +525,11 @@ public class CircleWatchface extends WatchFace implements SharedPreferences.OnSh
             Log.d("CircleWatchface", "sgv level : " + getSgvLevel());
             setSgvString(dataMap.getString("sgvString"));
             Log.d("CircleWatchface", "sgv string : " + getSgvString());
+            setRawString(dataMap.getString("rawString"));
             setDelta(dataMap.getString("delta"));
             setDatetime(dataMap.getDouble("timestamp"));
             addToWatchSet(dataMap);
+
 
             //start animation?
             // dataMap.getDataMapArrayList("entries") == null -> not on "resend data".

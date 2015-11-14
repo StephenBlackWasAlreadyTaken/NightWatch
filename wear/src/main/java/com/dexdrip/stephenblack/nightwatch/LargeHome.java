@@ -46,6 +46,8 @@ public class LargeHome extends BaseWatchFace {
         } else {
             mUploaderBattery.setTextColor(Color.RED);
         }
+
+        mRaw.setTextColor(Color.BLACK);
     }
 
 
@@ -80,7 +82,7 @@ public class LargeHome extends BaseWatchFace {
             } else {
                 mUploaderBattery.setTextColor(Color.RED);
             }
-
+            mRaw.setTextColor(Color.WHITE);
             mTime.setTextColor(Color.BLACK);
         } else {
             mRelativeLayout.setBackgroundColor(Color.BLACK);
@@ -101,7 +103,7 @@ public class LargeHome extends BaseWatchFace {
 
             mUploaderBattery.setTextColor(Color.BLACK);
             mTimestamp.setTextColor(Color.BLACK);
-
+            mRaw.setTextColor(Color.BLACK);
             mTime.setTextColor(Color.WHITE);
         }
     }

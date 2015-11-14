@@ -22,6 +22,7 @@ import java.util.Date;
 import retrofit.RetrofitError;
 
 public class DataCollectionService extends Service {
+    public static final int TIMEOUT = 15000; // 15 seconds for testing. Lower it afterwards.
     DataFetcher dataFetcher;
     SharedPreferences mPrefs;
     SharedPreferences.OnSharedPreferenceChangeListener mPreferencesListener;
@@ -45,6 +46,7 @@ public class DataCollectionService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "collector");
+        wakeLock.acquire();
         setFailoverTimer();
         setSettings();
         if(endpoint_set) { doService(wakeLock); } else { if(wakeLock != null && wakeLock.isHeld()) { wakeLock.release(); } }
@@ -138,6 +140,10 @@ public class DataCollectionService extends Service {
                     boolean success = new Rest(mContext).getBg(requestCount);
                     Thread.sleep(10000);
                     if (success) {
+                    //quick fix: stay awake a bit to handover wakelog
+                        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                                "quickFix2").acquire(TIMEOUT);
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
                     getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
@@ -149,6 +155,11 @@ public class DataCollectionService extends Service {
                     boolean success = new ShareRest(mContext).getBg(requestCount);
                     Thread.sleep(10000);
                     if (success) {
+                        //test wakelock: stay awake a bit to handover wakelog
+                        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                                "quickFix3").acquire(TIMEOUT);
+
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
                     getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
@@ -169,6 +180,7 @@ public class DataCollectionService extends Service {
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "collector data arived");
+        wakeLock.acquire();
         Log.d("NewDataArrived", "New Data Arrived");
         if (success && bg != null) {
             Intent intent = new Intent(context, WatchUpdaterService.class);
@@ -176,6 +188,9 @@ public class DataCollectionService extends Service {
             Log.d("NewDataArrived", "New Data Arrived with timestamp "+ bg.datetime);
             context.startService(intent);
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
+            //test wakelock: stay awake a bit to handover wakelog
+            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    "quickFix1").acquire(TIMEOUT);
             context.sendBroadcast(updateIntent);
         }
         context.startService(new Intent(context, Notifications.class));
