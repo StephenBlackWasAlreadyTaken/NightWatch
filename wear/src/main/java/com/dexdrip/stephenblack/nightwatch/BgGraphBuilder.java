@@ -214,7 +214,8 @@ public class BgGraphBuilder {
         //Add whole hours to the axis (as long as they are more than 15 mins away from the current time)
         for (int l = 0; l <= 24; l++) {
             double timestamp = endHour - (60000 * 60 * l);
-            if((timestamp - timeNow < 0) && (Math.abs(timestamp - timeNow) > (1000 * 60 * 15))) {
+            //if((timestamp - timeNow < 0) && (Math.abs(timestamp - timeNow) > (1000 * 60 * 15))) {
+            if((timestamp - timeNow < 0) && (timestamp > start_time)) {
                 xAxisValues.add(new AxisValue(fuzz(timestamp), (timeFormat.format(timestamp)).toCharArray()));
             }
         }
