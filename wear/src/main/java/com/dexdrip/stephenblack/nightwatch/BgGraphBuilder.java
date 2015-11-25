@@ -44,7 +44,7 @@ public class BgGraphBuilder {
     public Viewport viewport;
 
     public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aMidColor, int timespan) {
-        end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
+        end_time = new Date().getTime() + (1000 * 60 * 6 * timespan); //Now plus 30 minutes padding (for 5 hours. Less if less.)
         start_time = new Date().getTime()  - (1000 * 60 * 60 * timespan); //timespan hours ago
         this.bgDataList = aBgList;
         this.context = context;
@@ -59,7 +59,7 @@ public class BgGraphBuilder {
     }
 
     public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aHighColor, int aLowColor, int aMidColor, int timespan) {
-        end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
+        end_time = new Date().getTime() + (1000 * 60 * 6 * timespan); //Now plus 30 minutes padding (for 5 hours. Less if less.)
         start_time = new Date().getTime()  - (1000 * 60 * 60 * timespan); //timespan hours ago
         this.bgDataList = aBgList;
         this.context = context;
@@ -218,7 +218,7 @@ public class BgGraphBuilder {
         for (int l = 0; l <= 24; l++) {
             double timestamp = endHour - (60000 * 60 * l);
             if((timestamp - timeNow < 0) && (timestamp > start_time)) {
-                if(Math.abs(timestamp - timeNow) > (1000 * 60 * 6 * timespan)){
+                if(Math.abs(timestamp - timeNow) > (1000 * 60 * 8 * timespan)){
                     xAxisValues.add(new AxisValue(fuzz(timestamp), (timeFormat.format(timestamp)).toCharArray()));
                 }else {
                     xAxisValues.add(new AxisValue(fuzz(timestamp), "".toCharArray()));
