@@ -22,6 +22,7 @@ import lecho.lib.hellocharts.model.Viewport;
  * Created by stephenblack on 11/15/14.
  */
 public class BgGraphBuilder {
+    private int timespan;
     public double end_time;
     public double start_time;
     public double fuzzyTimeDenom = (1000 * 60 * 1);
@@ -42,9 +43,9 @@ public class BgGraphBuilder {
     private List<PointValue> lowValues = new ArrayList<PointValue>();
     public Viewport viewport;
 
-    public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aMidColor) {
+    public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aMidColor, int timespan) {
         end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
-        start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
+        start_time = new Date().getTime()  - (1000 * 60 * 60 * timespan); //timespan hours ago
         this.bgDataList = aBgList;
         this.context = context;
         this.highMark = aBgList.get(aBgList.size() - 1).high;
@@ -54,11 +55,12 @@ public class BgGraphBuilder {
         this.midColor = aMidColor;
         this.lowColor = aMidColor;
         this.highColor = aMidColor;
+        this.timespan = timespan;
     }
 
-    public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aHighColor, int aLowColor, int aMidColor) {
+    public BgGraphBuilder(Context context, List<BgWatchData> aBgList, int aPointSize, int aHighColor, int aLowColor, int aMidColor, int timespan) {
         end_time = new Date().getTime() + (1000 * 60 * 30); //Now plus 30 minutes padding
-        start_time = new Date().getTime()  - (1000 * 60 * 60 * 5); //5 hours ago
+        start_time = new Date().getTime()  - (1000 * 60 * 60 * timespan); //timespan hours ago
         this.bgDataList = aBgList;
         this.context = context;
         this.highMark = aBgList.get(aBgList.size() - 1).high;
@@ -67,6 +69,7 @@ public class BgGraphBuilder {
         this.highColor = aHighColor;
         this.lowColor = aLowColor;
         this.midColor = aMidColor;
+        this.timespan = timespan;
     }
 
     public LineChartData lineData() {
@@ -214,8 +217,12 @@ public class BgGraphBuilder {
         //Add whole hours to the axis (as long as they are more than 15 mins away from the current time)
         for (int l = 0; l <= 24; l++) {
             double timestamp = endHour - (60000 * 60 * l);
-            if((timestamp - timeNow < 0) && (Math.abs(timestamp - timeNow) > (1000 * 60 * 15))) {
-                xAxisValues.add(new AxisValue(fuzz(timestamp), (timeFormat.format(timestamp)).toCharArray()));
+            if((timestamp - timeNow < 0) && (timestamp > start_time)) {
+                if(Math.abs(timestamp - timeNow) > (1000 * 60 * 6 * timespan)){
+                    xAxisValues.add(new AxisValue(fuzz(timestamp), (timeFormat.format(timestamp)).toCharArray()));
+                }else {
+                    xAxisValues.add(new AxisValue(fuzz(timestamp), "".toCharArray()));
+                }
             }
         }
         xAxis.setValues(xAxisValues);
