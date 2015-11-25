@@ -354,7 +354,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
                 mSgv.setTextColor(Color.RED);
                 mDelta.setTextColor(Color.RED);
             }
-            mTimestamp.setTextColor(Color.BLACK);
+            mTimestamp.setTextColor(Color.WHITE);
 
             mTime.setTextColor(Color.WHITE);
             if (chart != null) {
