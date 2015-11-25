@@ -339,10 +339,11 @@ protected abstract void setColorDark();
 
     public void setupCharts() {
         if(bgDataList.size() > 0) { //Dont crash things just because we dont have values, people dont like crashy things
+            int timeframe = Integer.parseInt(sharedPrefs.getString("chart_timeframe", "5"));
             if (singleLine) {
-                bgGraphBuilder = new BgGraphBuilder(getApplicationContext(), bgDataList, pointSize, midColor);
+                bgGraphBuilder = new BgGraphBuilder(getApplicationContext(), bgDataList, pointSize, midColor, timeframe);
             } else {
-                bgGraphBuilder = new BgGraphBuilder(getApplicationContext(), bgDataList, pointSize, highColor, lowColor, midColor);
+                bgGraphBuilder = new BgGraphBuilder(getApplicationContext(), bgDataList, pointSize, highColor, lowColor, midColor, timeframe);
             }
 
             chart.setLineChartData(bgGraphBuilder.lineData());
