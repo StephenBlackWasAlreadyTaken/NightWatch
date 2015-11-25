@@ -35,6 +35,14 @@
             android:summary="Show BG. (Circle WF)"
             android:key="showBG" />
 
+        <ListPreference
+            android:key="chart_timeframe"
+            android:title="Chart Timeframe"
+            android:summary="Chart Timeframe"
+            android:entries="@array/chart_timeframe"
+            android:entryValues="@array/chart_timeframe_values"
+            android:defaultValue="5" />
+
         <CheckBoxPreference android:title="Show Big Numbers"
             android:defaultValue="false"
             android:summary="Big numbers. (Circle WF)"
