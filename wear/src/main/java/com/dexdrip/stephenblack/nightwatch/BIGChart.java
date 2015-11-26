@@ -8,9 +8,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -67,6 +70,8 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
     public View layoutView;
     private final Point displaySize = new Point();
     private int specW, specH;
+    private int animationAngle = 0;
+    private boolean isAnimated = false;
 
     private LocalBroadcastManager localBroadcastManager;
     private MessageReceiver messageReceiver;
@@ -238,10 +243,18 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
                 mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
                         mRelativeLayout.getMeasuredHeight());
                 invalidate();
+                setColor();
+
+                //start animation?
+                // dataMap.getDataMapArrayList("entries") == null -> not on "resend data".
+                if (sharedPrefs.getBoolean("animation", false) && dataMap.getDataMapArrayList("entries") == null && (sgvString.equals("100") || sgvString.equals("5.5") || sgvString.equals("5,5"))) {
+                    startAnimation();
+                }
+
+
             } else {
                 Log.d("ERROR: ", "DATA IS NOT YET SET");
             }
-            setColor();
         }
     }
 
@@ -262,7 +275,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
 
     }
 
-    
+
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
@@ -274,6 +287,57 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
                     mRelativeLayout.getMeasuredHeight());
         }
         invalidate();
+    }
+
+    protected void updateRainbow() {
+        animationAngle = (animationAngle + 1) % 360;
+        //Animation matrix:
+        int[] rainbow = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE
+                , Color.CYAN};
+        Shader shader = new LinearGradient(0, 0, 0, 20, rainbow,
+                null, Shader.TileMode.MIRROR);
+        Matrix matrix = new Matrix();
+        matrix.setRotate(animationAngle);
+        shader.setLocalMatrix(matrix);
+        mSgv.getPaint().setShader(shader);
+        invalidate();
+    }
+
+    private synchronized boolean isAnimated() {
+        return isAnimated;
+    }
+
+    private synchronized void setIsAnimated(boolean isAnimated) {
+        this.isAnimated = isAnimated;
+    }
+
+    void startAnimation() {
+        Log.d("CircleWatchface", "start startAnimation");
+
+        Thread animator = new Thread() {
+
+
+            public void run() {
+                //TODO:Wakelock?
+                setIsAnimated(true);
+                for (int i = 0; i <= 8 * 1000 / 40; i++) {
+                    updateRainbow();
+                    try {
+                        Thread.sleep(40);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mSgv.getPaint().setShader(null);
+                setIsAnimated(false);
+                invalidate();
+                setColor();
+
+                System.gc();
+            }
+        };
+
+        animator.start();
     }
 
 
@@ -290,6 +354,8 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
             mSgv.setTextColor(Color.RED);
             mDelta.setTextColor(Color.RED);
         }
+
+
         if (ageLevel == 1) {
             mTimestamp.setTextColor(Color.WHITE);
         } else {
@@ -374,8 +440,8 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
         int minutes_since   = (int) Math.floor(timeSince()/(1000*60));
         if(minutes_since >= 16 && ((minutes_since - 16) % 5) == 0) {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext())
-                        .setContentTitle("Missed BG Readings")
-                        .setVibrate(vibratePattern);
+                    .setContentTitle("Missed BG Readings")
+                    .setVibrate(vibratePattern);
             NotificationManager mNotifyMgr = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
             mNotifyMgr.notify(missed_readings_alert_id, notification.build());
             ListenerService.requestData(this); // attempt to recover missing data
