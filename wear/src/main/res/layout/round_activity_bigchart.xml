@@ -24,16 +24,6 @@
             android:layout_marginTop="-5dp"
             android:gravity="center_horizontal">
 
-            <TextView
-                android:id="@+id/sgv"
-                android:textSize="41sp"
-                android:text="---"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:layout_marginRight="5dp" />
 
             <TextView
                 android:id="@+id/delta"
@@ -43,11 +33,22 @@
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
                 android:layout_gravity="bottom"
-                android:gravity="center_horizontal|bottom" />
+                android:gravity="center_horizontal|bottom"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:id="@+id/sgv"
+                android:textSize="41sp"
+                android:text="---"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal" />
 
         </LinearLayout>
 
-         <lecho.lib.hellocharts.view.LineChartView
+        <lecho.lib.hellocharts.view.LineChartView
             android:id="@+id/chart"
             android:layout_width="match_parent"
             android:layout_height="77dp"
