@@ -8,8 +8,13 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -84,6 +89,22 @@ public class Home extends BaseActivity {
         };
 
         prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent();
+            String packageName = getPackageName();
+            Log.d(this.getClass().getName(), "Maybe ignoring battery optimization");
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(packageName) &&
+                    !prefs.getBoolean("requested_ignore_battery_optimizations", false)) {
+                Log.d(this.getClass().getName(), "Requesting ignore battery optimization");
+
+                prefs.edit().putBoolean("requested_ignore_battery_optimizations", true).apply();
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + packageName));
+                startActivity(intent);
+            }
+        }
     }
 
     public void checkEula() {
