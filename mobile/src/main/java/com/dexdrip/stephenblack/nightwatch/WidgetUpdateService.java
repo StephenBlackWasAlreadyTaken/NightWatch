@@ -61,7 +61,10 @@ public class WidgetUpdateService extends Service {
             Calendar calendar = Calendar.getInstance();
             AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // Adrian: do we even need to handle non-awake systems? Updating views on non-awake systems seems pointless.
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, WidgetUpdateService.class), 0));
+            } else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
                 alarm.setExact(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, WidgetUpdateService.class), 0));
             } else {
                 alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, WidgetUpdateService.class), 0));
