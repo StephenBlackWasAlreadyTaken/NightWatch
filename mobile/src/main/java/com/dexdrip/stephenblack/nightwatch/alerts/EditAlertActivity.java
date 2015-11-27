@@ -405,7 +405,7 @@ public class EditAlertActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(), "Reraise Value must be 1 minute or greater", Toast.LENGTH_LONG).show();
                     return;
                 } else if (alertReraise >= defaultSnooze) {
-                    Toast.makeText(getApplicationContext(), "Reraise Value must less than snooze length", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Reraise Value must be less than snooze length", Toast.LENGTH_LONG).show();
                     return;
                 }
 
