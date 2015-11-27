@@ -390,6 +390,15 @@ public class AlertType extends Model {
         return false;
     }
 
+    public long getNextAlertTime(Context ctx) {
+        int time = minutes_between;
+        if (time < 1 || AlertPlayer.isAscendingMode(ctx)) {
+            time = 1;
+        }
+        Calendar calendar = Calendar.getInstance();
+        return calendar.getTimeInMillis() + (time * 60000);
+    }
+
     public boolean should_alarm(double bg) {
 //        Log.e(TAG, "should_alarm called active =  " + active );
         if(in_time_frame() && active && (beyond_threshold(bg) || trending_to_threshold(bg))) {
