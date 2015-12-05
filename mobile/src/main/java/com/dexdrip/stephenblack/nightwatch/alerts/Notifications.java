@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -55,6 +56,7 @@ public class Notifications extends IntentService {
     private final static String TAG = AlertPlayer.class.getSimpleName();
 
     Context mContext;
+    PendingIntent wakeIntent;
     private static Handler mHandler = new Handler(Looper.getMainLooper());
 
     int currentVolume;
@@ -85,10 +87,14 @@ public class Notifications extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NotificationsIntent");
+        wl.acquire();
         Log.d("Notifications", "Running Notifications Intent Service");
         ReadPerfs(getApplicationContext());
         notificationSetter(getApplicationContext());
-        ArmTimer();
+        ArmTimer(getApplicationContext());
+        wl.release();
     }
 
     public void ReadPerfs(Context context) {
@@ -117,7 +123,7 @@ public class Notifications extends IntentService {
  */
 
 
-    public void FileBasedNotifications(Context context) {
+    private void FileBasedNotifications(Context context) {
         ReadPerfs(context);
 
         Bg bgReading = Bg.last();
@@ -235,21 +241,26 @@ public class Notifications extends IntentService {
         if(bgReadings == null || bgReadings.size() < 3) { return; }
     }
 
-    private void  ArmTimer() {
+    private void ArmTimer(Context ctx) {
         Log.d(TAG, "ArmTimer called");
         ActiveBgAlert activeBgAlert = ActiveBgAlert.getOnly();
-        if(activeBgAlert != null ) {
+        if (activeBgAlert != null) {
             AlertType alert = AlertType.get_alert(activeBgAlert.alert_uuid);
-            if(alert != null) {
-                int time = alert.minutes_between;
-                if (time < 1) { time = 1; }
+            if (alert != null) {
                 Calendar calendar = Calendar.getInstance();
                 AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                    alarm.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + time * 60000, PendingIntent.getService(this, 0, new Intent(this, Notifications.class), 0));
-                } else {
-                    alarm.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + time * 60000, PendingIntent.getService(this, 0, new Intent(this, Notifications.class), 0));
-                }
+                // sleep longer if the alert is snoozed.
+                long wakeTime = activeBgAlert.next_alert_at;
+                Log.d(TAG , "ArmTimer waking at: "+ new Date(wakeTime) +" in " +  (wakeTime - calendar.getTimeInMillis())/60000d + " minutes");
+                if (wakeIntent != null)
+                    alarm.cancel(wakeIntent);
+                wakeIntent = PendingIntent.getService(this, 0, new Intent(this, this.getClass()), 0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    alarm.setAlarmClock(new AlarmManager.AlarmClockInfo(wakeTime, wakeIntent), wakeIntent);
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    alarm.setExact(AlarmManager.RTC_WAKEUP, wakeTime, wakeIntent);
+                } else
+                    alarm.set(AlarmManager.RTC_WAKEUP, wakeTime, wakeIntent);
             }
         }
     }

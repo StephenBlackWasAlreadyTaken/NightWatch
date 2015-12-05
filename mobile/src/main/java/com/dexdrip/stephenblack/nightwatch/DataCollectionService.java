@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
@@ -29,6 +30,7 @@ public class DataCollectionService extends Service {
     boolean wear_integration  = false;
     boolean pebble_integration  = false;
     boolean endpoint_set = false;
+    private PendingIntent wakeIntent;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -77,12 +79,16 @@ public class DataCollectionService extends Service {
         Log.d("DataCollectionService", "Fallover Restarting in: " + (retry_in / (60 * 1000)) + " minutes");
         Calendar calendar = Calendar.getInstance();
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            alarm.setExact(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
+        long wakeTime = calendar.getTimeInMillis() + retry_in;
+        PendingIntent serviceIntent = PendingIntent.getService(this, 0, new Intent(this, this.getClass()), 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, wakeTime, serviceIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarm.setExact(AlarmManager.RTC_WAKEUP, wakeTime, serviceIntent);
         } else {
-            alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
-
+            alarm.set(AlarmManager.RTC_WAKEUP, wakeTime, serviceIntent);
         }
+
     }
 
     public void listenForChangeInSettings() {
@@ -106,11 +112,17 @@ public class DataCollectionService extends Service {
         Log.d("DataCollectionService", "Next packet should be available in " + (retry_in / (60 * 1000)) + " minutes");
         Calendar calendar = Calendar.getInstance();
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-
-            alarm.setExact(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
+        long wakeTime = calendar.getTimeInMillis() + retry_in;
+        Log.d(this.getClass().getName() , "ArmTimer waking at: "+ new Date(wakeTime) +" in " +  (wakeTime - calendar.getTimeInMillis())/60000d + " minutes");
+        if (wakeIntent != null)
+            alarm.cancel(wakeIntent);
+        wakeIntent = PendingIntent.getService(this, 0, new Intent(this, this.getClass()), 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            alarm.setAlarmClock(new AlarmManager.AlarmClockInfo(wakeTime, wakeIntent), wakeIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarm.setExact(AlarmManager.RTC_WAKEUP, wakeTime, wakeIntent);
         } else {
-            alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + retry_in, PendingIntent.getService(this, 0, new Intent(this, DataCollectionService.class), 0));
+            alarm.set(AlarmManager.RTC_WAKEUP, wakeTime, wakeIntent);
         }
     }
 

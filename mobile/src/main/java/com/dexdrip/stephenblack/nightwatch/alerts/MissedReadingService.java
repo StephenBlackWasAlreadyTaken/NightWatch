@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 
 import com.dexdrip.stephenblack.nightwatch.Bg;
@@ -50,10 +51,13 @@ public class MissedReadingService extends IntentService {
     public void setAlarm(long alarmIn) {
         Calendar calendar = Calendar.getInstance();
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            alarm.setExact(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + alarmIn, PendingIntent.getService(this, 0, new Intent(this, MissedReadingService.class), 0));
-        } else {
-            alarm.set(alarm.RTC_WAKEUP, calendar.getTimeInMillis() + alarmIn, PendingIntent.getService(this, 0, new Intent(this, MissedReadingService.class), 0));
-        }
+        long wakeTime = calendar.getTimeInMillis() + alarmIn;
+        PendingIntent serviceIntent = PendingIntent.getService(this, 0, new Intent(this, this.getClass()), 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, wakeTime, serviceIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarm.setExact(AlarmManager.RTC_WAKEUP, wakeTime, serviceIntent);
+        } else
+            alarm.set(AlarmManager.RTC_WAKEUP, wakeTime, serviceIntent);
     }
 }
