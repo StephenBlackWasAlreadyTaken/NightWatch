@@ -99,7 +99,7 @@ public class ShareGlucose extends Model {
     public double calculateDelta(double timestamp, double currentValue) {
         Bg bg = Bg.mostRecentBefore(timestamp);
         if (bg != null && Math.abs(bg.datetime - timestamp) < (60*1000*15)) {
-            return (bg.sgv_double() - currentValue);
+            return currentValue - bg.sgv_double();
         } else {
             return 0;
         }
