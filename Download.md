@@ -1,4 +1,14 @@
 ***
+## Beta 2.0.4  (1/15/2016)
+### Download: [Beta 2.0.4 (Click here)](http://bit.ly/1Pw0OmT)
+* Fixed issue where updates came in (very) late.
+* Added support for Android Marshmallow
+* Added new watchface
+* Added RAW values (see: http://www.nightscout.info/wiki/labs/raw-data-with-nightwatch)
+* Fixed issue where the delta had wrong sign following via Share
+* Scalable timeframe for charts on Watchface (settings)
+* Fixed rounding issue
+
 ## Version 2.0.3a  (9/24/2015)
 ### Download: [NightWatch-v2.0.3.apk](https://drive.google.com/file/d/0B9-XAGxWboTmRmZ0elU3WEQyTHc/view?usp=sharing)
 * Fixed issue where persistant notification was not showing
