@@ -5,9 +5,11 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -85,10 +87,15 @@ public class NightWatchWidget extends AppWidgetProvider {
             }
             views.setTextViewText(R.id.widgetDelta, bgGraphBuilder.unitizedDeltaString(lastBgreading.bgdelta));
             int timeAgo =(int) Math.floor((new Date().getTime() - lastBgreading.datetime)/(1000*60));
+            String raw_string = "";
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            if(prefs.getBoolean("widget_show_raw", false)){
+                raw_string = "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl")));
+            }
             if (timeAgo == 1) {
-                views.setTextViewText(R.id.readingAge, timeAgo + " Minute ago");
+                views.setTextViewText(R.id.readingAge, timeAgo + " Minute ago" + raw_string);
             } else {
-                views.setTextViewText(R.id.readingAge, timeAgo + " Minutes ago");
+                views.setTextViewText(R.id.readingAge, timeAgo + " Minutes ago" + raw_string);
             }
             if (timeAgo > 15) {
                 views.setTextColor(R.id.readingAge, Color.parseColor("#FFBB33"));
