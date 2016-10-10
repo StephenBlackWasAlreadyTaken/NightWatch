@@ -20,5 +20,10 @@
             android:entries="@array/bgUnitEntries"
             android:entryValues="@array/bgUnitValues"
             android:defaultValue="mgdl"/>
+        <CheckBoxPreference
+            android:key="widget_show_raw"
+            android:title="Show RAW on Widget"
+            android:summary="Show three raw values on the widget."
+            android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>
