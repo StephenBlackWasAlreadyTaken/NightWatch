@@ -1,5 +1,6 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -11,10 +12,13 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 
@@ -92,10 +96,32 @@ public class NightWatchWidget extends AppWidgetProvider {
             if(prefs.getBoolean("widget_show_raw", false)){
                 raw_string = "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl")));
             }
-            if (timeAgo == 1) {
-                views.setTextViewText(R.id.readingAge, timeAgo + " Minute ago" + raw_string);
-            } else {
-                views.setTextViewText(R.id.readingAge, timeAgo + " Minutes ago" + raw_string);
+            if(prefs.getBoolean("widget_show_time", false)){
+                views.setTextViewText(R.id.readingAge, timeAgo + "' ago" + raw_string);
+                views.setTextViewText(R.id.widget_time, DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date()));
+                views.setViewVisibility(R.id.widget_time, View.VISIBLE);
+
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    views.setTextViewTextSize(R.id.widgetBg, TypedValue.COMPLEX_UNIT_SP, 45);
+                    views.setTextViewTextSize(R.id.widgetArrow, TypedValue.COMPLEX_UNIT_SP, 30);
+
+                }
+
+            }   else {
+
+                views.setViewVisibility(R.id.widget_time, View.GONE);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    views.setTextViewTextSize(R.id.widgetBg, TypedValue.COMPLEX_UNIT_SP, 55);
+                    views.setTextViewTextSize(R.id.widgetArrow, TypedValue.COMPLEX_UNIT_SP, 37);
+
+                }
+
+
+                if (timeAgo == 1) {
+                    views.setTextViewText(R.id.readingAge, timeAgo + " Minute ago" + raw_string);
+                } else {
+                    views.setTextViewText(R.id.readingAge, timeAgo + " Minutes ago" + raw_string);
+                }
             }
             if (timeAgo > 15) {
                 views.setTextColor(R.id.readingAge, Color.parseColor("#FFBB33"));

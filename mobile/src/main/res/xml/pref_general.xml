@@ -25,5 +25,10 @@
             android:title="Show RAW on Widget"
             android:summary="Show three raw values on the widget."
             android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="widget_show_time"
+            android:title="Show Time on Widget"
+            android:summary="Show Time on Widget (only on smaller widget that can be used to pass through to Samsung Gear watches)."
+            android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>
