@@ -52,13 +52,31 @@
             </LinearLayout>
 
         </LinearLayout>
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:textSize="10sp"
-            android:text="-- minutes ago"
-            android:id="@+id/readingAge"
-            android:layout_gravity="center_horizontal"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                android:textSize="30sp"
+                android:text="00:00"
+                android:id="@+id/widget_time"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal|left|top"
+                android:layout_marginTop="0dp"
+                android:paddingTop="0dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                android:textSize="10sp"
+                android:text="-- minutes ago"
+                android:id="@+id/readingAge"
+                android:layout_gravity="right"/>
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>
