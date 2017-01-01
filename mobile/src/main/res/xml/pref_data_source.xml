@@ -14,7 +14,7 @@
             android:key="dex_collection_method"
             android:title="Nightscout URL"
             android:summary="URL for your nightscout site"
-            android:defaultValue="https://{yoursite}.azurewebsites.net"/>
+            android:defaultValue="https://ryancgminthecloud.azurewebsites.net"/>
 
         <CheckBoxPreference
             android:key="share_poll"

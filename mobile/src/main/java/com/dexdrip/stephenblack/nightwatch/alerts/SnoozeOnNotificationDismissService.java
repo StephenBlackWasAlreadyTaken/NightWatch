@@ -3,6 +3,9 @@ package com.dexdrip.stephenblack.nightwatch.alerts;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.dexdrip.stephenblack.nightwatch.model.ActiveBgAlert;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.

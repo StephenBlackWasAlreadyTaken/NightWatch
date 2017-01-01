@@ -6,15 +6,23 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.OkHttpClient;
 
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.util.List;
 
-import retrofit.RestAdapter;
-import retrofit.client.OkClient;
-import retrofit.converter.GsonConverter;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import retrofit2.Retrofit;
+
+
 
 /**
  * Created by stephenblack on 12/26/14.
@@ -25,9 +33,7 @@ public class Rest {
     private static final String UNITS = "mgdl";
     SharedPreferences prefs;
     PowerManager.WakeLock wakeLock;
-    public static Gson gson = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation()
-            .create();
+
 
     Rest(Context context) {
         mContext = context;
@@ -44,22 +50,15 @@ public class Rest {
             return false;
         }
         try {
-            PebbleEndpoint response;
             boolean newData = false;
+            PebbleEndpoint Bgs;
 
-            if (count > 1) {
-                response =  pebbleEndpointInterface().getPebbleInfo(UNITS, count);
-            } else
-                response = pebbleEndpointInterface().getPebbleInfo(UNITS);
+            Bgs = pebbleEndpointInterface().getPebbleInfo(UNITS,count).execute().body();
+
+
             double slope = 0, intercept = 0, scale = 0;
-            if (response.cals != null && response.cals.size() != 0){
-                Cal cal = response.cals.get(0);
-                slope = cal.slope;
-                intercept = cal.intercept;
-                scale = cal.scale;
-            }
 
-            for (Bg returnedBg: response.bgs) {
+            for (Bg returnedBg: Bgs.bgs) {
                 if (Bg.is_new(returnedBg)) {
 
                     //raw logic from https://github.com/nightscout/cgm-remote-monitor/blob/master/lib/plugins/rawbg.js#L59
@@ -92,26 +91,15 @@ public class Rest {
     }
 
     private PebbleEndpointInterface pebbleEndpointInterface() {
-        RestAdapter adapter = adapterBuilder().build();
-        PebbleEndpointInterface pebbleEndpointInterface =
-                adapter.create(PebbleEndpointInterface.class);
 
-        return pebbleEndpointInterface;
+
+        Retrofit restInf = new Retrofit.Builder()
+                .baseUrl(mUrl)
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder() .excludeFieldsWithoutExposeAnnotation().create()))
+                .build();
+        return restInf.create(PebbleEndpointInterface.class);
+
     }
 
-    private RestAdapter.Builder adapterBuilder() {
-        final OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setReadTimeout(1, TimeUnit.MINUTES);
-        okHttpClient.setConnectTimeout(1, TimeUnit.MINUTES);
 
-        RestAdapter.Builder adapterBuilder = new RestAdapter.Builder();
-        adapterBuilder
-                .setClient(new OkClient(okHttpClient))
-                .setEndpoint(mUrl)
-                .setConverter(new GsonConverter(new GsonBuilder()
-                        .excludeFieldsWithoutExposeAnnotation()
-                        .create()));
-
-        return adapterBuilder;
-    }
 }

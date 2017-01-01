@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.activeandroid.Cache;
 import com.activeandroid.query.Select;
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 
 

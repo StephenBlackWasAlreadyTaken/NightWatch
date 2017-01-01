@@ -20,15 +20,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.activeandroid.ActiveAndroid;
 import com.crashlytics.android.Crashlytics;
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
-import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import com.dexdrip.stephenblack.nightwatch.LicenseAgreementActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
 import com.dexdrip.stephenblack.nightwatch.WatchUpdaterService;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 import com.dexdrip.stephenblack.nightwatch.utils.IdempotentMigrations;
+import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 
 import java.util.Date;
 
@@ -72,14 +73,26 @@ public class Home extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_license, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_source, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_other, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_bg_notification, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_watch_integration, false);
         Fabric.with(this, new Crashlytics());
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //prefs.edit().putBoolean("nightscout_poll", true).apply();
+        //prefs.edit().putString("dex_collection_method", "https://ryancgminthecloud.azurewebsites.net").apply();
+
         checkEula();
+
         new IdempotentMigrations(getApplicationContext()).performAll();
 
         startService(new Intent(getApplicationContext(), DataCollectionService.class));
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_bg_notification, false);
+
 
         preferenceChangeListener = new OnSharedPreferenceChangeListener() {
             @Override
@@ -97,6 +110,7 @@ public class Home extends BaseActivity {
             PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
             if (!pm.isIgnoringBatteryOptimizations(packageName) &&
                     !prefs.getBoolean("requested_ignore_battery_optimizations", false)) {
+
                 Log.d(this.getClass().getName(), "Requesting ignore battery optimization");
 
                 prefs.edit().putBoolean("requested_ignore_battery_optimizations", true).apply();
@@ -105,6 +119,7 @@ public class Home extends BaseActivity {
                 startActivity(intent);
             }
         }
+
     }
 
     public void checkEula() {
@@ -166,7 +181,7 @@ public class Home extends BaseActivity {
             menu.removeItem(R.id.action_resend_last_bg);
 
         }
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

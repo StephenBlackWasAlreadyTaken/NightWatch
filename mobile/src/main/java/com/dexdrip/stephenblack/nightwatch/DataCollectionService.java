@@ -13,6 +13,12 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.activeandroid.Cache;
+import com.activeandroid.Configuration;
+import com.activeandroid.ActiveAndroid;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.dexdrip.stephenblack.nightwatch.sharemodels.ShareRest;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
@@ -20,7 +26,7 @@ import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
 import java.util.Calendar;
 import java.util.Date;
 
-import retrofit.RetrofitError;
+import retrofit.Retrofit;
 
 public class DataCollectionService extends Service {
     public static final int TIMEOUT = 15000; // 15 seconds for testing. Lower it afterwards.
@@ -39,9 +45,13 @@ public class DataCollectionService extends Service {
 
     @Override
     public void onCreate() {
+
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         setSettings();
         listenForChangeInSettings();
+
+        // check to see if we need to create the database
+        initDb( this );
     }
 
     @Override
@@ -64,7 +74,24 @@ public class DataCollectionService extends Service {
         }
         setFailoverTimer();
     }
+    private void initDb( Context context) {
+        Configuration dbConfiguration = new Configuration.Builder(context).create();
+        try {
+            SQLiteDatabase db = Cache.openDatabase();
+            if (db != null) {
+                Log.d("wearSENSOR", "InitDb DB exists");
+            }
+            else {
+                ActiveAndroid.initialize(dbConfiguration);
+                Log.d("wearSENSOR", "InitDb DB does NOT exist. Call ActiveAndroid.initialize()");
+            }
+        } catch (Exception e) {
+            ActiveAndroid.initialize(dbConfiguration);
+            Log.d("wearSENSOR", "InitDb CATCH: DB does NOT exist. Call ActiveAndroid.initialize()");
+        }
 
+
+    }
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
@@ -127,7 +154,12 @@ public class DataCollectionService extends Service {
     }
 
     public double sleepTime() {
-        Bg last_bg = Bg.last();
+        Bg last_bg=null;
+        try {
+            last_bg = Bg.last();
+        } catch (Exception exx ) {
+            last_bg = null;
+        }
         if (last_bg != null) {
             return Math.max((1000 * 30), Math.min(((long) (((1000 * 60 * 5) + 15000) - ((new Date().getTime()) - last_bg.datetime))), (1000 * 60 * 5)));
         } else {
@@ -164,23 +196,20 @@ public class DataCollectionService extends Service {
                 }
                 if(mPrefs.getBoolean("share_poll", false)) {
                     Log.d("ShareRest", "fetching " + requestCount);
-                    boolean success = new ShareRest(mContext).getBg(requestCount);
-                    Thread.sleep(10000);
-                    if (success) {
-                        //test wakelock: stay awake a bit to handover wakelog
-                        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                                "quickFix3").acquire(TIMEOUT);
-
-                        mContext.startService(new Intent(mContext, WatchUpdaterService.class));
-                    }
-                    getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
-                    if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
+//                    boolean success = new ShareRest(mContext,null);
+//                    if (success) {
+//                        //test wakelock: stay awake a bit to handover wakelog
+//                        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+//                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix3").acquire(TIMEOUT);
+//
+//                        mContext.startService(new Intent(mContext, WatchUpdaterService.class));
+//                    }
+//                    getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
+//                    if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
                     return true;
                 }
                 return true;
             }
-            catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
             catch (InterruptedException exx) { Log.d("Interruption Error: ", "BOOOO"); }
             catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
             if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
@@ -191,7 +220,7 @@ public class DataCollectionService extends Service {
     public static void newDataArrived(Context context, boolean success, Bg bg) {
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "collector data arived");
+                "collector data arrived");
         wakeLock.acquire();
         Log.d("NewDataArrived", "New Data Arrived");
         if (success && bg != null) {
@@ -201,8 +230,7 @@ public class DataCollectionService extends Service {
             context.startService(intent);
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
             //test wakelock: stay awake a bit to handover wakelog
-            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "quickFix1").acquire(TIMEOUT);
+            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix1").acquire(TIMEOUT);
             context.sendBroadcast(updateIntent);
         }
         context.startService(new Intent(context, Notifications.class));

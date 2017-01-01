@@ -1,5 +1,6 @@
 package com.dexdrip.stephenblack.nightwatch;
 
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.google.gson.annotations.Expose;
 
 import java.util.List;

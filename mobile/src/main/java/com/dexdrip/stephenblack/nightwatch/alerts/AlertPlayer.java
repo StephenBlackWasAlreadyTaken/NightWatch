@@ -11,7 +11,9 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.ActiveBgAlert;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.Date;

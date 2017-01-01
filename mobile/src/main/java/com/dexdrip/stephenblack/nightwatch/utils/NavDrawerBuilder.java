@@ -30,7 +30,7 @@ public class NavDrawerBuilder {
         boolean IUnderstand = prefs.getBoolean("I_understand", false);
 
         if (IUnderstand == false) {
-            this.nav_drawer_options.add("Settings");
+            this.nav_drawer_options.add(SettingsActivity.MENU_NAME);
             this.nav_drawer_intents.add(new Intent(context, SettingsActivity.class));
             return;
         }
@@ -48,7 +48,7 @@ public class NavDrawerBuilder {
         this.nav_drawer_intents.add(new Intent(context, SnoozeActivity.class));
 
 
-        this.nav_drawer_options.add("Settings");
+        this.nav_drawer_options.add(SettingsActivity.MENU_NAME);
         this.nav_drawer_intents.add(new Intent(context, SettingsActivity.class));
     }
 }

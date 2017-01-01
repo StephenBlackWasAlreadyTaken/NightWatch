@@ -10,6 +10,7 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +30,7 @@ import java.util.Vector;
 public class PercentileView extends View {
 
     private CalculatedData calculatedData = null;
-    private boolean ranteDataCalculating = false;
+    private boolean rangeDataCalculating = false;
 
     public static final int OFFSET = 30;
     public static final int NO_TIMESLOTS = 48;
@@ -45,40 +46,40 @@ public class PercentileView extends View {
 
         float textSize = dp2px(14);
         outerPaint = new Paint();
-        outerPaint.setColor(resources.getColor(R.color.percentile_outer));
+        outerPaint.setColor(ContextCompat.getColor( getContext(), R.color.percentile_outer));
         outerPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         outerPaint.setPathEffect(new CornerPathEffect(dp2px(10)));
         outerPaint.setStrokeWidth(dp2px(1));
 
 
         outerPaintLabel = new Paint();
-        outerPaintLabel.setColor(resources.getColor(R.color.percentile_outer));
+        outerPaintLabel.setColor(ContextCompat.getColor(getContext(),R.color.percentile_outer));
         outerPaintLabel.setStyle(Paint.Style.FILL_AND_STROKE);
         outerPaintLabel.setPathEffect(new CornerPathEffect(dp2px(10)));
         outerPaintLabel.setTextSize(textSize);
 
         innerPaint = new Paint();
-        innerPaint.setColor(resources.getColor(R.color.percentile_inner));
+        innerPaint.setColor(ContextCompat.getColor(getContext(),R.color.percentile_inner));
         innerPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         innerPaint.setPathEffect(new CornerPathEffect(dp2px(10)));
         innerPaint.setStrokeWidth(dp2px(1));
 
         innerPaintLabel = new Paint();
-        innerPaintLabel.setColor(resources.getColor(R.color.percentile_inner));
+        innerPaintLabel.setColor(ContextCompat.getColor(getContext(),R.color.percentile_inner));
         innerPaintLabel.setStyle(Paint.Style.FILL_AND_STROKE);
         innerPaintLabel.setPathEffect(new CornerPathEffect(dp2px(10)));
         innerPaintLabel.setTextSize(textSize);
 
 
         medianPaint = new Paint();
-        medianPaint.setColor(resources.getColor(R.color.percentile_median));
+        medianPaint.setColor(ContextCompat.getColor(getContext(),R.color.percentile_median));
         medianPaint.setStyle(Paint.Style.STROKE);
         medianPaint.setPathEffect(new CornerPathEffect(dp2px(10)));
         medianPaint.setStrokeWidth(dp2px(1));
 
 
         medianPaintLabel = new Paint();
-        medianPaintLabel.setColor(resources.getColor(R.color.percentile_median));
+        medianPaintLabel.setColor(ContextCompat.getColor(getContext(),R.color.percentile_median));
         medianPaintLabel.setStyle(Paint.Style.STROKE);
         medianPaintLabel.setPathEffect(new CornerPathEffect(dp2px(10)));
         medianPaintLabel.setTextSize(textSize);
@@ -243,8 +244,8 @@ public class PercentileView extends View {
 
     //return either RangeData or start a calculation if not already started
     public synchronized CalculatedData getMaybeCalculatedData() {
-        if (!ranteDataCalculating) {
-            ranteDataCalculating = true;
+        if (!rangeDataCalculating) {
+            rangeDataCalculating = true;
             Thread thread = new Thread() {
                 @Override
                 public void run() {

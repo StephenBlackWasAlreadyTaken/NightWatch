@@ -15,6 +15,9 @@ import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.R;
+import com.dexdrip.stephenblack.nightwatch.model.ActiveBgAlert;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError;
 
 import java.text.DateFormat;
 import java.util.Date;

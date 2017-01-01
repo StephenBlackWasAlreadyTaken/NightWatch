@@ -7,7 +7,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 
 import java.util.ArrayList;
 import java.util.Date;

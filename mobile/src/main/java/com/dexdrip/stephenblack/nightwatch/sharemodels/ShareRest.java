@@ -1,20 +1,26 @@
 package com.dexdrip.stephenblack.nightwatch.sharemodels;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.dexdrip.stephenblack.nightwatch.Bg;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.OkHttpClient;
+import com.dexdrip.stephenblack.nightwatch.model.UserError;
 
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+
+import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -23,136 +29,75 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import retrofit.Callback;
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.android.AndroidLog;
-import retrofit.client.OkClient;
-import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
-import retrofit.mime.TypedByteArray;
+import okio.Buffer;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
 /**
  * Created by stephenblack on 12/26/14.
  */
 public class ShareRest {
-    private Context mContext;
-    private String login;
+    public static String TAG = ShareRest.class.getSimpleName();
+
+    private String sessionId;
+
+    private String username;
     private String password;
-    private SharedPreferences prefs;
-    private int maxCount = 20;
-    private int requestCount;
-    OkClient client;
+    private String serialNumber;
+    private DexcomShare dexcomShareApi;
 
-    public static Gson gson = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation()
-            .create();
-
-    public ShareRest(Context context) {
-        client = getOkClient();
-        mContext = context;
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        login = prefs.getString("dexcom_account_name", "");
-        password = prefs.getString("dexcom_account_password", "");
-    }
-
-    public boolean getBg(int count) {
-        if(count > maxCount) {
-            requestCount = 20;
-        } else {
-            requestCount = count;
-        }
-        if (prefs.getBoolean("share_poll", false) && login.compareTo("") != 0 && password.compareTo("") != 0) {
-            return loginAndGetData();
-        } else {
-            return false;
-        }
-    }
-
-    private boolean loginAndGetData() {
-        dexcomShareAuthorizeInterface().getSessionId(new ShareAuthenticationBody(password, login), new Callback() {
-            @Override
-            public void success(Object o, Response response) {
-                Log.d("ShareRest", "Success!! got a response on auth.");
-                String returnedSessionId = new String(((TypedByteArray) response.getBody()).getBytes()).replace("\"", "");
-
-                getBg(returnedSessionId);
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if ("dexcom_account_name".equals(key)) {
+                username = sharedPreferences.getString(key, null);
+            } else if ("dexcom_account_password".equals(key)) {
+                password = sharedPreferences.getString(key, null);
+            } else if ("share_key".equals(key)) {
+                serialNumber = sharedPreferences.getString(key, null);
             }
 
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                Log.e("RETROFIT ERROR: ", ""+retrofitError.toString());
-            }
-        });
-        return true;
-    }
-
-    private void getBg(String sessionId) {
-        DataFetcher dataFetcher = new DataFetcher(mContext, sessionId);
-        dataFetcher.execute((Void) null);
-    }
-
-    private DexcomShareInterface dexcomShareAuthorizeInterface() {
-        RestAdapter adapter = authoirizeAdapterBuilder().build();
-        DexcomShareInterface dexcomShareInterface =
-                adapter.create(DexcomShareInterface.class);
-        return dexcomShareInterface;
-    }
-
-    private DexcomShareInterface dexcomShareGetBgInterface() {
-        RestAdapter adapter = getBgAdapterBuilder().build();
-        DexcomShareInterface dexcomShareInterface =
-                adapter.create(DexcomShareInterface.class);
-        return dexcomShareInterface;
-    }
-
-    private RestAdapter.Builder authoirizeAdapterBuilder() {
-        RestAdapter.Builder adapterBuilder = new RestAdapter.Builder();
-        adapterBuilder
-                .setClient(client)
-                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(new AndroidLog("SHAREREST"))
-                .setEndpoint("https://share1.dexcom.com/ShareWebServices/Services")
-                .setRequestInterceptor(authorizationRequestInterceptor)
-                .setConverter(new GsonConverter(new GsonBuilder()
-                        .excludeFieldsWithoutExposeAnnotation()
-                        .create()));
-        return adapterBuilder;
-    }
-
-    private RestAdapter.Builder getBgAdapterBuilder() {
-        RestAdapter.Builder adapterBuilder = new RestAdapter.Builder();
-        adapterBuilder
-                .setClient(client)
-                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(new AndroidLog("SHAREREST"))
-                .setEndpoint("https://share1.dexcom.com/ShareWebServices/Services")
-                .setRequestInterceptor(getBgRequestInterceptor)
-                .setConverter(new GsonConverter(new GsonBuilder()
-                        .excludeFieldsWithoutExposeAnnotation()
-                        .create()));
-        return adapterBuilder;
-    }
-
-    RequestInterceptor authorizationRequestInterceptor = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestInterceptor.RequestFacade request) {
-            request.addHeader("User-Agent", "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0");
-            request.addHeader("Content-Type", "application/json");
-            request.addHeader("Accept", "application/json");
-        }
-    };
-    RequestInterceptor getBgRequestInterceptor = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestInterceptor.RequestFacade request) {
-            request.addHeader("User-Agent", "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0");
-            request.addHeader("Content-Type", "application/json");
-            request.addHeader("Content-Length", "0");
-            request.addHeader("Accept", "application/json");
         }
     };
 
-    public OkHttpClient getOkHttpClient() {
+    private static final String US_SHARE_BASE_URL = "https://share2.dexcom.com/ShareWebServices/Services/";
+    private static final String NON_US_SHARE_BASE_URL = "https://shareous1.dexcom.com/ShareWebServices/Services/";
+    private SharedPreferences sharedPreferences;
 
+    public ShareRest(Context context, OkHttpClient okHttpClient) {
+
+        try {
+            OkHttpClient httpClient = okHttpClient != null ? okHttpClient : getOkHttpClient();
+
+            if (httpClient == null) httpClient = getOkHttpClient(); // try again on failure
+            // if fails second time we've got big problems
+
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+
+            retrofit2.Retrofit retrofit = new retrofit2.Retrofit.Builder()
+                    .baseUrl(sharedPreferences.getBoolean("dex_share_us_acct", true) ? US_SHARE_BASE_URL : NON_US_SHARE_BASE_URL)
+                    .client(httpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            dexcomShareApi = retrofit.create(DexcomShare.class);
+            sessionId = sharedPreferences.getString("dexcom_share_session_id", null);
+            username = sharedPreferences.getString("dexcom_account_name", null);
+            password = sharedPreferences.getString("dexcom_account_password", null);
+            serialNumber = sharedPreferences.getString("share_key", null);
+            if (sharedPreferences.getBoolean("engineering_mode", false)) {
+                final String share_test_key = sharedPreferences.getString("share_test_key", "").trim();
+                if (share_test_key.length() > 4) serialNumber = share_test_key;
+            }
+            sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+            if ("".equals(sessionId)) // migrate previous empty sessionIds to null;
+                sessionId = null;
+        } catch (IllegalStateException e) {
+            Log.wtf(TAG, "Illegal state exception: " + e);
+        }
+    }
+
+    private synchronized OkHttpClient getOkHttpClient() {
         try {
             final TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
                 @Override
@@ -177,76 +122,176 @@ public class ShareRest {
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-            OkHttpClient okHttpClient = new OkHttpClient();
-            okHttpClient.setSslSocketFactory(sslSocketFactory);
-            okHttpClient.setHostnameVerifier(new HostnameVerifier() {
 
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .sslSocketFactory(sslContext.getSocketFactory())
+                    .build();
+            okHttpClient.newBuilder().networkInterceptors().add(new Interceptor() {
                 @Override
-                public boolean verify(String hostname, SSLSession session) {
-                        return true;
+                public Response intercept(Chain chain) throws IOException {
+                    try {
+                        // Add user-agent and relevant headers.
+                        Request original = chain.request();
+                        Request copy = chain.request();
+                        Request modifiedRequest = original.newBuilder()
+                                .header("User-Agent", "CGM-Store-1.2/22 CFNetwork/711.5.6 Darwin/14.0.0")
+                                .header("Content-Type", "application/json")
+                                .header("Accept", "application/json")
+                                .build();
+                        Log.d(TAG, "Sending request: " + modifiedRequest.toString());
+                        Buffer buffer = new Buffer();
+                        copy.body().writeTo(buffer);
+                        Log.d(TAG, "Request body: " + buffer.readUtf8());
+
+                        final Response response = chain.proceed(modifiedRequest);
+                        Log.d(TAG, "Received response: " + response.toString());
+                        if (response.body() != null) {
+                            MediaType contentType = response.body().contentType();
+                            String bodyString = response.body().string();
+                            Log.d(TAG, "Response body: " + bodyString);
+                            return response.newBuilder().body(ResponseBody.create(contentType, bodyString)).build();
+                        } else
+                            return response;
+
+                    } catch (NullPointerException e) {
+                        Log.e(TAG, "Got null pointer exception: " + e);
+                        return null;
+                    } catch (IllegalStateException e) {
+                        UserError.Log.wtf(TAG,"Got illegal state exception: " + e);
+                        return null;
+                    }
                 }
             });
 
+
             return okHttpClient;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error occurred initializing OkHttp: ", e);
+        }
+    }
+
+    private String getSessionId() {
+        AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
+
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    Boolean isActive = null;
+                    if (params[0] != null)
+                        isActive = dexcomShareApi.checkSessionActive(params[0]).execute().body();
+                    if (isActive == null || !isActive) {
+                        return updateAuthenticationParams();
+                    } else
+                        return params[0];
+                } catch (IOException e) {
+                    return null;
+                } catch (RuntimeException e) {
+                    UserError.Log.wtf(TAG, "Painful exception processing response in updateAuthenticationParams " + e);
+                    return null;
+                }
+            }
+
+            private String updateAuthenticationParams() throws IOException {
+                sessionId = dexcomShareApi.getSessionId(new ShareAuthenticationBody(password, username).toMap()).execute().body();
+                dexcomShareApi.authenticatePublisherAccount(sessionId, serialNumber, new ShareAuthenticationBody(password, username).toMap()).execute().body();
+                dexcomShareApi.StartRemoteMonitoringSession(sessionId, serialNumber).execute();
+                String assignment = dexcomShareApi.checkMonitorAssignment(sessionId, serialNumber).execute().body();
+                if ((assignment != null) && (!assignment.equals("AssignedToYou"))) {
+                    dexcomShareApi.updateMonitorAssignment(sessionId, serialNumber).execute();
+                }
+                return sessionId;
+            }
+
+        };
+
+        //if (sessionId == null || sessionId.equals(""))
+         //   try {
+         //       sessionId = task.executeOnExecutor(xdrip.executor,sessionId).get();
+         //   } catch (InterruptedException | ExecutionException e) {
+         //       e.printStackTrace();
+         //   }
+        return sessionId;
+    }
+
+    public void getContacts(final Callback<List<ExistingFollower>> existingFollowerListener) {
+        dexcomShareApi.getContacts(getSessionId()).enqueue(new AuthenticatingCallback<List<ExistingFollower>>(existingFollowerListener) {
+            @Override
+            public void onRetry() {
+                dexcomShareApi.getContacts(getSessionId()).enqueue(this);
+            }
+        });
+    }
+
+    public void uploadBGRecords(final ShareUploadPayload bg, Callback<ResponseBody> callback) {
+        dexcomShareApi.uploadBGRecords(getSessionId(), bg).enqueue(new AuthenticatingCallback<ResponseBody>(callback) {
+            @Override
+            public void onRetry() {
+                dexcomShareApi.uploadBGRecords(getSessionId(), bg).enqueue(this);
+            }
+        });
+    }
+
+    public void createContact(final String followerName, final String followerEmail, Callback<String> callback) {
+        dexcomShareApi.createContact(getSessionId(), followerName, followerEmail).enqueue(new AuthenticatingCallback<String>(callback) {
+            @Override
+            public void onRetry() {
+                dexcomShareApi.createContact(getSessionId(), followerName, followerEmail).enqueue(this);
+            }
+        });
+    }
+
+    public void createInvitationForContact(final String contactId, final InvitationPayload invitationPayload, Callback<String> callback) {
+        dexcomShareApi.createInvitationForContact(getSessionId(), contactId, invitationPayload).enqueue(new AuthenticatingCallback<String>(callback) {
+            @Override
+            public void onRetry() {
+                dexcomShareApi.createInvitationForContact(getSessionId(), contactId, invitationPayload).enqueue(this);
+            }
+        });
+    }
+
+    public void deleteContact(final String contactId, Callback<ResponseBody> deleteFollowerListener) {
+        dexcomShareApi.deleteContact(getSessionId(), contactId).enqueue(new AuthenticatingCallback<ResponseBody>(deleteFollowerListener) {
+            @Override
+            public void onRetry() {
+                dexcomShareApi.deleteContact(getSessionId(), contactId).enqueue(this);
+            }
+        });
+    }
+
+    public abstract class AuthenticatingCallback<T> implements Callback<T> {
+
+        private int attempts = 0;
+        private Callback<T> delegate;
+        public AuthenticatingCallback (Callback<T> callback) {
+            this.delegate = callback;
         }
 
-    }
 
-    public OkClient  getOkClient (){
-        OkHttpClient client1 = getOkHttpClient();
-        OkClient _client = new OkClient(client1);
-        return _client;
-    }
+        public abstract void onRetry();
 
-    public Map<String, String> queryParamMap(String sessionId) {
-        Map map = new HashMap<String, String>();
-        map.put("sessionID", sessionId);
-        map.put("minutes", String.valueOf(minutesCount()));
-        map.put("maxCount", String.valueOf(requestCount));
-        return map;
+        @Override
+        public void onResponse(Call<T> call, retrofit2.Response<T> response) {
+            if (response.code() == 500 && attempts == 0) {
+                // retry with new session ID
+                attempts += 1;
+                //dexcomShareApi.getSessionId(new ShareAuthenticationBody(password, username).toMap()).enqueue(new Callback<String>() {
+                //    @Override
+                 //   public void onResponse(Call<T> call, Retrofit retrofit) {
+                //        if (call.isSuccessful()) {
+                 //           sessionId = retrofit.body();
+                 //           ShareRest.this.sharedPreferences.edit().putString("dexcom_share_session_id", sessionId).apply();
+                 //           onRetry();
+                 //       }
+                //    }
 
-    }
 
-    public class DataFetcher extends AsyncTask<Void, Void, Boolean> {
-        Context mContext;
-        String mSessionId;
-        DataFetcher(Context context, String sessionId) {
-            mContext = context;
-            mSessionId = sessionId;
+                //});
+            }
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                try {
-                    final ShareGlucose[] shareGlucoses = dexcomShareGetBgInterface().getShareBg(queryParamMap(mSessionId));
-                    Log.d("REST Success: ", "YAY!");
-                    if(shareGlucoses != null && shareGlucoses.length > 0) {
-                        for (ShareGlucose shareGlucose : shareGlucoses) {
-                            shareGlucose.processShareData(mContext);
-                        }
-                    return true;
-                    }
-                    return false;
-                } catch (Exception e) {
-                    Log.d("REST CALL ERROR: ", "BOOOO");
-                    return false;
-                }
-            }
-            catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
-            catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
-            return false;
-        }
-    }
+        public void onFailure(Call<T> call, Throwable t) {
 
-    public int minutesCount() {
-        Bg bg = Bg.last();
-        if(bg != null && bg.datetime < new Date().getTime()) {
-            return Math.min((int) Math.ceil(((new Date().getTime() - bg.datetime) / (1000 * 60))), 1440);
-        } else {
-            return 1440;
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.dexdrip.stephenblack.nightwatch.alerts;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -32,7 +32,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 import com.dexdrip.stephenblack.nightwatch.R;
@@ -42,6 +43,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static android.app.AlertDialog.THEME_HOLO_DARK;
 
 public class EditAlertActivity extends BaseActivity {
     public static final String MENU_NAME = "Edit Alert";
@@ -486,7 +489,7 @@ public class EditAlertActivity extends BaseActivity {
                                     fileIntent.setAction(Intent.ACTION_GET_CONTENT);
                                     startActivityForResult(Intent.createChooser(fileIntent, "Select File for Alert"), CHOOSE_FILE);
                                 } else {
-                                    // Xdrip default was chossen, we live the file name as empty.
+                                    // Xdrip default was chosen, we leave the file name as empty.
                                     audioPath = "";
                                     alertMp3File.setText(shortPath(audioPath));
                                 }
@@ -517,7 +520,7 @@ public class EditAlertActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, R.style.NightWatch, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         startHour = selectedHour;
@@ -535,7 +538,7 @@ public class EditAlertActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog mTimePicker = new TimePickerDialog(mContext, R.style.NightWatch, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         endHour = selectedHour;

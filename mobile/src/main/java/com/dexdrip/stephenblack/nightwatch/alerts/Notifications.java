@@ -23,8 +23,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.ActiveBgAlert;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.UserNotificationV2;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.R;

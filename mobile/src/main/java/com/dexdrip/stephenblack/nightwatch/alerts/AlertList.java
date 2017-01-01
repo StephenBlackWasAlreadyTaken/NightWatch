@@ -15,7 +15,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.text.ParseException;
@@ -51,7 +52,7 @@ public class AlertList extends BaseActivity {
     }
 
     HashMap<String, String> createAlertMap(AlertType alert) {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         String overrideSilentMode = "Override Silent Mode";
         if(alert.override_silent_mode == false) {
             overrideSilentMode = "No Alert in Silent Mode";

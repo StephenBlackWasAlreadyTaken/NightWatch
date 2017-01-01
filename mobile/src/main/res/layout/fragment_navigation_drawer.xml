@@ -8,4 +8,4 @@
     android:dividerHeight="8dp"
     android:paddingTop="10dp"
     android:background="#cccc"
-    tools:context="com.shopkeep.pocketandroid.NavigationDrawerFragment" />
+    tools:context="com.dexdrip.stephenblack.nightwatch.activities.SettingsActivity" />

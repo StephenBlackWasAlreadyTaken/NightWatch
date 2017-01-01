@@ -1,48 +1,50 @@
 package com.dexdrip.stephenblack.nightwatch.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
-
 import com.dexdrip.stephenblack.nightwatch.NavigationDrawerFragment;
 import com.dexdrip.stephenblack.nightwatch.R;
 import com.dexdrip.stephenblack.nightwatch.utils.NavDrawerBuilder;
-
 import java.util.List;
+
 
 /**
  * Created by stephenblack on 9/8/15.
  */
-public abstract class BaseActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public abstract class BaseActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private NavigationDrawerFragment mNavigationDrawerFragment;
+    private String menu_name = "Home Screen";
+
+
+
+    @Override
+    public void setSupportActionBar(@Nullable Toolbar toolbar) {
+        super.setSupportActionBar(toolbar);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
+
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        setupToolbar();
-        initializeNavDrawer();
-    }
-
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(getMenuName());
-        toolbar.setNavigationIcon(R.drawable.ic_drawer);
-        toolbar.setLogo(R.drawable.ic_icon);
-        setSupportActionBar(toolbar);
-    }
-
-    private void initializeNavDrawer() {
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mNavigationDrawerFragment.setUp((DrawerLayout) findViewById(R.id.drawer_layout), this);
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), menu_name, this);
+
+    }
+
+    public void setUp(DrawerLayout drawerLayout, Activity activity) {
+        mNavigationDrawerFragment.setUp( R.id.drawer_layout, drawerLayout, "Home Screen", this);
     }
 
     protected abstract String getMenuName();

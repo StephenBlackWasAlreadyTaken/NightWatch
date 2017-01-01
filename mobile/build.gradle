@@ -7,6 +7,7 @@ buildscript {
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
+
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
@@ -20,14 +21,15 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
-
+    buildToolsVersion '25'
     defaultConfig {
         applicationId "com.dexdrip.stephenblack.nightwatch"
-        minSdkVersion 15
+        minSdkVersion 23
         targetSdkVersion 23
         versionCode 1
-        versionName "2.0.3"
+        versionName '2.0.4'
+        multiDexEnabled true
+
     }
     buildTypes {
         release {
@@ -35,22 +37,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree( dir: 'libs')
     wearApp project(':wear')
-    compile 'com.squareup.okhttp:okhttp:2.2.0'
-    testCompile 'com.squareup.okhttp:mockwebserver:2.2.0'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.google.android.gms:play-services:7.5.0'
-    compile 'com.google.code.gson:gson:2.3'
+    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
+    compile 'com.squareup.okhttp3:okhttp:3.3.0'
+    //testCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.google.android.gms:play-services:10.0.1'
     compile 'com.getpebble:pebblekit:3.0.0'
     compile 'com.github.lecho:hellocharts-android:v1.5.5'
-
     compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.android.support:recyclerview-v7:22.2.0'
+    compile 'com.android.support:recyclerview-v7:23.1.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
         transitive = true;
     }

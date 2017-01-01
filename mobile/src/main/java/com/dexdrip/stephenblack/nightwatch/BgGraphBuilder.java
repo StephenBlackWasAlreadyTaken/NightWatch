@@ -6,7 +6,9 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -48,7 +50,9 @@ public class BgGraphBuilder {
 
     private double endHour;
     private final int numValues =(60/5)*24;
+
     private final List<Bg> bgReadings = Bg.latestForGraph(numValues, start_time * fuzz);
+
     private List<PointValue> inRangeValues = new ArrayList<PointValue>();
     private List<PointValue> highValues = new ArrayList<PointValue>();
     private List<PointValue> lowValues = new ArrayList<PointValue>();
@@ -88,7 +92,7 @@ public class BgGraphBuilder {
 
     public List<Line> defaultLines() {
         addBgReadingValues();
-        List<Line> lines = new ArrayList<Line>();
+        List<Line> lines = new ArrayList<>();
         lines.add(minShowLine());
         lines.add(maxShowLine());
         lines.add(highLine());
