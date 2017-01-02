@@ -24,7 +24,7 @@ android {
     buildToolsVersion '25'
     defaultConfig {
         applicationId "com.dexdrip.stephenblack.nightwatch"
-        minSdkVersion 23
+        minSdkVersion 20
         targetSdkVersion 23
         versionCode 1
         versionName '2.0.4'
@@ -48,7 +48,6 @@ dependencies {
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.3.0'
-    //testCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.google.android.gms:play-services:10.0.1'
     compile 'com.getpebble:pebblekit:3.0.0'
