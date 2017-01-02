@@ -6,7 +6,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import android.util.Log;
+
 
 import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import java.text.DecimalFormat;
@@ -107,6 +107,7 @@ public class BgGraphBuilder {
         Line highValuesLine = new Line(highValues);
         highValuesLine.setColor(ChartUtils.COLOR_ORANGE);
         highValuesLine.setHasLines(false);
+        highValuesLine.setHasLabelsOnlyForSelected(true);
         highValuesLine.setPointRadius(3);
         highValuesLine.setHasPoints(true);
         return highValuesLine;
@@ -116,6 +117,7 @@ public class BgGraphBuilder {
         Line lowValuesLine = new Line(lowValues);
         lowValuesLine.setColor(Color.parseColor("#C30909"));
         lowValuesLine.setHasLines(false);
+        lowValuesLine.setHasLabelsOnlyForSelected(true);
         lowValuesLine.setPointRadius(3);
         lowValuesLine.setHasPoints(true);
         return lowValuesLine;
@@ -125,6 +127,7 @@ public class BgGraphBuilder {
         Line inRangeValuesLine = new Line(inRangeValues);
         inRangeValuesLine.setColor(ChartUtils.COLOR_BLUE);
         inRangeValuesLine.setHasLines(false);
+        inRangeValuesLine.setHasLabelsOnlyForSelected(true);
         inRangeValuesLine.setPointRadius(3);
         inRangeValuesLine.setHasPoints(true);
         return inRangeValuesLine;
@@ -230,7 +233,9 @@ public class BgGraphBuilder {
         }
         for(int l=0; l<=24; l++) {
             double timestamp = (endHour - (60000 * 60 * l));
-            xAxisValues.add(new AxisValue((long)(timestamp/fuzz), (timeFormat.format(timestamp)).toCharArray()));
+            AxisValue point = new AxisValue((long)(timestamp/fuzz));
+            point.setLabel((timeFormat.format(timestamp)));
+            xAxisValues.add(point);
         }
         xAxis.setValues(xAxisValues);
         xAxis.setHasLines(true);
@@ -248,7 +253,9 @@ public class BgGraphBuilder {
         timeFormat.setTimeZone(TimeZone.getDefault());
         for(int l=0; l<=24; l+=hoursPreviewStep) {
             double timestamp = (endHour - (60000 * 60 * l));
-            previewXaxisValues.add(new AxisValue((long)(timestamp/fuzz), (timeFormat.format(timestamp)).toCharArray()));
+            AxisValue point = new AxisValue((long)(timestamp/fuzz));
+            point.setLabel((timeFormat.format(timestamp)));
+            previewXaxisValues.add(point);
         }
         Axis previewXaxis = new Axis();
         previewXaxis.setValues(previewXaxisValues);
