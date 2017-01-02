@@ -66,7 +66,7 @@ public class BgGraphBuilder {
         this.lowMark = Double.parseDouble(prefs.getString("lowValue", "70"));
         this.doMgdl = (prefs.getString("units", "mgdl").compareTo("mgdl") == 0);
         defaultMinY = unitized(40);
-        defaultMaxY = unitized(250);
+        defaultMaxY = Double.parseDouble(prefs.getString("maxBgYAxis","250"));
         pointSize = isXLargeTablet() ? 5 : 3;
         axisTextSize = isXLargeTablet() ? 20 : Axis.DEFAULT_TEXT_SIZE_SP;
         previewAxisTextSize = isXLargeTablet() ? 12 : 5;

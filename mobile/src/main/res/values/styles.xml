@@ -1,26 +1,15 @@
 <resources>
-    <style name="NightWatch" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="NightWatch">
         <item name="colorPrimary">#212121</item>
         <item name="colorPrimaryDark">#212222</item>
         <item name="colorAccent">#33B5E5</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
-    <style name="navDrawer" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="android:textSize">18sp</item>
-        <item name="android:background">@color/transparent_sk_dk_blue</item>
+    <style name="navDrawer" >
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
-    <!-- -->
-    <!-- -->
-        <!--<item name="android:background">#212121</item>-->
-        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
-    <!--</style>-->
-
-    <!--&lt;!&ndash; ActionBar styles &ndash;&gt;-->
-    <!--<style name="MyActionBar"-->
-        <!--parent="@android:style/Widget.Holo.ActionBar">-->
-        <!--<item name="android:background">#212121</item>-->
-        <!--&lt;!&ndash;<item name="android:color">#616161</item>&ndash;&gt;-->
-    <!--</style>-->
 </resources>

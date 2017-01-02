@@ -52,6 +52,7 @@ public class Notifications extends IntentService {
     public static boolean calibration_notifications;
     public static boolean calibration_override_silent;
     public static int calibration_snooze;
+    public static int bg_stale_data_limit;
     public static String calibration_notification_sound;
     public static boolean doMgdl;
     public static boolean smart_snoozing;

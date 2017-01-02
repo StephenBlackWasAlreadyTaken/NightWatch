@@ -1,6 +1,6 @@
 package com.dexdrip.stephenblack.nightwatch.activities;
 
-import android.os.PersistableBundle;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,24 +15,18 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
-import com.dexdrip.stephenblack.nightwatch.NavigationDrawerFragment;
 import com.dexdrip.stephenblack.nightwatch.PebbleSync;
 import com.dexdrip.stephenblack.nightwatch.R;
-import com.dexdrip.stephenblack.nightwatch.utils.NavDrawerBuilder;
-
-import java.util.List;
 
 
 public class SettingsActivity extends AppCompatActivity  {
     public static final String MENU_NAME = "Settings";
     public static SharedPreferences prefs;
     private static AllPrefsFragment prefsFragment;
-    private NavigationDrawerFragment mNavigationDrawerFragment;
 
 
 
@@ -40,15 +34,13 @@ public class SettingsActivity extends AppCompatActivity  {
     @Override
     protected void onResume(){
         super.onResume();
-        //mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        //mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), MENU_NAME, this);
 
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.NightWatch);
+        setTheme(R.style.navDrawer);
         this.prefsFragment = new AllPrefsFragment();
         getFragmentManager().beginTransaction().replace(android.R.id.content,
                 this.prefsFragment).commit();
@@ -82,6 +74,7 @@ public class SettingsActivity extends AppCompatActivity  {
 
             //Notifications
             addPreferencesFromResource(R.xml.pref_notifications);
+            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("maxBgYAxis"));
             bindPreferenceSummaryToValue(findPreference("bg_alert_profile"));
             bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("bg_missed_minutes"));
             bindPreferenceSummaryToValue(findPreference("falling_bg_val"));

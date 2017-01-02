@@ -14,6 +14,12 @@
         <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
             android:title="Bg Alerts Settings"
             android:key="bg_alerts_screen">
+            <EditTextPreference
+                android:key="maxBgYAxis"
+                android:title="Max Bg on Graph"
+                android:numeric="decimal"
+                android:summary="The maximum value you want on the Graph."
+                android:defaultValue="250" />
             <ListPreference
                     android:key="bg_alert_profile"
                     android:title="BG alerts profile"
