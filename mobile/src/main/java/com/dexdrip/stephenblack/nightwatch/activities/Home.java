@@ -274,7 +274,13 @@ public class Home extends BaseActivity {
 
         if (lastBgreading != null) {
             //TODO: Adrian: Remove raw string?
-            notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
+            if ( prefs.getBoolean("showRaw",false) ) {
+                // show age and raw readings
+                notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
+            } else {
+                // just show age
+                notificationText.setText(lastBgreading.readingAge());
+            }
             currentBgValueText.setText(bgGraphBuilder.unitized_string(lastBgreading.sgv_double()) + " " + lastBgreading.slopeArrow());
             if ((new Date().getTime()) - (60000 * 16) - lastBgreading.datetime > 0) {
                 notificationText.setTextColor(Color.parseColor("#C30909"));

@@ -11,29 +11,33 @@
     tools:context="com.dexdrip.stephenblack.nightwatch.activities.About">
 
     <TextView
-        android:text="Version Name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="33dp"
-        android:layout_marginTop="29dp"
-        android:id="@+id/versionName" />
-
-    <TextView
         android:text="Version Number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:id="@+id/versionNumber"
-        android:layout_below="@+id/versionName"
+        android:layout_marginTop="71dp"
+        android:layout_below="@+id/About"
         android:layout_alignStart="@+id/versionName" />
 
     <TextView
-        android:text="About"
+        android:text="Version Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="27dp"
+        android:id="@+id/versionName"
+        android:layout_below="@+id/About"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="About"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/About"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        tools:text="About NightWatch:"
+        android:layout_marginTop="15dp"
         android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/versionName"
-        android:id="@+id/About" />
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="14dp" />
 </RelativeLayout>

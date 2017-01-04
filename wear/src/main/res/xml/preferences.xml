@@ -10,10 +10,6 @@
         android:summary="Dark theme"
         android:key="dark" />
 
-        <CheckBoxPreference android:title="Show Raw"
-            android:defaultValue="false"
-            android:summary="Show Raw."
-            android:key="showRaw" />
 
         <CheckBoxPreference android:title="Show Raw on ???"
             android:defaultValue="true"

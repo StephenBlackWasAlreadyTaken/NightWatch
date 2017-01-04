@@ -589,7 +589,7 @@ public class EditAlertActivity extends BaseActivity {
 
     public String getPath(Uri uri) {
         String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        Cursor cursor = getContentResolver().query(uri, projection, null,null,null);
         if(cursor!=null)
         {
             //HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
