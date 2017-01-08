@@ -2,6 +2,8 @@
 package com.dexdrip.stephenblack.nightwatch.sharemodels;
 
 
+import com.dexdrip.stephenblack.nightwatch.model.ShareGlucose;
+
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +58,11 @@ public interface DexcomShare {
     @POST("Publisher/ReplacePublisherAccountMonitoredReceiver")
     Call<ResponseBody> updateMonitorAssignment(@Query("sessionId") String sessionId,
                                                @Query("serialNumber") String serialNumber);
-    // needs ?sessionId={YourSessionId}&serialNumber={YourdexcomSerialNumber}
-    // returns status code?
+
+    @POST("Publisher/ReadPublisherLatestGlucoseValues")
+    Call<List<ShareGlucose>> getBgReadings(@Query("sessionId") String sessionId,
+                                   @Query("minutes") int minutes,
+                                   @Query("maxcount") int maxcount);
 
 
     @POST("Publisher/UpdatePublisherAccountRuntimeInfo")

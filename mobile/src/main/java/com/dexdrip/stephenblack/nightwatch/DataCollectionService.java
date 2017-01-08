@@ -19,14 +19,19 @@ import com.activeandroid.ActiveAndroid;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.dexdrip.stephenblack.nightwatch.model.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.ShareGlucose;
 import com.dexdrip.stephenblack.nightwatch.sharemodels.ShareRest;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DataCollectionService extends Service {
     public static final int TIMEOUT = 15000; // 15 seconds for testing. Lower it afterwards.
@@ -170,6 +175,7 @@ public class DataCollectionService extends Service {
     public class DataFetcher extends AsyncTask<Integer, Void, Boolean> {
         Context mContext;
         PowerManager.WakeLock mWakeLock;
+
         DataFetcher(Context context, PowerManager.WakeLock wakeLock) { mContext = context; mWakeLock = wakeLock; }
 
         @Override
@@ -184,10 +190,9 @@ public class DataCollectionService extends Service {
                     boolean success = new Rest(mContext).getBg(requestCount);
                     Thread.sleep(10000);
                     if (success) {
-                    //quick fix: stay awake a bit to handover wakelog
+                        //quick fix: stay awake a bit to handover wakelog
                         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                                "quickFix2").acquire(TIMEOUT);
+                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix2").acquire(TIMEOUT);
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
                     getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
@@ -196,16 +201,28 @@ public class DataCollectionService extends Service {
                 }
                 if(mPrefs.getBoolean("share_poll", false)) {
                     Log.d("ShareRest", "fetching " + requestCount);
-//                    boolean success = new ShareRest(mContext,null);
-//                    if (success) {
-//                        //test wakelock: stay awake a bit to handover wakelog
-//                        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-//                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix3").acquire(TIMEOUT);
-//
-//                        mContext.startService(new Intent(mContext, WatchUpdaterService.class));
-//                    }
-//                    getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
-//                    if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
+                    // create the callback function
+                    Callback<List<ShareGlucose>> shareDataCallback = new Callback<List<ShareGlucose>>() {
+                        @Override
+                        public void onResponse(Call<List<ShareGlucose>> call, Response<List<ShareGlucose>> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<ShareGlucose>> call, Throwable t) {
+
+                        }
+                    };
+                    Boolean shareRest = new ShareRest(mContext, null).getBgReadings(requestCount,  shareDataCallback );
+                    if ( shareRest ) {
+                        //test wakelock: stay awake a bit to handover wakelog
+                        PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix3").acquire(TIMEOUT);
+
+                        mContext.startService(new Intent(mContext, WatchUpdaterService.class));
+                    }
+                    getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
+                    if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
                     return true;
                 }
                 return true;

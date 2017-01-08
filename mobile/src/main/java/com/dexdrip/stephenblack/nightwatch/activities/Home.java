@@ -84,8 +84,6 @@ public class Home extends BaseActivity {
 
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //prefs.edit().putBoolean("nightscout_poll", true).apply();
-        //prefs.edit().putString("dex_collection_method", "https://ryancgminthecloud.azurewebsites.net").apply();
 
         checkEula();
 
@@ -278,8 +276,8 @@ public class Home extends BaseActivity {
                 // show age and raw readings
                 notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
             } else {
-                // just show age
-                notificationText.setText(lastBgreading.readingAge());
+                // show age the delta
+                notificationText.setText(lastBgreading.readingAge() + "\n" + bgGraphBuilder.unitizedDeltaString(true,true) );
             }
             currentBgValueText.setText(bgGraphBuilder.unitized_string(lastBgreading.sgv_double()) + " " + lastBgreading.slopeArrow());
             if ((new Date().getTime()) - (60000 * 16) - lastBgreading.datetime > 0) {

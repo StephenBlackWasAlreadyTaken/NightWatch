@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.dexdrip.stephenblack.nightwatch.model.ShareGlucose;
 import com.dexdrip.stephenblack.nightwatch.model.UserError;
 
 import okhttp3.Interceptor;
@@ -20,9 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -71,7 +70,6 @@ public class ShareRest {
 
             if (httpClient == null) httpClient = getOkHttpClient(); // try again on failure
             // if fails second time we've got big problems
-
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 
@@ -80,15 +78,19 @@ public class ShareRest {
                     .client(httpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
+
             dexcomShareApi = retrofit.create(DexcomShare.class);
+
             sessionId = sharedPreferences.getString("dexcom_share_session_id", null);
             username = sharedPreferences.getString("dexcom_account_name", null);
             password = sharedPreferences.getString("dexcom_account_password", null);
             serialNumber = sharedPreferences.getString("share_key", null);
+
             if (sharedPreferences.getBoolean("engineering_mode", false)) {
                 final String share_test_key = sharedPreferences.getString("share_test_key", "").trim();
                 if (share_test_key.length() > 4) serialNumber = share_test_key;
             }
+
             sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
             if ("".equals(sessionId)) // migrate previous empty sessionIds to null;
                 sessionId = null;
@@ -222,6 +224,16 @@ public class ShareRest {
         });
     }
 
+    public Boolean getBgReadings(final int maxCount,Callback<List<ShareGlucose>> bgCallback ) {
+
+        // need to get the readings from Share and pass them into DataCollection
+        dexcomShareApi.getBgReadings(getSessionId(), 1440, maxCount ).enqueue(new AuthenticatingCallback<List<ShareGlucose>>(bgCallback) {
+            @Override
+                public void onRetry() {
+                dexcomShareApi.getBgReadings(getSessionId(), 1440, maxCount ).enqueue(this); }
+        });
+        return true;
+    }
     public void uploadBGRecords(final ShareUploadPayload bg, Callback<ResponseBody> callback) {
         dexcomShareApi.uploadBGRecords(getSessionId(), bg).enqueue(new AuthenticatingCallback<ResponseBody>(callback) {
             @Override
