@@ -164,6 +164,11 @@ public class DataCollectionService extends Service {
                         return true;
                     }
                 }
+            }
+            catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
+            catch (InterruptedException exx) { Log.d("Interruption Error: ", "BOOOO"); }
+            catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
+            try {
                 if(mPrefs.getBoolean("share_poll", false)) {
                     Log.d("ShareRest", "fetching " + requestCount);
                     boolean success = new ShareRest(mContext).getBg(requestCount);
