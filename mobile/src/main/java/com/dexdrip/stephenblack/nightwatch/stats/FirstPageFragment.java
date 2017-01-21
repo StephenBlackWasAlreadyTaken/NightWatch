@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 import com.dexdrip.stephenblack.nightwatch.R;
 
+import org.w3c.dom.Text;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -130,8 +132,9 @@ public class FirstPageFragment extends Fragment {
                 double len = bgList.size();
                 double stdev = 0;
                 for (BgReadingStats bgr : bgList) {
-                    mean += bgr.calculated_value / len;
+                    mean += bgr.calculated_value;
                 }
+                mean = mean/len;
 
                 TextView meanView = (TextView) localView.findViewById(R.id.textView_mean);
                 //update mean
@@ -141,11 +144,12 @@ public class FirstPageFragment extends Fragment {
                     updateText(localView, meanView, (Math.round(mean * Constants.MGDL_TO_MMOLL * 100) / 100d) + " mmol/l");
 
                 }
+
                 //update A1c
                 TextView a1cView = (TextView) localView.findViewById(R.id.textView_a1c);
                 int a1c_ifcc = (int) Math.round(((mean + 46.7) / 28.7 - 2.15) * 10.929);
                 double a1c_dcct = Math.round(10 * (mean + 46.7) / 28.7) / 10d;
-                updateText(localView, a1cView, a1c_ifcc + " mmol/mol\n" + a1c_dcct + "%");
+                updateText(localView, a1cView, a1c_ifcc + " mmol/mol\n" + a1c_dcct + " %");
 
 
                 for (BgReadingStats bgr : bgList) {
@@ -158,6 +162,10 @@ public class FirstPageFragment extends Fragment {
                 } else {
                     updateText(localView, stdevView, (Math.round(stdev * Constants.MGDL_TO_MMOLL * 100) / 100d) + " mmol/l");
                 }
+                // update the CV
+                TextView cvView = (TextView) localView.findViewById(R.id.textView_cv);
+                double cv = (stdev/mean) * 100 ;
+                updateText(localView, cvView, String.format( "%.2f", cv ) + " %");
             }
         }
 

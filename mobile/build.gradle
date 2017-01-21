@@ -7,6 +7,10 @@ buildscript {
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
+project.ext{
+    devVersionCode = 14
+    releaseVersionCode = 1
+}
 
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
@@ -18,16 +22,28 @@ repositories {
     maven { url "https://oss.sonatype.org/content/groups/public/" }
 }
 
+def getReleaseVersionCode() {
+    def version = project.releaseVersionCode + 1
+    project.releaseVersionCode = version
+    println sprintf("Returning version %d", version)
+    return version
+}
+
+def getDevVersionCode() {
+    def version = project.devVersionCode + 1
+    project.devVersionCode = version
+    println sprintf("Returning version %d", version)
+    return version
+}
 
 android {
     compileSdkVersion 23
     buildToolsVersion '25'
     defaultConfig {
         applicationId "com.dexdrip.stephenblack.nightwatch"
-        minSdkVersion 20
+        minSdkVersion 19
         targetSdkVersion 23
-        versionCode 1
-        versionName '2.0.6'
+        versionName '2.0.7'
         multiDexEnabled true
 
     }
@@ -35,10 +51,38 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                println( "Build Variant " + variant.getName() );
+                variant.outputs.each { output ->
+                    def project = "NightWatch"
+                    def SEP = "_"
+                    def flavor = variant.productFlavors[0].name
+                    def buildType = variant.variantData.variantConfiguration.buildType.name
+                    def version = defaultConfig.versionName
+                    def versionCode = variant.versionCode
+                    def date = new Date();
+                    def formattedDate = date.format('MMddyy_HHmm')
+
+                    def newApkName = project + SEP + flavor + SEP + buildType + SEP + version + SEP + versionCode + SEP + formattedDate + ".apk"
+
+                    output.outputFile = new File(output.outputFile.parent, newApkName)
+                }
+
+            }
+        }
+        debug {
+
         }
     }
     productFlavors {
+        rel {
+            versionCode getReleaseVersionCode()
+        }
+        dev {
+            versionCode getDevVersionCode()
+        }
     }
+
 }
 
 dependencies {
@@ -48,8 +92,7 @@ dependencies {
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.3.0'
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.google.android.gms:play-services:10.0.1'
+    compile 'com.google.android.gms:play-services-wearable:10.0.1'
     compile 'com.getpebble:pebblekit:3.0.0'
     compile 'com.github.lecho:hellocharts-android:v1.5.5'
     compile 'com.android.support:appcompat-v7:23.1.0'

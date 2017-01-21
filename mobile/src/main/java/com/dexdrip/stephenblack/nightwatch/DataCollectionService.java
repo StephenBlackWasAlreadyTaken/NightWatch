@@ -84,15 +84,15 @@ public class DataCollectionService extends Service {
         try {
             SQLiteDatabase db = Cache.openDatabase();
             if (db != null) {
-                Log.d("wearSENSOR", "InitDb DB exists");
+                Log.d("DataCollectionService", "InitDb DB exists");
             }
             else {
                 ActiveAndroid.initialize(dbConfiguration);
-                Log.d("wearSENSOR", "InitDb DB does NOT exist. Call ActiveAndroid.initialize()");
+                Log.d("DataCollectionService", "InitDb DB does NOT exist. Call ActiveAndroid.initialize()");
             }
         } catch (Exception e) {
             ActiveAndroid.initialize(dbConfiguration);
-            Log.d("wearSENSOR", "InitDb CATCH: DB does NOT exist. Call ActiveAndroid.initialize()");
+            Log.d("DataCollectionService", "InitDb CATCH: DB does NOT exist. Call ActiveAndroid.initialize()");
         }
 
 
@@ -239,11 +239,11 @@ public class DataCollectionService extends Service {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "collector data arrived");
         wakeLock.acquire();
-        Log.d("NewDataArrived", "New Data Arrived");
         if (success && bg != null) {
             Intent intent = new Intent(context, WatchUpdaterService.class);
+            String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date ((long)bg.datetime));
             intent.putExtra("timestamp", bg.datetime);
-            Log.d("NewDataArrived", "New Data Arrived with timestamp "+ bg.datetime);
+            Log.d("NewDataArrived", "New Data Arrived with timestamp "+ date);
             context.startService(intent);
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
             //test wakelock: stay awake a bit to handover wakelog
