@@ -139,6 +139,8 @@ public class Notifications extends IntentService {
 
         Log.d(TAG, "FileBasedNotifications called bgReading.sgv_double() = " + bgReading.sgv_double());
 
+        new AlertType().testAll( context);
+
         // TODO: tzachi what is the time of this last bgReading
         // If the last reading does not have a sensor, or that sensor was stopped.
         // or the sensor was started, but the 2 hours did not still pass? or there is no calibrations.
@@ -220,7 +222,7 @@ public class Notifications extends IntentService {
         //  User does not want smart snoozing at all.
             return false;
         }
-        return Bg.trendingToAlertEnd(context, Alert.above);
+        return Bg.trendingToAlertEnd(context, Alert.type);
     }
 /*
  * *****************************************************************************************************************

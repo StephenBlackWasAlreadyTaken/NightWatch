@@ -76,7 +76,6 @@ public class SettingsActivity extends AppCompatActivity  {
             addPreferencesFromResource(R.xml.pref_notifications);
             bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("maxBgYAxis"));
             bindPreferenceSummaryToValue(findPreference("bg_alert_profile"));
-            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("bg_missed_minutes"));
             bindPreferenceSummaryToValue(findPreference("falling_bg_val"));
             bindPreferenceSummaryToValue(findPreference("rising_bg_val"));
             bindPreferenceSummaryToValue(findPreference("other_alerts_sound"));

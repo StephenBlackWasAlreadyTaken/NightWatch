@@ -44,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static android.app.AlertDialog.THEME_HOLO_DARK;
 
 public class EditAlertActivity extends BaseActivity {
     public static final String MENU_NAME = "Edit Alert";
@@ -80,6 +79,7 @@ public class EditAlertActivity extends BaseActivity {
     private int alertReraise = 1;
 
     private int defaultSnooze;
+    AlertType.alertType typeOfAlert;
 
     private String audioPath;
 
@@ -88,8 +88,10 @@ public class EditAlertActivity extends BaseActivity {
     private boolean doMgdl;
 
     private String uuid;
+    private String alertTypeClicked;
     private Context mContext;
-    private boolean above;
+
+    private AlertType.alertType alertType;
     private final int CHOOSE_FILE = 1;
     private final int MIN_ALERT = 40;
     private final int MAX_ALERT = 400;
@@ -198,10 +200,17 @@ public class EditAlertActivity extends BaseActivity {
         }
 
         uuid = getExtra(savedInstanceState, "uuid");
+        alertTypeClicked = getExtra(savedInstanceState,"alertTypeClicked");
+        if ( alertTypeClicked.equals("high") ) {
+            typeOfAlert = AlertType.alertType.high;
+        } else if ( alertTypeClicked.equals("low") ) {
+            typeOfAlert = AlertType.alertType.low;
+        } else if ( alertTypeClicked.equals("missed")){
+            typeOfAlert = AlertType.alertType.missed;
+        }
         String status;
         if (uuid == null) {
             // This is a new alert
-            above = Boolean.parseBoolean(getExtra(savedInstanceState, "above"));
             checkboxAllDay.setChecked(true);
             checkboxVibrate.setChecked(true);
             checkboxAlertOverride.setChecked(true);
@@ -209,11 +218,24 @@ public class EditAlertActivity extends BaseActivity {
             audioPath = "";
             alertMp3File.setText(shortPath(audioPath));
             alertMp3File.setKeyListener(null);
-            defaultSnooze = SnoozeActivity.getDefaultSnooze(above);
+            defaultSnooze = SnoozeActivity.getDefaultSnooze(typeOfAlert);
             buttonRemove.setVisibility(View.GONE);
             // One can not snooze an alert that is still not in the database...
             buttonPreSnooze.setVisibility(View.GONE);
-            status = "Adding " + (above ? "high" : "low") + " alert";
+            status = "Adding ";
+            switch ( typeOfAlert)
+            {
+                case high:
+                    status = status + "High ";
+                    break;
+                case low:
+                    status = status + "Low ";
+                    break;
+                case missed:
+                    status = status + "Missed Data ";
+                    break;
+            }
+            status = status + "Alert";
             startHour = 0;
             startMinute = 0;
             endHour = 23;
@@ -230,7 +252,7 @@ public class EditAlertActivity extends BaseActivity {
                 return;
             }
 
-            above =at.above;
+            alertType = at.type;
             alertText.setText(at.name);
             alertThreshold.setText(unitsConvert2Disp(doMgdl, at.threshold));
             checkboxAllDay.setChecked(at.all_day);
@@ -238,13 +260,26 @@ public class EditAlertActivity extends BaseActivity {
             checkboxAlertOverride.setChecked(at.override_silent_mode);
             defaultSnooze = at.default_snooze;
             if(defaultSnooze == 0) {
-                SnoozeActivity.getDefaultSnooze(above);
+                SnoozeActivity.getDefaultSnooze(typeOfAlert);
             }
 
             audioPath = at.mp3_file;
             alertMp3File.setText(shortPath(audioPath));
 
-            status = "editing " + (above ? "high" : "low") + " alert";
+            status = "Editing ";
+            switch ( typeOfAlert)
+            {
+                case high:
+                    status = status + "High ";
+                    break;
+                case low:
+                    status = status + "Low ";
+                    break;
+                case missed:
+                    status = status + "Missed Data ";
+                    break;
+            }
+            status = status + "alert";
             startHour = AlertType.time2Hours(at.start_time_minutes);
             startMinute = AlertType.time2Minutes(at.start_time_minutes);
             endHour = AlertType.time2Hours(at.end_time_minutes);
@@ -311,15 +346,17 @@ public class EditAlertActivity extends BaseActivity {
     }
 
     private boolean verifyThreshold(double threshold) {
-        List<AlertType> lowAlerts = AlertType.getAll(false);
-        List<AlertType> highAlerts = AlertType.getAll(true);
+        List<AlertType> lowAlerts = AlertType.getAll(AlertType.alertType.low);
+        List<AlertType> highAlerts = AlertType.getAll(AlertType.alertType.high);
 
-        if(threshold < MIN_ALERT || threshold > MAX_ALERT) {
-            Toast.makeText(getApplicationContext(), "threshold has to be between " +unitsConvert2Disp(doMgdl, MIN_ALERT) + " and " + unitsConvert2Disp(doMgdl, MAX_ALERT),Toast.LENGTH_LONG).show();
-            return false;
+        if (typeOfAlert != AlertType.alertType.missed) {
+            if(threshold < MIN_ALERT || threshold > MAX_ALERT) {
+                Toast.makeText(getApplicationContext(), "threshold has to be between " +unitsConvert2Disp(doMgdl, MIN_ALERT) + " and " + unitsConvert2Disp(doMgdl, MAX_ALERT),Toast.LENGTH_LONG).show();
+                return false;
+            }
         }
         if (uuid == null) {
-            // We want to make sure that for each threashold there is only one alert. Otherwise, which file should we play.
+            // We want to make sure that for each threshold there is only one alert. Otherwise, which file should we play.
             for (AlertType lowAlert : lowAlerts) {
                 if(lowAlert.threshold == threshold) {
                     Toast.makeText(getApplicationContext(),
@@ -335,8 +372,9 @@ public class EditAlertActivity extends BaseActivity {
                 }
             }
         }
+
         // high alerts have to be higher than all low alerts...
-        if(above) {
+        if(typeOfAlert == AlertType.alertType.high) {
             for (AlertType lowAlert : lowAlerts) {
                 if(threshold < lowAlert.threshold  ) {
                     Toast.makeText(getApplicationContext(),
@@ -393,6 +431,7 @@ public class EditAlertActivity extends BaseActivity {
                 if(Double.isNaN(threshold))
                     return;
 
+
                 threshold = unitsConvertFromDisp(threshold);
                 if(!verifyThreshold(threshold)) {
                     return;
@@ -436,9 +475,9 @@ public class EditAlertActivity extends BaseActivity {
 
                 String mp3_file = audioPath;
                 if (uuid != null) {
-                    AlertType.update_alert(uuid, alertText.getText().toString(), above, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, defaultSnooze, vibrate);
+                    AlertType.update_alert(uuid, alertText.getText().toString(), typeOfAlert, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, defaultSnooze, vibrate);
                 }  else {
-                    AlertType.add_alert(null, alertText.getText().toString(), above, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, defaultSnooze, vibrate);
+                    AlertType.add_alert(null, alertText.getText().toString(), typeOfAlert, threshold, allDay, alertReraise, mp3_file, timeStart, timeEnd, overrideSilentMode, defaultSnooze, vibrate);
                 }
                 Intent returnIntent = new Intent();
                 setResult(RESULT_OK,returnIntent);
@@ -677,7 +716,7 @@ public class EditAlertActivity extends BaseActivity {
                     final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
 
 
-                    SnoozeActivity.SetSnoozePickerValues(snoozeValue, above, defaultSnooze);
+                    SnoozeActivity.SetSnoozePickerValues(snoozeValue, typeOfAlert, defaultSnooze);
                     b1.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -717,7 +756,7 @@ public class EditAlertActivity extends BaseActivity {
 
                 final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
 
-                SnoozeActivity.SetSnoozePickerValues(snoozeValue, above, defaultSnooze);
+                SnoozeActivity.SetSnoozePickerValues(snoozeValue, typeOfAlert, defaultSnooze);
                 b1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -770,7 +809,7 @@ public class EditAlertActivity extends BaseActivity {
         boolean vibrate = checkboxVibrate.isChecked();
         boolean overrideSilentMode = checkboxAlertOverride.isChecked();
         String mp3_file = audioPath;
-        AlertType.testAlert(alertText.getText().toString(), above, threshold, allDay, 1, mp3_file, timeStart, timeEnd, overrideSilentMode, defaultSnooze, vibrate, mContext);
+        AlertType.testAlert(alertText.getText().toString(), typeOfAlert, threshold, allDay, 1, mp3_file, timeStart, timeEnd, overrideSilentMode, defaultSnooze, vibrate, mContext);
 
     }
 }

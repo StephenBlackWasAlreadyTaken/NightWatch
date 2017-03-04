@@ -29,7 +29,7 @@ public class SnoozeOnNotificationDismissService extends IntentService {
             if(activeBgAlert.default_snooze != 0) {
                 snooze = activeBgAlert.default_snooze;
             } else {
-                snooze = SnoozeActivity.getDefaultSnooze(activeBgAlert.above);
+                snooze = SnoozeActivity.getDefaultSnooze(activeBgAlert.type);
             }
         }
 

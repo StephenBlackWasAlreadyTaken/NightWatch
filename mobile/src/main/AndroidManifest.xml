@@ -27,10 +27,15 @@
             android:value="NightWatch.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="6" />
+            android:value="7" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="             com.dexcom.stephenblack.nightwatch.model.ActiveBgAlert,             com.dexcom.stephenblack.nightwatch.model.AlertType,             com.dexcom.stephenblack.nightwatch.model.Bg,             com.dexcom.stephenblack.nightwatch.model.ShareGlucose,             com.dexcom.stephenblack.nightwatch.model.UserError,             com.dexcom.stephenblack.nightwatch.model.UserNotificationV2" />
+            android:value="com.dexcom.stephenblack.nightwatch.model.ActiveBgAlert,
+                com.dexcom.stephenblack.nightwatch.model.AlertType,
+                com.dexcom.stephenblack.nightwatch.model.Bg,
+                com.dexcom.stephenblack.nightwatch.model.ShareGlucose,
+                com.dexcom.stephenblack.nightwatch.model.UserError,
+                com.dexcom.stephenblack.nightwatch.model.UserNotificationV2" />
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"

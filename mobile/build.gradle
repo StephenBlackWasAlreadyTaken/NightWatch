@@ -48,21 +48,21 @@ android {
 
     }
     buildTypes {
+        def project = "NightWatch"
+        def SEP = "_"
+        def date = new Date();
+        def formattedDate = date.format('MMddyy_HHmm')
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationVariants.all { variant ->
                 println( "Build Variant " + variant.getName() );
                 variant.outputs.each { output ->
-                    def project = "NightWatch"
-                    def SEP = "_"
-                    def flavor = variant.productFlavors[0].name
-                    def buildType = variant.variantData.variantConfiguration.buildType.name
                     def version = defaultConfig.versionName
                     def versionCode = variant.versionCode
-                    def date = new Date();
-                    def formattedDate = date.format('MMddyy_HHmm')
-
+                    def buildType = variant.variantData.variantConfiguration.buildType.name
+                    def flavor = variant.productFlavors[0].name
                     def newApkName = project + SEP + flavor + SEP + buildType + SEP + version + SEP + versionCode + SEP + formattedDate + ".apk"
 
                     output.outputFile = new File(output.outputFile.parent, newApkName)
@@ -71,6 +71,18 @@ android {
             }
         }
         debug {
+            applicationVariants.all { variant ->
+            println( "Build Variant " + variant.getName() );
+            variant.outputs.each { output ->
+                def version = defaultConfig.versionName
+                def versionCode = variant.versionCode
+                def buildType = variant.variantData.variantConfiguration.buildType.name
+                def newApkName = project + SEP + buildType + SEP + version + SEP + versionCode + ".apk"
+
+                output.outputFile = new File(output.outputFile.parent, newApkName)
+            }
+
+        }
 
         }
     }

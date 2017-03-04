@@ -276,10 +276,12 @@ public class Home extends BaseActivity {
                 // show age and raw readings
                 notificationText.setText(lastBgreading.readingAge() + "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
             } else {
-                // show age the delta
+                // show age and the delta
                 notificationText.setText(lastBgreading.readingAge() + "\n" + bgGraphBuilder.unitizedDeltaString(true,true) );
             }
+
             currentBgValueText.setText(bgGraphBuilder.unitized_string(lastBgreading.sgv_double()) + " " + lastBgreading.slopeArrow());
+
             if ((new Date().getTime()) - (60000 * 16) - lastBgreading.datetime > 0) {
                 notificationText.setTextColor(Color.parseColor("#C30909"));
                 currentBgValueText.setPaintFlags(currentBgValueText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);

@@ -83,15 +83,16 @@ public class DataCollectionService extends Service {
         Configuration dbConfiguration = new Configuration.Builder(context).create();
         try {
             SQLiteDatabase db = Cache.openDatabase();
+            ActiveAndroid.initialize(this,false ); // second parameter turns on debug output
             if (db != null) {
                 Log.d("DataCollectionService", "InitDb DB exists");
             }
             else {
-                ActiveAndroid.initialize(dbConfiguration);
+                ActiveAndroid.initialize(this,false);
                 Log.d("DataCollectionService", "InitDb DB does NOT exist. Call ActiveAndroid.initialize()");
             }
         } catch (Exception e) {
-            ActiveAndroid.initialize(dbConfiguration);
+            ActiveAndroid.initialize(this,false);
             Log.d("DataCollectionService", "InitDb CATCH: DB does NOT exist. Call ActiveAndroid.initialize()");
         }
 

@@ -2,8 +2,8 @@
     <PreferenceCategory
         android:title="Alerts and Notifications"
         android:key="alerts_category">
-        <Preference android:title="Bg Level Alerts"
-            android:key="bg_level_alerts" >
+        <Preference android:title="Alerts"
+            android:key="alerts" >
             <intent
                 android:action="android.intent.action.MAIN"
                 android:targetPackage="com.dexdrip.stephenblack.nightwatch"
@@ -12,8 +12,8 @@
         </Preference>
 
         <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-            android:title="Bg Alerts Settings"
-            android:key="bg_alerts_screen">
+            android:title="Alert Settings"
+            android:key="alerts_screen">
             <EditTextPreference
                 android:key="maxBgYAxis"
                 android:title="Max Bg on Graph"
@@ -44,20 +44,6 @@
             android:title="Other Alerts"
             android:key="other_alerts_screen">
 
-            <PreferenceCategory
-                android:title="Missed Readings">
-                <CheckBoxPreference
-                    android:key="bg_missed_alerts"
-                    android:title="Missed Reading Alerts"
-                    android:defaultValue="false" />
-                <EditTextPreference
-                    android:dependency="bg_missed_alerts"
-                    android:key="bg_missed_minutes"
-                    android:title="Minutes until alerting for missed readings"
-                    android:inputType="number"
-                    android:summary="Alert if no data receieved in x minutes"
-                    android:defaultValue="30" />
-            </PreferenceCategory>
 
             <PreferenceCategory
                 android:title="Falling/Rising BG">

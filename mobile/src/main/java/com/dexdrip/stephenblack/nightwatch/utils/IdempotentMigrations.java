@@ -39,8 +39,8 @@ public class IdempotentMigrations {
             boolean bg_sound_in_silent = prefs.getBoolean("bg_sound_in_silent", false);
             String bg_notification_sound = prefs.getString("bg_notification_sound", "content://settings/system/notification_sound");
 
-            int bg_high_snooze = Integer.parseInt(prefs.getString("bg_snooze",  Integer.toString(SnoozeActivity.getDefaultSnooze(true))));
-            int bg_low_snooze = Integer.parseInt(prefs.getString("bg_snooze",  Integer.toString(SnoozeActivity.getDefaultSnooze(false))));
+            int bg_high_snooze = Integer.parseInt(prefs.getString("bg_snooze",  Integer.toString(SnoozeActivity.getDefaultSnooze(AlertType.alertType.high))));
+            int bg_low_snooze = Integer.parseInt(prefs.getString("bg_snooze",  Integer.toString(SnoozeActivity.getDefaultSnooze(AlertType.alertType.low))));
 
 
             //AlertType.add_alert(null, "High Alert", true, highMark, true, 1, bg_notification_sound, 0, 0, bg_sound_in_silent, bg_high_snooze, true);

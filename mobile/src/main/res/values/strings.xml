@@ -12,6 +12,10 @@
     <string name="add_widget">Add widget</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="create_missed">Create Missed Data Alert</string>
+    <string name="create_high">Create High Alert</string>
+    <string name="create_low">Create Low Alert</string>
+    <string name="alert_tip">(Long Press an existing alert to edit)</string>
     <string name="xDripWidget">xDripWidget</string>
     <string name="snooze">Snooze</string>
 

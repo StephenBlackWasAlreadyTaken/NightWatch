@@ -76,14 +76,14 @@ public class SnoozeActivity extends BaseActivity {
         return snoozeValues[pickedNumber];
     }
 
-    static public int getDefaultSnooze(boolean above) {
-        if (above) {
+    static public int getDefaultSnooze(AlertType.alertType type) {
+        if (type == AlertType.alertType.high) {
             return 120;
         }
         return 30;
     }
 
-    static void SetSnoozePickerValues(NumberPicker picker, boolean above, int default_snooze) {
+    static void SetSnoozePickerValues(NumberPicker picker, AlertType.alertType type, int default_snooze) {
         String[] values=new String[snoozeValues.length];
         for(int i=0;i<values.length;i++){
             values[i]=getNameFromTime(snoozeValues[i]);
@@ -96,7 +96,7 @@ public class SnoozeActivity extends BaseActivity {
         if(default_snooze != 0) {
             picker.setValue(getSnoozeLocation(default_snooze));
         } else {
-            picker.setValue(getSnoozeLocation(getDefaultSnooze(above)));
+            picker.setValue(getSnoozeLocation(getDefaultSnooze(type)));
         }
     }
 
@@ -193,7 +193,7 @@ public class SnoozeActivity extends BaseActivity {
                 Button b2 = (Button) d.findViewById(R.id.button2);
                 final NumberPicker snoozeValue = (NumberPicker) d.findViewById(R.id.numberPicker1);
 
-                SnoozeActivity.SetSnoozePickerValues(snoozeValue, false, 60);
+                SnoozeActivity.SetSnoozePickerValues(snoozeValue, AlertType.alertType.low, 60);
                 b1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -204,8 +204,8 @@ public class SnoozeActivity extends BaseActivity {
                         if (aba != null) {
                             AlertType activeBgAlert = ActiveBgAlert.alertTypegetOnly();
                             if (disableType.equalsIgnoreCase("alerts_disabled_until")
-                                    || (activeBgAlert.above && disableType.equalsIgnoreCase("high_alerts_disabled_until"))
-                                    || (!activeBgAlert.above && disableType.equalsIgnoreCase("low_alerts_disabled_until"))
+                                    || (activeBgAlert.type == AlertType.alertType.high && disableType.equalsIgnoreCase("high_alerts_disabled_until"))
+                                    || (activeBgAlert.type == AlertType.alertType.low && disableType.equalsIgnoreCase("low_alerts_disabled_until"))
                                     ) {
                                 //active bg alert exists which is a type that is being disabled so let's remove it completely from the database
                                 ActiveBgAlert.ClearData();
@@ -296,7 +296,7 @@ public class SnoozeActivity extends BaseActivity {
             } else {
                 status = "Active alert exists named \"" + activeBgAlert.name + "\" (not snoozed)";
             }
-            SetSnoozePickerValues(snoozeValue, activeBgAlert.above, activeBgAlert.default_snooze);
+            SetSnoozePickerValues(snoozeValue, activeBgAlert.type, activeBgAlert.default_snooze);
             alertStatus.setText(status);
         }
 
