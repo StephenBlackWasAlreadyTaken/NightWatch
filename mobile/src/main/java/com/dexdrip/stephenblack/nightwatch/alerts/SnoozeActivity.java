@@ -17,6 +17,7 @@ import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class SnoozeActivity extends BaseActivity {
@@ -285,7 +286,8 @@ public class SnoozeActivity extends BaseActivity {
             snoozeValue.setVisibility(View.GONE);
         } else {
             if(!aba.ready_to_alarm()) {
-                status = getString(R.string.active_alert_snoozed).replace("$1", activeBgAlert.name).replace("$2", DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date(aba.next_alert_at))).replace("$3",  ((aba.next_alert_at - new Date().getTime() / 60000) + ""));
+                long timeTillNext = (aba.next_alert_at - new Date().getTime()) / 60000;
+                status = getString(R.string.active_alert_snoozed).replace("$1", activeBgAlert.name).replace("$2", DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date(aba.next_alert_at))).replace("$3",  timeTillNext + "");
             } else {
                 status = getString(R.string.active_alert).replace("$1", activeBgAlert.name);
             }
