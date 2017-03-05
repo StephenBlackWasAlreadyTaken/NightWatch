@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.dexdrip.stephenblack.nightwatch.R;
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.activities.SettingsActivity;
 import com.dexdrip.stephenblack.nightwatch.alerts.AlertList;
@@ -30,25 +31,25 @@ public class NavDrawerBuilder {
         boolean IUnderstand = prefs.getBoolean("I_understand", false);
 
         if (IUnderstand == false) {
-            this.nav_drawer_options.add("Settings");
+            this.nav_drawer_options.add(context.getString(R.string.menu_settings));
             this.nav_drawer_intents.add(new Intent(context, SettingsActivity.class));
             return;
         }
 
-        this.nav_drawer_options.add(Home.MENU_NAME);
+        this.nav_drawer_options.add(context.getString(R.string.menu_home));
         this.nav_drawer_intents.add(new Intent(context, Home.class));
 
-        this.nav_drawer_options.add(StatsActivity.MENU_NAME);
+        this.nav_drawer_options.add(context.getString(R.string.activity_stats));
         this.nav_drawer_intents.add(new Intent(context, StatsActivity.class));
 
-        this.nav_drawer_options.add(AlertList.MENU_NAME);
+        this.nav_drawer_options.add(context.getString(R.string.activity_alerts));
         this.nav_drawer_intents.add(new Intent(context, AlertList.class));
 
-        this.nav_drawer_options.add(SnoozeActivity.MENU_NAME);
+        this.nav_drawer_options.add(context.getString(R.string.activity_snooze));
         this.nav_drawer_intents.add(new Intent(context, SnoozeActivity.class));
 
 
-        this.nav_drawer_options.add("Settings");
+        this.nav_drawer_options.add(context.getString(R.string.menu_settings));
         this.nav_drawer_intents.add(new Intent(context, SettingsActivity.class));
     }
 }

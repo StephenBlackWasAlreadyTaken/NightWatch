@@ -316,9 +316,9 @@ public class Notifications extends IntentService {
         NotificationCompat.Builder b = new NotificationCompat.Builder(mContext);
         //b.setOngoing(true);
         b.setCategory(NotificationCompat.CATEGORY_STATUS);
-        String titleString = lastReading == null ? "BG Reading Unavailable" : (lastReading.displayValue(mContext) + " " + lastReading.slopeArrow());
+        String titleString = lastReading == null ? getString(R.string.bg_unavailable) : (lastReading.displayValue(mContext) + " " + lastReading.slopeArrow());
         b.setContentTitle(titleString)
-                .setContentText("xDrip Data collection service is running.")
+                .setContentText(getString(R.string.service_running))
                 .setSmallIcon(R.drawable.ic_action_communication_invert_colors_on)
                 .setUsesChronometer(false);
         if (lastReading != null) {
@@ -420,13 +420,13 @@ public class Notifications extends IntentService {
     public static void bgUnclearAlert(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int otherAlertSnooze =  Integer.parseInt(prefs.getString("other_alerts_snooze", "20"));
-        OtherAlert(context, "bg_unclear_readings_alert", "Unclear Sensor Readings", uncleanAlertNotificationId,  otherAlertSnooze);
+        OtherAlert(context, "bg_unclear_readings_alert", context.getString(R.string.unclear_readings), uncleanAlertNotificationId,  otherAlertSnooze);
     }
 
     public static void bgMissedAlert(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int otherAlertSnooze =  Integer.parseInt(prefs.getString("other_alerts_snooze", "20"));
-        OtherAlert(context, "bg_missed_alerts", "BG Readings Missed", missedAlertNotificationId, otherAlertSnooze);
+        OtherAlert(context, "bg_missed_alerts", context.getString(R.string.missed_readings), missedAlertNotificationId, otherAlertSnooze);
     }
 
     public static void RisingAlert(Context context, boolean on) {

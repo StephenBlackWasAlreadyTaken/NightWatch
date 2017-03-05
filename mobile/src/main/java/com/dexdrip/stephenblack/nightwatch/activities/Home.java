@@ -41,7 +41,6 @@ import lecho.lib.hellocharts.view.PreviewLineChartView;
 
 
 public class Home extends BaseActivity {
-    public static final String MENU_NAME = "NightWatch";
     private LineChartView chart;
     private PreviewLineChartView previewChart;
     Viewport tempViewport = new Viewport();
@@ -61,7 +60,7 @@ public class Home extends BaseActivity {
 
     @Override
     public String getMenuName() {
-        return MENU_NAME;
+        return getString(R.string.activity_home);
     }
 
     @Override

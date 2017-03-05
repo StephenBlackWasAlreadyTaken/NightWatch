@@ -6,7 +6,10 @@
     <ScrollView
         android:id="@+id/scrollView5"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -26,7 +29,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="Range:\n(in/high/low)"
+                    android:text="@string/range"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
@@ -49,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="Absolute #s:"
+                    android:text="@string/absolute"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
@@ -73,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="Median BG: "
+                    android:text="@string/median_bg"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
@@ -97,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="Mean BG: "
+                    android:text="@string/mean_bg"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
@@ -121,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="HbA1c est.: "
+                    android:text="@string/hba1c_estimate"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
@@ -145,7 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="StdDev: "
+                    android:text="@string/stddev"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView

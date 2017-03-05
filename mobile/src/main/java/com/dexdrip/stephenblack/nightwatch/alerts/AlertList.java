@@ -27,7 +27,6 @@ import java.util.List;
 
 
 public class AlertList extends BaseActivity {
-    public static final String MENU_NAME = "BG Level Alerts";
     ListView listViewLow;
     ListView listViewHigh;
     Button createLowAlert;
@@ -39,12 +38,12 @@ public class AlertList extends BaseActivity {
     SharedPreferences prefs;
     private final static String TAG = AlertPlayer.class.getSimpleName();
 
-    public String getMenuName() { return MENU_NAME; }
+    public String getMenuName() { return getString(R.string.bg_level_alerts); }
 
     public int getLayoutId() { return R.layout.activity_alert_list; }
 
     String stringTimeFromAlert(AlertType alert) {
-        if(alert.all_day) { return "all day"; }
+        if(alert.all_day) { return getString(R.string.all_day); }
         String start = timeFormatString(AlertType.time2Hours(alert.start_time_minutes), AlertType.time2Minutes(alert.start_time_minutes));
         String end = timeFormatString(AlertType.time2Hours(alert.end_time_minutes), AlertType.time2Minutes(alert.end_time_minutes));
         return start + " - " + end;
@@ -52,9 +51,9 @@ public class AlertList extends BaseActivity {
 
     HashMap<String, String> createAlertMap(AlertType alert) {
         HashMap<String, String> map = new HashMap<String, String>();
-        String overrideSilentMode = "Override Silent Mode";
+        String overrideSilentMode = getString(R.string.s_override_silent_mode);
         if(alert.override_silent_mode == false) {
-            overrideSilentMode = "No Alert in Silent Mode";
+            overrideSilentMode = getString(R.string.s_no_alert_silent);
         }
 
         map.put("alertName", alert.name);

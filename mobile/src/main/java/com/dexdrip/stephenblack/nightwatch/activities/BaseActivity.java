@@ -71,7 +71,7 @@ public abstract class BaseActivity extends ActionBarActivity implements Navigati
         if (!getMenuName().equals(menu_option_list.get(position))) {
             startActivity(intent_list.get(position));
             //do not close activity if it is the Launcher or "Home".
-            if (!getMenuName().equalsIgnoreCase(Home.MENU_NAME)) {
+            if (!getMenuName().equalsIgnoreCase(getString(R.string.menu_home))) {
                 finish();
             }
         }

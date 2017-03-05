@@ -92,7 +92,7 @@
                 <TextView
                     android:id="@+id/timestamp"
                     android:textSize="8sp"
-                    android:text="-- Minutes ago"
+                    android:text="@string/minutes_ago"
                     android:layout_width="wrap_content"
                     android:textAlignment="center"
                     android:textColor="#000000"
@@ -100,7 +100,7 @@
                 <TextView
                     android:id="@+id/uploader_battery"
                     android:textSize="8sp"
-                    android:text="Uploader: ---%"
+                    android:text="@string/uploader"
                     android:layout_width="wrap_content"
                     android:textAlignment="center"
                     android:textColor="#000000"

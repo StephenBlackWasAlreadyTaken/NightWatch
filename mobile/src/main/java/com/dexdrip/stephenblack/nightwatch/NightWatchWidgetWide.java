@@ -97,9 +97,9 @@ public class NightWatchWidgetWide extends AppWidgetProvider {
                 raw_string = "\n" + Bg.threeRaw((prefs.getString("units", "mgdl").equals("mgdl")));
             }
             if (timeAgo == 1) {
-                views.setTextViewText(R.id.wreadingAge, timeAgo + " Minute ago" + raw_string);
+                views.setTextViewText(R.id.wreadingAge, timeAgo + " " + mContext.getString(R.string.s_minute_ago) + raw_string);
             } else {
-                views.setTextViewText(R.id.wreadingAge, timeAgo + " Minutes ago" + raw_string);
+                views.setTextViewText(R.id.wreadingAge, timeAgo + " " + mContext.getString(R.string.s_minutes_ago) + raw_string);
             }
             if (timeAgo > 15) {
                 views.setTextColor(R.id.wreadingAge, Color.parseColor("#FFBB33"));

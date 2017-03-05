@@ -15,7 +15,6 @@ import java.util.List;
  * Created by stephenblack on 8/3/15.
  */
 public class ErrorsActivity extends BaseActivity {
-    public static final String MENU_NAME = "Errors";
     private CheckBox highCheckboxView;
     private CheckBox mediumCheckboxView;
     private CheckBox lowCheckboxView;
@@ -25,7 +24,7 @@ public class ErrorsActivity extends BaseActivity {
 
     @Override
     public String getMenuName() {
-        return MENU_NAME;
+        return getString(R.string.activity_errors);
     }
 
     @Override

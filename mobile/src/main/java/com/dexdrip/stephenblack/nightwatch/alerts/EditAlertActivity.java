@@ -44,8 +44,6 @@ import java.util.Date;
 import java.util.List;
 
 public class EditAlertActivity extends BaseActivity {
-    public static final String MENU_NAME = "Edit Alert";
-
     private TextView viewHeader;
 
     private EditText alertText;
@@ -95,7 +93,7 @@ public class EditAlertActivity extends BaseActivity {
 
     @Override
     public String getMenuName() {
-        return MENU_NAME;
+        return getString(R.string.activity_edit_alert);
     }
 
     @Override
@@ -210,7 +208,7 @@ public class EditAlertActivity extends BaseActivity {
             buttonRemove.setVisibility(View.GONE);
             // One can not snooze an alert that is still not in the database...
             buttonPreSnooze.setVisibility(View.GONE);
-            status = "Adding " + (above ? "high" : "low") + " alert";
+            status = above ? getString(R.string.adding_high_alert) : getString(R.string.adding_low_alert);
             startHour = 0;
             startMinute = 0;
             endHour = 23;
@@ -241,7 +239,7 @@ public class EditAlertActivity extends BaseActivity {
             audioPath = at.mp3_file;
             alertMp3File.setText(shortPath(audioPath));
 
-            status = "editing " + (above ? "high" : "low") + " alert";
+            status = above ? getString(R.string.editing_high_alert) : getString(R.string.editing_low_alert);
             startHour = AlertType.time2Hours(at.start_time_minutes);
             startMinute = AlertType.time2Minutes(at.start_time_minutes);
             endHour = AlertType.time2Hours(at.end_time_minutes);
@@ -303,7 +301,7 @@ public class EditAlertActivity extends BaseActivity {
         if(overrideSilence) {
             checkboxAlertOverride.setText("");
         } else {
-            checkboxAlertOverride.setText("Warning, no alert will be played at phone silent/vibrate mode!!!");
+            checkboxAlertOverride.setText(getString(R.string.warning_silent_mode));
         }
     }
 
@@ -312,7 +310,7 @@ public class EditAlertActivity extends BaseActivity {
         List<AlertType> highAlerts = AlertType.getAll(true);
 
         if(threshold < MIN_ALERT || threshold > MAX_ALERT) {
-            Toast.makeText(getApplicationContext(), "threshold has to be between " +unitsConvert2Disp(doMgdl, MIN_ALERT) + " and " + unitsConvert2Disp(doMgdl, MAX_ALERT),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.treshold_range).replace("$1", unitsConvert2Disp(doMgdl, MIN_ALERT)).replace("$2", unitsConvert2Disp(doMgdl, MAX_ALERT)),Toast.LENGTH_LONG).show();
             return false;
         }
         if (uuid == null) {
@@ -320,14 +318,14 @@ public class EditAlertActivity extends BaseActivity {
             for (AlertType lowAlert : lowAlerts) {
                 if(lowAlert.threshold == threshold) {
                     Toast.makeText(getApplicationContext(),
-                            "Each alert should have it's own threshold. Please choose another threshold.",Toast.LENGTH_LONG).show();
+                            getString(R.string.unique_treshold),Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
             for (AlertType highAlert : highAlerts) {
                 if(highAlert.threshold == threshold) {
                     Toast.makeText(getApplicationContext(),
-                            "Each alert should have it's own threshold. Please choose another threshold.",Toast.LENGTH_LONG).show();
+                            getString(R.string.unique_treshold),Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -337,7 +335,7 @@ public class EditAlertActivity extends BaseActivity {
             for (AlertType lowAlert : lowAlerts) {
                 if(threshold < lowAlert.threshold  ) {
                     Toast.makeText(getApplicationContext(),
-                            "High alert threshold has to be higher than all low alerts. Please choose another threshold.",Toast.LENGTH_LONG).show();
+                            getString(R.string.high_alert_low),Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -346,7 +344,7 @@ public class EditAlertActivity extends BaseActivity {
             for (AlertType highAlert : highAlerts) {
                 if(threshold > highAlert.threshold  ) {
                     Toast.makeText(getApplicationContext(),
-                            "Low alert threshold has to be lower than all high alerts. Please choose another threshold.",Toast.LENGTH_LONG).show();
+                            getString(R.string.low_alert_hight),Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -361,11 +359,11 @@ public class EditAlertActivity extends BaseActivity {
             return numberFormatter.parse(str).doubleValue();
         } catch (NumberFormatException nfe) {
             Log.w(TAG, "Invalid number", nfe);
-            Toast.makeText(getApplicationContext(), "Invalid number: " + str, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.invalid_number) + " " + str, Toast.LENGTH_LONG).show();
             return Double.NaN;
         } catch (ParseException e) {
             Log.w(TAG, "Invalid number", e);
-            Toast.makeText(getApplicationContext(), "Invalid number: " + str, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.invalid_number) + " " + str, Toast.LENGTH_LONG).show();
             return Double.NaN;
         }
     }
@@ -376,7 +374,7 @@ public class EditAlertActivity extends BaseActivity {
         }
         catch (NumberFormatException nfe) {
             Log.w(TAG, "Invalid number", nfe);
-            Toast.makeText(getApplicationContext(), "Invalid number: " + str, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.invalid_number) + " " + str, Toast.LENGTH_LONG).show();
             return null;
         }
     }
@@ -402,10 +400,10 @@ public class EditAlertActivity extends BaseActivity {
                 alertReraise = alterReraiseInt;
 
                 if(alertReraise < 1) {
-                    Toast.makeText(getApplicationContext(), "Reraise Value must be 1 minute or greater", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.reraise_low), Toast.LENGTH_LONG).show();
                     return;
                 } else if (alertReraise >= defaultSnooze) {
-                    Toast.makeText(getApplicationContext(), "Reraise Value must be less than snooze length", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.reraise_snooze), Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -425,7 +423,7 @@ public class EditAlertActivity extends BaseActivity {
                     allDay = true;
                 }
                 if (timeStart == timeEnd && (allDay==false)) {
-                    Toast.makeText(getApplicationContext(), "start time and end time of alert can not be equal",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.alert_start_end),Toast.LENGTH_LONG).show();
                     return;
                 }
                 boolean vibrate = checkboxVibrate.isChecked();
@@ -470,12 +468,12 @@ public class EditAlertActivity extends BaseActivity {
         buttonalertMp3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("What type of Alert?")
+                builder.setTitle(getString(R.string.alert_type))
                         .setItems(R.array.alertType, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (which == 0) {
                                     Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select tone for Alerts:");
+                                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.select_tone));
                                     intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
                                     intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
                                     intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL);
@@ -484,7 +482,7 @@ public class EditAlertActivity extends BaseActivity {
                                     Intent fileIntent = new Intent();
                                     fileIntent.setType("audio/mpeg3");
                                     fileIntent.setAction(Intent.ACTION_GET_CONTENT);
-                                    startActivityForResult(Intent.createChooser(fileIntent, "Select File for Alert"), CHOOSE_FILE);
+                                    startActivityForResult(Intent.createChooser(fileIntent, getString(R.string.select_file)), CHOOSE_FILE);
                                 } else {
                                     // Xdrip default was chossen, we live the file name as empty.
                                     audioPath = "";
@@ -525,7 +523,7 @@ public class EditAlertActivity extends BaseActivity {
                         setTimeRanges();
                     }
                 }, 0, 0, DateFormat.is24HourFormat(mContext));
-                mTimePicker.setTitle("Select Time");
+                mTimePicker.setTitle(getString(R.string.select_time));
                 mTimePicker.show();
 
             }
@@ -543,7 +541,7 @@ public class EditAlertActivity extends BaseActivity {
                         setTimeRanges();
                     }
                 }, 23, 59, DateFormat.is24HourFormat(mContext));
-                mTimePicker.setTitle("Select Time");
+                mTimePicker.setTitle(getString(R.string.select_time));
                 mTimePicker.show();
 
             }
@@ -666,7 +664,7 @@ public class EditAlertActivity extends BaseActivity {
             public boolean onTouch(View mView, MotionEvent mMotionEvent) {
                 if (mMotionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     final Dialog d = new Dialog(mContext);
-                    d.setTitle("Default Snooze");
+                    d.setTitle(getString(R.string.default_snooze));
                     d.setContentView(R.layout.snooze_picker);
                     Button b1 = (Button) d.findViewById(R.id.button1);
                     Button b2 = (Button) d.findViewById(R.id.button2);
@@ -706,7 +704,7 @@ public class EditAlertActivity extends BaseActivity {
             //public boolean onTouch(View mView, MotionEvent mMotionEvent) {
             public void onClick(View v) {
                 final Dialog d = new Dialog(mContext);
-                d.setTitle("Snooze this alert...");
+                d.setTitle(getString(R.string.snooze_this_alert));
                 d.setContentView(R.layout.snooze_picker);
                 Button b1 = (Button) d.findViewById(R.id.button1);
                 Button b2 = (Button) d.findViewById(R.id.button2);
@@ -761,7 +759,7 @@ public class EditAlertActivity extends BaseActivity {
             allDay = true;
         }
         if (timeStart == timeEnd && (allDay==false)) {
-            Toast.makeText(getApplicationContext(), "start time and end time of alert can not be equal",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.alert_start_end),Toast.LENGTH_LONG).show();
             return;
         }
         boolean vibrate = checkboxVibrate.isChecked();

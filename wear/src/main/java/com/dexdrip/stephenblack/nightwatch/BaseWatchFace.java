@@ -141,12 +141,12 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
     }
 
     public String readingAge(boolean shortString) {
-        if (datetime == 0) { return shortString?"--'":"-- Minute ago"; }
+        if (datetime == 0) { return shortString?"--'":getString(R.string.s__minute_ago); }
         int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
         if (minutesAgo == 1) {
-            return minutesAgo + (shortString?"'":" Minute ago");
+            return minutesAgo + (shortString?"'":" " + getString(R.string.s_minute_ago));
         }
-        return minutesAgo + (shortString?"'":" Minutes ago");
+        return minutesAgo + (shortString?"'":" " + getString(R.string.s_minutes_ago));
     }
 
     @Override
@@ -254,7 +254,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
         } else {
             mRaw.setVisibility(View.GONE);
             mTimestamp.setText(readingAge(false));
-            mUploaderBattery.setText("Uploader: " + batteryString + "%");
+            mUploaderBattery.setText(getString(R.string.s_uploader) + " " + batteryString + "%");
         }
     }
 

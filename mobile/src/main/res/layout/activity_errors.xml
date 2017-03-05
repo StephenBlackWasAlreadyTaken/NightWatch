@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main_layout"
-    tools:context=".MainActivity">
+    tools:context=".alerts.ErrorsActivity">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_height="wrap_content"
@@ -40,19 +40,19 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Low"
+                android:text="@string/low"
                 android:id="@+id/lowSeverityCheckBox"
                 android:checked="false"/>
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mid"
+                android:text="@string/mid"
                 android:id="@+id/midSeverityCheckbox"
                 android:checked="true"/>
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="High"
+                android:text="@string/high"
                 android:id="@+id/highSeverityCheckbox"
                 android:checked="true"/>
         </LinearLayout>

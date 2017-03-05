@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Other Settings"
+        android:title="@string/other_settings_title"
         android:key="other_settings">
         <CheckBoxPreference
             android:key="bg_ongoing"
-            android:title="Persistent Notification"
-            android:summary="Display current BG in notification area."
+            android:title="@string/persistent_notification"
+            android:summary="@string/persistent_notifcation_summary"
             android:defaultValue="false" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Watch Integration"
+        android:title="@string/watch_integration"
         android:key="watch_integration">
         <CheckBoxPreference
             android:key="watch_sync"
-            android:title="Android Wear Integration"
-            android:summary="Send data to Android Wear Watchface."
+            android:title="@string/android_wear"
+            android:summary="@string/android_wear_summary"
             android:defaultValue="false" />
         <CheckBoxPreference
             android:key="broadcast_to_pebble"
-            android:title="Pebble Integration"
-            android:summary="Send data to Pebble xDrip Watchface."
+            android:title="@string/pebble"
+            android:summary="@string/pebble_summary"
             android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>
