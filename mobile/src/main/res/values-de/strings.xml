@@ -45,7 +45,7 @@
     <string name="treshold">Warngrenze:</string>
     <string name="acceptable_bg_range">Akzeptabler Glukosebereich</string>
     <string name="active_alert">Es existiert ein Alarm names \"$1\" (nicht gesnoozed).</string>
-    <string name="active_alert_snoozed">"Es existiert ein Alarm namens \"$1\". Der Alarm ist gesnoozed bis $1 ($3 Minuten verbleibend)."</string>
+    <string name="active_alert_snoozed">"Es existiert ein Alarm namens \"$1\". Der Alarm ist gesnoozed bis $2 ($3 Minuten verbleibend)."</string>
     <string name="activity_alerts">Glukosealarme</string>
     <string name="activity_edit_alert">Alarm bearbeiten</string>
     <string name="activity_errors">Fehler</string>
@@ -73,9 +73,9 @@
     <string name="bg_units">Glukose-Einheit</string>
     <string name="bs_level_alerts_button">Glukosealarme</string>
     <string name="dexcom_login">Dexcom Benutzername</string>
-    <string name="dexcom_login_summary">Dein Benutzername für die Dexcom Webseite</string>
+    <string name="dexcom_login_summary">Dein Benutzername für die Dexcom Webseite.</string>
     <string name="dexcom_password">Dexcom Passwort</string>
-    <string name="dexcom_password_summary">Dein Passwort für die Dexcom Webseite</string>
+    <string name="dexcom_password_summary">Dein Passwort für die Dexcom Webseite.</string>
     <string name="editing_high_alert">Hoch-Alarm bearbeiten</string>
     <string name="editing_low_alert">Niedrig-Alarm bearbeiten</string>
     <string name="high_alert_low">Die Hoch-Alarm Warngrenze muss höher sein als die von allen Niedrig-Alarmen.</string>
