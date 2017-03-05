@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main_layout"
-    tools:context=".MainActivity">
+    tools:context=".activities.Home">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
                     android:gravity="left|top"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:text="Alerts and messages" />
+                    android:text="@string/alerts_and_messages" />
 
                 <lecho.lib.hellocharts.view.LineChartView
                     android:id="@+id/chart"

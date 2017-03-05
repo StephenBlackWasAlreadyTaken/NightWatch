@@ -1,34 +1,35 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Acceptable BG range"
+        android:title="@string/acceptable_bg_range"
         android:key="bgRange">
         <EditTextPreference
             android:key="highValue"
-            android:title="High Value"
+            android:title="@string/high_value"
             android:numeric="decimal"
-            android:summary="The maximum value you consider to be in range."
+            android:summary="@string/high_value_summary"
             android:defaultValue="170" />
         <EditTextPreference
             android:key="lowValue"
-            android:title="Low Value"
+            android:title="@string/low_value"
             android:numeric="decimal"
-            android:summary="The minimum value you consider to be in range."
+            android:summary="@string/low_value_summary"
             android:defaultValue="70" />
         <ListPreference
             android:key="units"
-            android:title="Bg Units"
+            android:title="@string/bg_units"
             android:entries="@array/bgUnitEntries"
             android:entryValues="@array/bgUnitValues"
             android:defaultValue="mgdl"/>
         <CheckBoxPreference
             android:key="widget_show_raw"
-            android:title="Show RAW on Widget"
-            android:summary="Show three raw values on the widget."
+            android:title="@string/widget_show_raw"
+            android:summary="@string/widget_show_raw_summary"
             android:defaultValue="false" />
         <CheckBoxPreference
             android:key="widget_show_time"
-            android:title="Show Time on Widget"
-            android:summary="Show Time on Widget (only on smaller widget that can be used to pass through to Samsung Gear watches)."
+            android:title="@string/widget_show_time"
+            android:summary="@string/widget_show_time_summary"
             android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NightW. Prefs.</string>
+    <string name="chart_timeframe">Diagramm Zeitrahmen</string>
+    <string name="chart_timeframe_summary">Diagramm Zeitrahmen.</string>
+    <string name="dark_theme">Dunkel</string>
+    <string name="light_ring_history">Light-Ring-Historie</string>
+    <string name="dark_theme_summary">Dunkles Design.</string>
+    <string name="light_ring_history_summary">Weniger Augenschmaus. (Kreis-ZB)</string>
+    <string name="nightwatch_settings">NightWatch Einstellungen</string>
+    <string name="minutes_ago">-- Minuten zuvor</string>
+    <string name="s__minute_ago">-- Minute zuvor</string>
+    <string name="s_minute_ago">Minute zuvor</string>
+    <string name="s_minutes_ago">Minuten zuvor</string>
+    <string name="s_uploader">Uploader:</string>
+    <string name="show_ago">Minuten anzeigen</string>
+    <string name="show_ago_summary">DIe Minuten seit dem letzten Wert. (Kreis-ZB)</string>
+    <string name="show_animations">Animationen anzeigen</string>
+    <string name="show_animations_summary">Animationen. (Kreis-ZB)</string>
+    <string name="show_bg">Glukose anzeigen</string>
+    <string name="show_bg_summary">Glukose anzeigen. (Kreis-ZB)</string>
+    <string name="show_big_numbers">Große Zahlen anzeigen</string>
+    <string name="show_big_numbers_summary">Große Zahlen anzeigen. (Kreis-ZB)</string>
+    <string name="show_delta">Delta anzeigen</string>
+    <string name="show_delta_summary">Delta anzeigen. (Kreis-ZB)</string>
+    <string name="show_raw">Rohdaten anzeigen</string>
+    <string name="show_raw_noise">Rohdaten bei ??? anzeigen</string>
+    <string name="show_raw_noise_summary">Rohdaten bei ??? anzeigen.</string>
+    <string name="show_raw_summary">Rohdaten anzeigen.</string>
+    <string name="show_ring_history">Ring-Historie anzeigen</string>
+    <string name="show_ring_history_summary">Graphische Historie. (Kreis-ZB)</string>
+    <string name="uploader">Uploader: ---%</string>
+
+    <string-array name="chart_timeframe">
+        <item>1 Stunde</item>
+        <item>2 Stunden</item>
+        <item>3 Stunden</item>
+        <item>4 Stunden</item>
+        <item>5 Stunden</item>
+    </string-array>
+</resources>

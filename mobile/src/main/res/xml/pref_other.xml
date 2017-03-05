@@ -3,9 +3,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="other_category"
-        android:title="Other Settings">
+        android:title="@string/other_settings">
         <Preference
-            android:title="View Recent Errors/Warnings"
+            android:title="@string/recent_errors"
             android:key="recent_errors">
             <intent
                 android:action="android.intent.action.MAIN"

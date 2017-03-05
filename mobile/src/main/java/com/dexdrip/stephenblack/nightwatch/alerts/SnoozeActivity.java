@@ -20,8 +20,6 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class SnoozeActivity extends BaseActivity {
-    public static final String MENU_NAME = "Snooze Alert";
-
     TextView alertStatus;
     Button buttonSnooze;
     Button disableAlerts;
@@ -37,7 +35,7 @@ public class SnoozeActivity extends BaseActivity {
 
     @Override
     public String getMenuName() {
-        return MENU_NAME;
+        return getString(R.string.activity_snooze);
     }
 
     @Override
@@ -287,11 +285,9 @@ public class SnoozeActivity extends BaseActivity {
             snoozeValue.setVisibility(View.GONE);
         } else {
             if(!aba.ready_to_alarm()) {
-                status = "Active alert exists named \"" + activeBgAlert.name + "\" Alert snoozed until " +
-                    DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date(aba.next_alert_at)) +
-                    " (" + (aba.next_alert_at - new Date().getTime()) / 60000 + " minutes left)";
+                status = getString(R.string.active_alert_snoozed).replace("$1", activeBgAlert.name).replace("$2", DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date(aba.next_alert_at))).replace("$3",  ((aba.next_alert_at - new Date().getTime() / 60000) + ""));
             } else {
-                status = "Active alert exists named \"" + activeBgAlert.name + "\" (not snoozed)";
+                status = getString(R.string.active_alert).replace("$1", activeBgAlert.name);
             }
             SetSnoozePickerValues(snoozeValue, activeBgAlert.above, activeBgAlert.default_snooze);
             alertStatus.setText(status);

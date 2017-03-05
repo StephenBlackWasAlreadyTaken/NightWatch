@@ -2,6 +2,35 @@
 <resources>
 
     <string name="app_name">NightW. Prefs.</string>
+    <string name="minutes_ago">-- Minutes ago</string>
+    <string name="uploader">Uploader: ---%</string>
+    <string name="nightwatch_settings">NightWatch Settings</string>
+    <string name="dark_theme">Dark</string>
+    <string name="dark_theme_summary">Dark theme</string>
+    <string name="show_raw">Show Raw</string>
+    <string name="show_raw_summary" >Show Raw.</string>
+    <string name="show_raw_noise">Show Raw on ???</string>
+    <string name="show_raw_noise_summary">Show Raw on ???.</string>
+    <string name="chart_timeframe">Chart Timeframe</string>
+    <string name="chart_timeframe_summary">Chart Timeframe</string>
+    <string name="show_ago">Show Ago</string>
+    <string name="show_ago_summary">Minutes since last reading. (Circle WF)</string>
+    <string name="show_delta">Show Delta</string>
+    <string name="show_delta_summary">Show delta. (Circle WF)</string>
+    <string name="show_bg">Show BG</string>
+    <string name="show_bg_summary">Show BG. (Circle WF)</string>
+    <string name="show_big_numbers">Show Big Numbers</string>
+    <string name="show_big_numbers_summary">Big numbers. (Circle WF)</string>
+    <string name="show_ring_history">Show Ring History</string>
+    <string name="show_ring_history_summary">Graphical history. (Circle WF)</string>
+    <string name="light_ring_history">Light Ring History</string>
+    <string name="light_ring_history_summary">Less eyecandy. (Circle WF)</string>
+    <string name="show_animations">Show Animations</string>
+    <string name="show_animations_summary">Animations. (Circle WF)</string>
+    <string name="s__minute_ago">-- Minute ago</string>
+    <string name="s_minute_ago">Minute ago</string>
+    <string name="s_minutes_ago">Minutes ago</string>
+    <string name="s_uploader">Uploader:</string>
 
     <string-array name="chart_timeframe">
         <item>1 hour</item>

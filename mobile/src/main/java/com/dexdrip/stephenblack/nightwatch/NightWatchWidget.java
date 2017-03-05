@@ -118,9 +118,9 @@ public class NightWatchWidget extends AppWidgetProvider {
 
 
                 if (timeAgo == 1) {
-                    views.setTextViewText(R.id.readingAge, timeAgo + " Minute ago" + raw_string);
+                    views.setTextViewText(R.id.readingAge, timeAgo + " " + mContext.getString(R.string.s_minute_ago) + raw_string);
                 } else {
-                    views.setTextViewText(R.id.readingAge, timeAgo + " Minutes ago" + raw_string);
+                    views.setTextViewText(R.id.readingAge, timeAgo + " " + mContext.getString(R.string.s_minutes_ago) + raw_string);
                 }
             }
             if (timeAgo > 15) {

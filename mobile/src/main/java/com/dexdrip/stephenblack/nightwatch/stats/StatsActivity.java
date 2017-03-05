@@ -24,7 +24,6 @@ import com.dexdrip.stephenblack.nightwatch.R;
 
 
 public class StatsActivity extends BaseActivity {
-    public static final String MENU_NAME = "Statistics";
     public static final int TODAY = 0;
     public static final int YESTERDAY = 1;
     public static final int D7 = 2;
@@ -41,7 +40,7 @@ public class StatsActivity extends BaseActivity {
     private AppCompatButton button30d;
     private AppCompatButton button90d;
 
-    public String getMenuName() { return MENU_NAME; }
+    public String getMenuName() { return getString(R.string.activity_stats); }
 
     public int getLayoutId() { return R.layout.activity_statistics; }
 
@@ -63,7 +62,7 @@ public class StatsActivity extends BaseActivity {
         }
 
         TextView tv = new TextView(this);
-        tv.setText("Swipe left/right to switch between reports!");
+        tv.setText(getString(R.string.stats_swipe));
         tv.setTextColor(Color.CYAN);
         tv.setTextSize(28);
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="BgAlertProfileEntries">
+        <item>Hoch</item>
+        <item>Ansteigend (deaktiviert Wiederbenachrichtigung)</item>
+        <item>Mittel</item>
+        <item>Nur Vibrieren</item>
+        <item>Lautlos</item>
+    </string-array>
+
+    <string-array name="BgAlertProfileValues">
+    <item>Hoch</item>
+    <item>Ansteigend</item>
+    <item>Mittel</item>
+    <item>Mur Vibrieren</item>
+    <item>Lautlos</item>
+    </string-array>
+
+    <string-array name="alertType">
+    <item>System Ton/Alarm</item>
+    <item>Benutzdefinierte Ton/Alarm</item>
+    <item>Standard xDrip Ton</item>
+    </string-array>
+</resources>

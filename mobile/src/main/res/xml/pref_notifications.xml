@@ -1,8 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Alerts and Notifications"
+        android:title="@string/alerts_and_notifications"
         android:key="alerts_category">
-        <Preference android:title="Bg Level Alerts"
+        <Preference android:title="@string/bs_level_alerts_button"
             android:key="bg_level_alerts" >
             <intent
                 android:action="android.intent.action.MAIN"
@@ -12,91 +12,91 @@
         </Preference>
 
         <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-            android:title="Bg Alerts Settings"
+            android:title="@string/bg_alerts_settings_button"
             android:key="bg_alerts_screen">
             <ListPreference
                     android:key="bg_alert_profile"
-                    android:title="BG alerts profile"
+                    android:title="@string/bg_alerts_profile"
                     android:entries="@array/BgAlertProfileEntries"
                     android:entryValues="@array/BgAlertProfileValues"
                     android:defaultValue="ascending"/>
 
             <CheckBoxPreference
                 android:key="smart_snoozing"
-                android:title="Smart snoozing"
-                android:summary="Keep snoozing if bg is heading in the right direction"
+                android:title="@string/smart_snoozing"
+                android:summary="@string/smart_snoozing_summary"
                 android:defaultValue="true" />
 
             <CheckBoxPreference
                 android:key="smart_alerting"
-                android:title="Smart alerting"
-                android:summary="Don't alert if bg is heading in the right direction"
+                android:title="@string/smart_alerting"
+                android:summary="@string/smart_alerting_summary"
                 android:defaultValue="true" />
         </PreferenceScreen>
 
         <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-            android:title="Other Alerts"
+            android:title="@string/other_alerts_button"
             android:key="other_alerts_screen">
 
             <PreferenceCategory
-                android:title="Missed Readings">
+                android:title="@string/missed_readings_title">
                 <CheckBoxPreference
                     android:key="bg_missed_alerts"
-                    android:title="Missed Reading Alerts"
+                    android:title="@string/missed_reading_alerts"
                     android:defaultValue="false" />
                 <EditTextPreference
                     android:dependency="bg_missed_alerts"
                     android:key="bg_missed_minutes"
-                    android:title="Minutes until alerting for missed readings"
+                    android:title="@string/missed_readings_delay"
                     android:inputType="number"
-                    android:summary="Alert if no data receieved in x minutes"
+                    android:summary="@string/missed_readings_delay_summary"
                     android:defaultValue="30" />
             </PreferenceCategory>
 
             <PreferenceCategory
-                android:title="Falling/Rising BG">
+                android:title="@string/bg_falling_rising">
                 <CheckBoxPreference
                     android:key="falling_alert"
-                    android:title="Bg falling fast"
+                    android:title="@string/bg_falling_fast"
                     android:defaultValue="false" />
                 <ListPreference
                     android:dependency="falling_alert"
                     android:key="falling_bg_val"
-                    android:title="falling threshold"
+                    android:title="@string/falling_treshold"
                     android:entries="@array/risingEntries"
                     android:entryValues="@array/risingValues"
                     android:defaultValue="3"/>
                  <CheckBoxPreference
                     android:key="rising_alert"
-                    android:title="Bg rising fast"
+                    android:title="@string/bg_rising_fast"
                     android:defaultValue="false" />
                 <ListPreference
                     android:dependency="rising_alert"
                     android:key="rising_bg_val"
-                    android:title="rising threshold"
+                    android:title="@string/rising_treshold"
                     android:entries="@array/risingEntries"
                     android:entryValues="@array/risingValues"
                     android:defaultValue="3"/>
             </PreferenceCategory>
 
             <PreferenceCategory
-                android:title="Alert Preferences (for these alerts)">
+                android:title="@string/alert_preferences">
                 <RingtonePreference
                     android:key="other_alerts_sound"
-                    android:title="Alert Sound"
+                    android:title="@string/alert_sound"
                     android:ringtoneType="alarm"
                     android:showSilent="true"
                     android:summary="Set sound used for BG Alerts."
                     android:defaultValue="content://settings/system/alarm_alert" />
                 <CheckBoxPreference
                     android:key="other_alerts_override_silent"
-                    android:title="Override Silent mode on these alerts"
+                    android:title="@string/override_silent_these"
                     android:defaultValue="false" />
                 <EditTextPreference
                     android:key="other_alerts_snooze"
-                    android:title="Alert Snooze"
+                    android:title="@string/alert_snooze_these"
                     android:numeric="integer"
-                    android:summary="Minimum number of minutes to pass before raising the same alert."
+                    android:summary="@string/alert_snooze_these_summary"
                     android:defaultValue="20" />
             </PreferenceCategory>
         </PreferenceScreen>

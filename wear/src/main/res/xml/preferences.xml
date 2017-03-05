@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="NightWatch Settings"
+        android:title="@string/nightwatch_settings"
         android:key="category"
         android:selectable="false">
 
-    <CheckBoxPreference android:title="Dark"
+    <CheckBoxPreference android:title="@string/dark_theme"
         android:defaultValue="true"
-        android:summary="Dark theme"
+        android:summary="@string/dark_theme_summary"
         android:key="dark" />
 
-        <CheckBoxPreference android:title="Show Raw"
+        <CheckBoxPreference android:title="@string/show_raw"
             android:defaultValue="false"
-            android:summary="Show Raw."
+            android:summary="@string/show_raw_summary"
             android:key="showRaw" />
 
-        <CheckBoxPreference android:title="Show Raw on ???"
+        <CheckBoxPreference android:title="@string/show_raw_noise"
             android:defaultValue="true"
-            android:summary="Show Raw on ???."
+            android:summary="@string/show_raw_noise_summary"
             android:key="showRawNoise" />
 
         <ListPreference
             android:key="chart_timeframe"
-            android:title="Chart Timeframe"
-            android:summary="Chart Timeframe"
+            android:title="@string/chart_timeframe"
+            android:summary="@string/chart_timeframe_summary"
             android:entries="@array/chart_timeframe"
             android:entryValues="@array/chart_timeframe_values"
             android:defaultValue="5" />
 
-        <CheckBoxPreference android:title="Show Ago"
+        <CheckBoxPreference android:title="@string/show_ago"
             android:defaultValue="true"
-            android:summary="Minutes since last reading. (Circle WF)"
+            android:summary="@string/show_ago_summary"
             android:key="showAgo" />
 
-        <CheckBoxPreference android:title="Show Delta"
+        <CheckBoxPreference android:title="@string/show_delta"
             android:defaultValue="true"
-            android:summary="Show delta. (Circle WF)"
+            android:summary="@string/show_delta_summary"
             android:key="showDelta" />
 
-        <CheckBoxPreference android:title="Show BG"
+        <CheckBoxPreference android:title="@string/show_bg"
             android:defaultValue="true"
-            android:summary="Show BG. (Circle WF)"
+            android:summary="@string/show_bg_summary"
             android:key="showBG" />
 
-        <CheckBoxPreference android:title="Show Big Numbers"
+        <CheckBoxPreference android:title="@string/show_big_numbers"
             android:defaultValue="false"
-            android:summary="Big numbers. (Circle WF)"
+            android:summary="@string/show_big_numbers_summary"
             android:key="showBigNumbers" />
 
-        <CheckBoxPreference android:title="Show Ring History"
+        <CheckBoxPreference android:title="@string/show_ring_history"
             android:defaultValue="false"
-            android:summary="Graphical history. (Circle WF)"
+            android:summary="@string/show_ring_history_summary"
             android:key="showRingHistory" />
 
-        <CheckBoxPreference android:title="Light Ring History"
+        <CheckBoxPreference android:title="@string/light_ring_history"
             android:defaultValue="true"
-            android:summary="Less eyecandy. (Circle WF)"
+            android:summary="@string/light_ring_history_summary"
             android:key="softRingHistory" />
 
 
-        <CheckBoxPreference android:title="Show Animations"
+        <CheckBoxPreference android:title="@string/show_animations"
             android:defaultValue="true"
-            android:summary="Animations. (Circle WF)"
+            android:summary="@string/show_animations_summary"
             android:key="animation" />
 
     </PreferenceCategory>
