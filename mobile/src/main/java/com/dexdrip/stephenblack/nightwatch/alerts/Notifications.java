@@ -139,7 +139,9 @@ public class Notifications extends IntentService {
 
         Log.d(TAG, "FileBasedNotifications called bgReading.sgv_double() = " + bgReading.sgv_double());
 
-        new AlertType().testAll( context);
+
+        // FIXME: This is to test alterts, not for normal use
+        // new AlertType().testAll( context);
 
         // TODO: tzachi what is the time of this last bgReading
         // If the last reading does not have a sensor, or that sensor was stopped.
@@ -188,7 +190,7 @@ public class Notifications extends IntentService {
                 // Example, if we have two alerts one for 90 and the other for 80. and we were already alerting for the 80
                 // and we were snoozed. Now bg is 85, the alert for 80 is cleared, but we are alerting for 90.
                 // We should not do anything if we are snoozed for the 80...
-                // If one allert was high and the second one is low however, we alarm in any case (snoozing ignored).
+                // If one alert was high and the second one is low however, we alarm in any case (snoozing ignored).
                 boolean opositeDirection = AlertType.OpositeDirection(activeBgAlert, newAlert);
                 AlertType  newHigherAlert = AlertType.HigherAlert(activeBgAlert, newAlert);
                 if ((newHigherAlert == activeBgAlert) && (!opositeDirection)) {

@@ -13,10 +13,13 @@ import android.support.v4.app.NotificationCompat;
 
 import com.dexdrip.stephenblack.nightwatch.model.ActiveBgAlert;
 import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.util.Date;
+
+import static com.dexdrip.stephenblack.nightwatch.model.AlertType.*;
 
 public class AlertPlayer {
 
@@ -117,7 +120,7 @@ public class AlertPlayer {
             stopAlert(ctx, false, false);
 
             int timeFromStartPlaying = activeBgAlert.getUpdatePlayTime();
-            AlertType alert = AlertType.get_alert(activeBgAlert.alert_uuid);
+            AlertType alert = get_alert(activeBgAlert.alert_uuid);
             if (alert == null) {
                 Log.w(TAG, "ClockTick: The alert was already deleted... will not play");
                 ActiveBgAlert.ClearData();
@@ -225,7 +228,12 @@ public class AlertPlayer {
         }
 
         String title = bgValue + " " + alert.name;
-        String content = "BG LEVEL ALERT: " + bgValue;
+        String content;
+        if ( alert.type == alertType.missed ){
+            content = "Missed Data Alert: " + Bg.last().readingAge();
+        } else {
+            content = "BG LEVEL ALERT: " + bgValue;
+        }
         Intent intent = new Intent(ctx, SnoozeActivity.class);
 
         NotificationCompat.Builder  builder = new NotificationCompat.Builder(ctx)

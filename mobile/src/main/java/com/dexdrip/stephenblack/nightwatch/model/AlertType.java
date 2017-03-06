@@ -107,24 +107,18 @@ public class AlertType extends Model {
      * In the case of "unclear state" for more than predefined time, return the "55" alert
      * In case that alerts are turned off, only return the 55.
      */
-    public static AlertType get_highest_active_alert(Context context, double bg) {
+    public static AlertType get_highest_active_alert(Context context, double threshold) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if(prefs.getLong("alerts_disabled_until", 0) > new Date().getTime()){
             UserError.Log.w("NOTIFICATIONS", "Notifications are currently disabled!!");
             return null;
         }
 
-        AlertType missedDataAlert = checkIfMissedReadingAlert(context);
-
-        if ( missedDataAlert != null ) {
-            Log.d( TAG_ALERT, "get_highest_active_alert_helper returned alert uuid = " +  missedDataAlert.uuid + " alert name = " + missedDataAlert.name );
-            return missedDataAlert;
-        }
-        if (bg <= 14) { // Special dexcom codes should not set off low alarms
+        if (threshold <= 14) { // Special dexcom codes should not set off low alarms
             return null;
         }
 
-        AlertType at = get_highest_active_alert_helper(bg);
+        AlertType at = get_highest_active_alert_helper(threshold);
         if (at != null) {
             Log.d(TAG_ALERT, "get_highest_active_alert_helper returned alert uuid = " + at.uuid + " alert name = " + at.name);
         } else {
@@ -153,7 +147,7 @@ public class AlertType extends Model {
         return null;
     }
     // bg_minute is the estimate of the bg change rate
-    private static AlertType get_highest_active_alert_helper(double bg) {
+    private static AlertType get_highest_active_alert_helper(double threshold) {
         // Check the missed data alerts
         List<AlertType> missedAlerts  = new Select()
                 .from(AlertType.class)
@@ -170,13 +164,13 @@ public class AlertType extends Model {
         // Check the low alerts
         List<AlertType> lowAlerts  = new Select()
             .from(AlertType.class)
-            .where("threshold >= ?", bg)
+            .where("threshold >= ?", threshold)
             .where("type = ?", alertType.low)
             .orderBy("threshold asc")
             .execute();
 
         for (AlertType lowAlert : lowAlerts) {
-            if(lowAlert.should_alarm(bg)) {
+            if(lowAlert.should_alarm(threshold)) {
                 return lowAlert;
             }
         }
@@ -184,14 +178,14 @@ public class AlertType extends Model {
         // If no low alert found, check higher alert.
         List<AlertType> HighAlerts  = new Select()
             .from(AlertType.class)
-            .where("threshold <= ?", bg)
+            .where("threshold <= ?", threshold)
             .where("type = ?", alertType.high)
             .orderBy("threshold desc")
             .execute();
 
         for (AlertType HighAlert : HighAlerts) {
             //Log.e(TAG, "Testing high alert " + HighAlert.toString());
-            if(HighAlert.should_alarm(bg)) {
+            if(HighAlert.should_alarm(threshold)) {
                 return HighAlert;
             }
         }
@@ -395,33 +389,53 @@ public class AlertType extends Model {
         add_alert(null, "high alert 2", alertType.high, 200, true, 10, null, 0, 0, true, 20, true);
         add_alert(null, "high alert 3", alertType.high, 220, true, 10, null, 0, 0, true, 20, true);
         print_all();
-        AlertType a1 = get_highest_active_alert(context, 190);
-        Log.d(TAG, "a1 = " + a1.toString());
-        AlertType a2 = get_highest_active_alert(context, 210);
-        Log.d(TAG, "a2 = " + a2.toString());
+
+        // check to see if we get the alerts we expect
+        AlertType ah1 = get_highest_active_alert(context, 190);
+        Log.d(TAG, "ah1 = " + ah1.toString());
+        AlertType ah2 = get_highest_active_alert(context, 210);
+        Log.d(TAG, "ah2 = " + ah2.toString());
 
 
-        AlertType a3 = get_alert(a1.uuid);
-        Log.d(TAG, "a1 == a3 ? need to see true " + (a1==a3) + a1 + " " + a3);
+        // check to make sure we retrieve the correct record
+        AlertType a3 = get_alert(ah1.uuid);
+        Log.d(TAG, "ah1 == a3 ? need to see true " + (ah1==a3) + " " + ah1 + " " + a3);
 
         add_alert(null, "low alert 1", alertType.low, 80, true, 10, null, 0, 0, true, 20, true);
         add_alert(null, "low alert 2", alertType.low, 60, true, 10, null, 0, 0, true, 20, true);
         print_all();
+
+        // a bs of 90 should not trigger an Alarm
+        // 90 > 80 && 90 > 60 && 90 < 180, 200, 220
         AlertType al1 = get_highest_active_alert(context, 90);
         Log.d(TAG, "al1 should be null  " + al1);
+
+        // a bs of 80 should trigger a low
         al1 = get_highest_active_alert(context, 80);
         Log.d(TAG, "al1 = " + al1.toString());
+
+        // now we should see the 60 alarm instead of 80
         AlertType al2 = get_highest_active_alert(context, 50);
         Log.d(TAG, "al2 = " + al2.toString());
 
         add_alert(null, "missed data 1", alertType.missed, 15, true, 10, null, 0, 0, true, 20, true);
         add_alert(null, "missed data 2", alertType.missed, 30, true, 10, null, 0, 0, true, 20, true);
+
+        AlertType md1 = get_highest_active_alert(context, 10);
+        if ( md1 != null ) {
+            Log.d(TAG, "md1 = " + md1.toString());
+        }
+
+        AlertType md2 = get_highest_active_alert(context, 35);
+        if ( md2 != null ) {
+            Log.d(TAG, "md2 = " + md2.toString());
+        }
         print_all();
 
-        Log.d(TAG, "HigherAlert(a1, a2) = a1? " +  (HigherAlert(a1,a2) == a2));
-        Log.d(TAG, "HigherAlert(al1, al2) = al1? " +  (HigherAlert(al1,al2) == al2));
-        Log.d(TAG, "HigherAlert(a1, al1) = al1? " +  (HigherAlert(a1,al1) == al1));
-        Log.d(TAG, "HigherAlert(al1, a2) = al1? " +  (HigherAlert(al1,a2) == al1));
+        Log.d(TAG, "HigherAlert(ah1, ah2) = ah2? " +  (HigherAlert(ah1,ah2) == ah2));
+        Log.d(TAG, "HigherAlert(al1, al2) = al2? " +  (HigherAlert(al1,al2) == al2));
+        Log.d(TAG, "HigherAlert(ah1, al1) = al1? " +  (HigherAlert(ah1,al1) == al1));
+        Log.d(TAG, "HigherAlert(al1, ah2) = al1? " +  (HigherAlert(al1,ah2) == al1));
 
         // Make sure we do not influence on real data...
         remove_all();

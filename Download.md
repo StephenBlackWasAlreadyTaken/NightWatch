@@ -1,4 +1,10 @@
 ***
+## Version 2.0.7  (03/05/2017)
+### Download: [Version 2.0.7(Click here)](https://github.com/robertanye/NightWatch/release/download/v2.0.7/NightWatch_debug_2.0.7_15.apk)
+* Rework the Alert System so that the missed data altert has the same options as a BG alert. The alert now has a type instead of high or low 
+  so the user can add Data Missing alerts in the same manner as a BG alert. I found myself wanting to set an alert so I can set a time around 
+  the missed data alert. I care if the data is missing at night so I can follow up and see what is going on but during the day it is not as urgent.
+***
 ## Version 2.0.4_2  (11/12/2016)
 ### Download: [Version 2.0.4_2 (Click here)](https://github.com/StephenBlackWasAlreadyTaken/NightWatch/releases/download/v2.0.4_2/nightwatch204_2.apk)
 * Add option to show time on the widget (can be used as watchface via wearable-widgets on watches not supporting Android Wear)

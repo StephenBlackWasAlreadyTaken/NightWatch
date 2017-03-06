@@ -181,7 +181,9 @@ public class Bg extends Model {
             return minutesAgo + " Minute ago";
         }
         if ( minutesAgo > 60 ) {
-            return String.format("%.2f Hours ago",(minutesAgo/60.0));
+            int hours = minutesAgo/60;
+            int mins = minutesAgo % 60;
+            return String.format("%d Hours %d Mins ago",hours, mins);
         } else {
             return minutesAgo + " Minutes ago";
         }
@@ -193,10 +195,15 @@ public class Bg extends Model {
     }
 
     public static double timeSince() {
-        String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date ((long)Bg.last().datetime));
+        String lastdate = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date ((long)Bg.last().datetime));
 
-        Log.i(TAG_ALERT,"timeSince: datetime " + date); 
-        double diffInMillis = new Date().getTime() - Bg.last().datetime;
+        Log.i(TAG_ALERT,"timeSince: datetime " + lastdate);
+        long last = (long)Bg.last().datetime;
+        long now = new Date().getTime();
+        String nowdate = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (now));
+        Log.i(TAG_ALERT,"timeSince: now " + nowdate);
+
+        long diffInMillis = now - last;
         return diffInMillis;
     }
 

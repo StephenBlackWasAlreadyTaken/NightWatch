@@ -12,6 +12,8 @@ import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 import java.text.DateFormat;
 import java.util.Date;
 
+import static com.dexdrip.stephenblack.nightwatch.model.AlertType.get_alert;
+
 /**
  * Created by stephenblack on 1/14/15.
  */
@@ -31,6 +33,8 @@ public class ActiveBgAlert extends Model {
 
     @Column(name = "next_alert_at")
     public Long next_alert_at;
+
+    public AlertType.alertType type;
 
     // This is needed in order to have ascending alerts
     // we set the real value of it when is_snoozed is being turned to false
@@ -100,7 +104,7 @@ public class ActiveBgAlert extends Model {
             return null;
         }
 
-        AlertType alert = AlertType.get_alert(aba.alert_uuid);
+        AlertType alert = get_alert(aba.alert_uuid);
         if(alert == null) {
             Log.w(TAG, "alertTypegetOnly did not find the active alert as part of existing alerts. returning null");
             // removing the alert to be in a better state.
@@ -121,6 +125,9 @@ public class ActiveBgAlert extends Model {
         }
         aba.alert_uuid = alert_uuid;
         aba.is_snoozed = is_snoozed;
+        // get the alert that caused this
+        AlertType a1 = get_alert(alert_uuid);
+        aba.type = a1.type;
         aba.last_alerted_at = 0L;
         aba.next_alert_at = next_alert_at;
         aba.alert_started_at = new Date().getTime();

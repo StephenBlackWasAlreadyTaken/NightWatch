@@ -35,7 +35,8 @@
                 com.dexcom.stephenblack.nightwatch.model.Bg,
                 com.dexcom.stephenblack.nightwatch.model.ShareGlucose,
                 com.dexcom.stephenblack.nightwatch.model.UserError,
-                com.dexcom.stephenblack.nightwatch.model.UserNotificationV2" />
+                com.dexcom.stephenblack.nightwatch.model.UserNotificationV2"
+        />
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"
