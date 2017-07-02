@@ -112,7 +112,7 @@ public class ShareRest {
         adapterBuilder
                 .setClient(client)
                 .setLogLevel(RestAdapter.LogLevel.FULL).setLog(new AndroidLog("SHAREREST"))
-                .setEndpoint("https://share1.dexcom.com/ShareWebServices/Services")
+                .setEndpoint("https://shareous1.dexcom.com/ShareWebServices/Services")
                 .setRequestInterceptor(authorizationRequestInterceptor)
                 .setConverter(new GsonConverter(new GsonBuilder()
                         .excludeFieldsWithoutExposeAnnotation()
@@ -125,7 +125,7 @@ public class ShareRest {
         adapterBuilder
                 .setClient(client)
                 .setLogLevel(RestAdapter.LogLevel.FULL).setLog(new AndroidLog("SHAREREST"))
-                .setEndpoint("https://share1.dexcom.com/ShareWebServices/Services")
+                .setEndpoint("https://shareous1.dexcom.com/ShareWebServices/Services")
                 .setRequestInterceptor(getBgRequestInterceptor)
                 .setConverter(new GsonConverter(new GsonBuilder()
                         .excludeFieldsWithoutExposeAnnotation()
