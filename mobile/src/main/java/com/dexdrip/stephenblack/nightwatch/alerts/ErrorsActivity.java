@@ -7,6 +7,7 @@ import android.widget.ListView;
 
 import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
 import com.dexdrip.stephenblack.nightwatch.R;
+import com.dexdrip.stephenblack.nightwatch.model.UserError;
 
 import java.util.ArrayList;
 import java.util.List;

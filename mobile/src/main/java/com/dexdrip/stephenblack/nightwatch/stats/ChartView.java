@@ -22,7 +22,7 @@ import java.util.List;
 public class ChartView extends View {
 
     private RangeData rangeData = null;
-    private boolean ranteDataCalculating = false;
+    private boolean rangeDataCalculating = false;
     private Resources resources;
 
     public ChartView(Context context) {
@@ -91,15 +91,16 @@ public class ChartView extends View {
     }
 
     private int dp2px(float dp) {
-        DisplayMetrics metrics = resources.getDisplayMetrics();
+        DisplayMetrics metrics;
+        metrics = resources.getDisplayMetrics();
         int px = (int) (dp * (metrics.densityDpi / 160f));
         return px;
     }
 
     //return either RangeData or start a calculation if not already started
     public synchronized RangeData getMaybeRangeData() {
-        if (!ranteDataCalculating) {
-            ranteDataCalculating = true;
+        if (!rangeDataCalculating) {
+            rangeDataCalculating = true;
             Thread thread = new Thread() {
                 @Override
                 public void run() {
@@ -140,9 +141,9 @@ public class ChartView extends View {
     }
 
     protected class RangeData {
-        public int inRange;
-        public int aboveRange;
-        public int belowRange;
+        private int inRange;
+        private int aboveRange;
+        private int belowRange;
     }
 
 }

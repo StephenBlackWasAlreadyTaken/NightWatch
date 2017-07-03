@@ -100,7 +100,7 @@ public class StatsActivity extends BaseActivity {
         indicationDots[0].setText("\u26AB");
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mStatisticsPageAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

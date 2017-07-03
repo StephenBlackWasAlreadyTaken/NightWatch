@@ -21,9 +21,9 @@
             android:entryValues="@array/bgUnitValues"
             android:defaultValue="mgdl"/>
         <CheckBoxPreference
-            android:key="widget_show_raw"
-            android:title="Show RAW on Widget"
-            android:summary="Show three raw values on the widget."
+            android:key="showRaw"
+            android:title="Show RAW Values"
+            android:summary="Show three raw values"
             android:defaultValue="false" />
         <CheckBoxPreference
             android:key="widget_show_time"

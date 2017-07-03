@@ -1,9 +1,11 @@
 package com.dexdrip.stephenblack.nightwatch.sharemodels;
 
+import com.dexdrip.stephenblack.nightwatch.model.ShareGlucose;
+
 import java.util.Map;
 
 import retrofit.Callback;
-import retrofit.client.Response;
+import retrofit.Response;
 import retrofit.http.Body;
 import retrofit.http.POST;
 import retrofit.http.QueryMap;

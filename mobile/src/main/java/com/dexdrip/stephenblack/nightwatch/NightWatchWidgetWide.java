@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 
 import java.util.Date;
 
@@ -25,7 +26,7 @@ public class NightWatchWidgetWide extends AppWidgetProvider {
 
     public static RemoteViews views;
     public static Context mContext;
-    public static String TAG = "xDripWidget";
+    public static String TAG = "NightWidget";
 
 
     @Override

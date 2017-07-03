@@ -15,7 +15,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.dexdrip.stephenblack.nightwatch.activities.BaseActivity;
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
 import com.dexdrip.stephenblack.nightwatch.R;
 
 import java.text.ParseException;
@@ -30,8 +31,10 @@ public class AlertList extends BaseActivity {
     public static final String MENU_NAME = "BG Level Alerts";
     ListView listViewLow;
     ListView listViewHigh;
+    ListView listViewMissed;
     Button createLowAlert;
     Button createHighAlert;
+    Button createMissedAlert;
     boolean doMgdl;
     Context mContext;
     final int ADD_ALERT = 1;
@@ -51,7 +54,7 @@ public class AlertList extends BaseActivity {
     }
 
     HashMap<String, String> createAlertMap(AlertType alert) {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         String overrideSilentMode = "Override Silent Mode";
         if(alert.override_silent_mode == false) {
             overrideSilentMode = "No Alert in Silent Mode";
@@ -67,10 +70,10 @@ public class AlertList extends BaseActivity {
         return map;
     }
 
-    ArrayList<HashMap<String, String>> createAlertsMap(boolean above) {
+    ArrayList<HashMap<String, String>> createAlertsMap(AlertType.alertType type ) {
         ArrayList<HashMap<String, String>> feedList= new ArrayList<HashMap<String, String>>();
 
-        List<AlertType> alerts = AlertType.getAll(above);
+        List<AlertType> alerts = AlertType.getAll(type);
         for (AlertType alert : alerts) {
             Log.d(TAG, alert.toString());
             feedList.add(createAlertMap(alert));
@@ -92,7 +95,10 @@ public class AlertList extends BaseActivity {
             // with only some items responding to longclick. (might be used for non removable alerts)
 
             Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
+
+
             myIntent.putExtra("uuid", item.get("uuid")); //Optional parameters
+            myIntent.putExtra( "alertTypeClicked", "missed");
             AlertList.this.startActivityForResult(myIntent, EDIT_ALERT);
             return true;
         }
@@ -104,6 +110,7 @@ public class AlertList extends BaseActivity {
         mContext = getApplicationContext();
         listViewLow = (ListView) findViewById(R.id.listView_low);
         listViewHigh = (ListView) findViewById(R.id.listView_high);
+        listViewMissed = (ListView) findViewById(R.id.listView_missed);
         prefs =  PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         doMgdl = (prefs.getString("units", "mgdl").compareTo("mgdl") == 0);
 
@@ -111,26 +118,38 @@ public class AlertList extends BaseActivity {
         FillLists();
         listViewLow.setOnItemLongClickListener(new AlertsOnItemLongClickListener());
         listViewHigh.setOnItemLongClickListener(new AlertsOnItemLongClickListener());
+        listViewMissed.setOnItemLongClickListener(new AlertsOnItemLongClickListener());
     }
 
 
     public void addListenerOnButton() {
         createLowAlert = (Button)findViewById(R.id.button_create_low);
         createHighAlert = (Button)findViewById(R.id.button_create_high);
+        createMissedAlert = (Button)findViewById(R.id.button_create_missed);
 
         createLowAlert.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
-                myIntent.putExtra("above", "false");
+                myIntent.putExtra("alertTypeClicked", "low");
                 AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
             }
 
-        });
+        }); 
 
         createHighAlert.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
-                myIntent.putExtra("above", "true");
+                myIntent.putExtra("alertTypeClicked", "high");
+                AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
+            }
+        });
+
+
+
+        createMissedAlert.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(AlertList.this, EditAlertActivity.class);
+                myIntent.putExtra("alertTypeClicked", "missed");
                 AlertList.this.startActivityForResult(myIntent, ADD_ALERT);
             }
         });
@@ -152,13 +171,19 @@ public class AlertList extends BaseActivity {
 
     void FillLists() {
         ArrayList<HashMap<String, String>> feedList;
-        feedList = createAlertsMap(false);
+        feedList = createAlertsMap(AlertType.alertType.low);
         SimpleAdapter simpleAdapter = new SimpleAdapter(this, feedList, R.layout.row_alerts, new String[]{"alertName", "alertThreshold", "alertTime", "alertMp3File", "alertOverrideSilenceMode"}, new int[]{R.id.alertName, R.id.alertThreshold, R.id.alertTime, R.id.alertMp3File, R.id.alertOverrideSilent});
         listViewLow.setAdapter(simpleAdapter);
 
-        feedList = createAlertsMap(true);
+        feedList = createAlertsMap(AlertType.alertType.high);
         SimpleAdapter simpleAdapterHigh = new SimpleAdapter(this, feedList, R.layout.row_alerts, new String[]{"alertName", "alertThreshold", "alertTime", "alertMp3File", "alertOverrideSilenceMode"}, new int[]{R.id.alertName, R.id.alertThreshold, R.id.alertTime, R.id.alertMp3File, R.id.alertOverrideSilent});
         listViewHigh.setAdapter(simpleAdapterHigh);
+
+        feedList = createAlertsMap(AlertType.alertType.missed);
+        SimpleAdapter simpleAdapterMissed = new SimpleAdapter(this, feedList, R.layout.row_alerts, new String[]{"alertName", "alertThreshold", "alertTime", "alertMp3File", "alertOverrideSilenceMode"}, new int[]{R.id.alertName, R.id.alertThreshold, R.id.alertTime, R.id.alertMp3File, R.id.alertOverrideSilent});
+        listViewMissed.setAdapter(simpleAdapterMissed);
+
+
     }
 
     public String shortPath(String path) {

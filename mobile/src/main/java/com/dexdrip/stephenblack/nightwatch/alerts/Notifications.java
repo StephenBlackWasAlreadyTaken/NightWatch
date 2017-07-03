@@ -23,8 +23,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.ActiveBgAlert;
+import com.dexdrip.stephenblack.nightwatch.model.AlertType;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.UserNotificationV2;
 import com.dexdrip.stephenblack.nightwatch.BgGraphBuilder;
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.R;
@@ -49,6 +52,7 @@ public class Notifications extends IntentService {
     public static boolean calibration_notifications;
     public static boolean calibration_override_silent;
     public static int calibration_snooze;
+    public static int bg_stale_data_limit;
     public static String calibration_notification_sound;
     public static boolean doMgdl;
     public static boolean smart_snoozing;
@@ -135,6 +139,10 @@ public class Notifications extends IntentService {
 
         Log.d(TAG, "FileBasedNotifications called bgReading.sgv_double() = " + bgReading.sgv_double());
 
+
+        // FIXME: This is to test alterts, not for normal use
+        // new AlertType().testAll( context);
+
         // TODO: tzachi what is the time of this last bgReading
         // If the last reading does not have a sensor, or that sensor was stopped.
         // or the sensor was started, but the 2 hours did not still pass? or there is no calibrations.
@@ -182,7 +190,7 @@ public class Notifications extends IntentService {
                 // Example, if we have two alerts one for 90 and the other for 80. and we were already alerting for the 80
                 // and we were snoozed. Now bg is 85, the alert for 80 is cleared, but we are alerting for 90.
                 // We should not do anything if we are snoozed for the 80...
-                // If one allert was high and the second one is low however, we alarm in any case (snoozing ignored).
+                // If one alert was high and the second one is low however, we alarm in any case (snoozing ignored).
                 boolean opositeDirection = AlertType.OpositeDirection(activeBgAlert, newAlert);
                 AlertType  newHigherAlert = AlertType.HigherAlert(activeBgAlert, newAlert);
                 if ((newHigherAlert == activeBgAlert) && (!opositeDirection)) {
@@ -216,7 +224,7 @@ public class Notifications extends IntentService {
         //  User does not want smart snoozing at all.
             return false;
         }
-        return Bg.trendingToAlertEnd(context, Alert.above);
+        return Bg.trendingToAlertEnd(context, Alert.type);
     }
 /*
  * *****************************************************************************************************************

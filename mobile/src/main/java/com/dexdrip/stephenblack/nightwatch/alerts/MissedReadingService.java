@@ -8,8 +8,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 
 import java.util.Calendar;
 
@@ -32,14 +33,26 @@ public class MissedReadingService extends IntentService {
         bg_missed_minutes =  Integer.parseInt(prefs.getString("bg_missed_minutes", "30"));
         otherAlertSnooze =  Integer.parseInt(prefs.getString("other_alerts_snooze", "20"));
 
-        if (bg_missed_alerts && Bg.getTimeSinceLastReading() > (bg_missed_minutes * 1000 * 60)) {
+        if ( !isAirplaneModeOn(getApplicationContext()) && bg_missed_alerts
+                && Bg.getTimeSinceLastReading() > (bg_missed_minutes * 1000 * 60)) {
             Notifications.bgMissedAlert(mContext);
             checkBackAfterSnoozeTime();
         } else {
             checkBackAfterMissedTime();
         }
     }
+    /**
+     * Gets the state of Airplane Mode.
+     *
+     * @param context
+     * @return true if enabled.
+     */
+    private static boolean isAirplaneModeOn(Context context) {
 
+        return Settings.Global.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+
+    }
    public void checkBackAfterSnoozeTime() {
        setAlarm(otherAlertSnooze * 1000 * 60);
    }

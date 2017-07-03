@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main_layout"
-    tools:context=".MainActivity">
+    tools:context=".activities.Home">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_height="wrap_content"
@@ -33,11 +33,30 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:showDividers="middle">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_weight=".36"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:weightSum="1">
+            <Button
+                android:id="@+id/button_create_missed"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_missed" />
+            <ListView
+                android:id="@+id/listView_missed"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="bottom"/>
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_weight=".46"
+            android:layout_weight=".36"
             android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
@@ -46,7 +65,7 @@
                 android:id="@+id/button_create_low"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Create low alert" />
+                android:text="@string/create_low" />
             <ListView
                 android:id="@+id/listView_low"
                 android:layout_width="fill_parent"
@@ -57,7 +76,7 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_weight=".46"
+            android:layout_weight=".36"
             android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal">
@@ -65,7 +84,7 @@
                 android:id="@+id/button_create_high"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Create high alert"/>
+                android:text="@string/create_high"/>
             <ListView
                 android:id="@+id/listView_high"
                 android:layout_width="fill_parent"
@@ -82,7 +101,7 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="(Long Press an existing alert to edit)"
+                android:text="@string/alert_tip"
                 android:textSize="12sp"
                 android:gravity="center_horizontal" />
         </LinearLayout>

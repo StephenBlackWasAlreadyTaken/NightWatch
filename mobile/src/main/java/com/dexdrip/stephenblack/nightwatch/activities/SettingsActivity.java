@@ -1,37 +1,51 @@
 package com.dexdrip.stephenblack.nightwatch.activities;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v7.app.ActionBarActivity;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import com.dexdrip.stephenblack.nightwatch.PebbleSync;
 import com.dexdrip.stephenblack.nightwatch.R;
 
-public class SettingsActivity extends ActionBarActivity {
+
+public class SettingsActivity extends AppCompatActivity  {
+    public static final String MENU_NAME = "Settings";
     public static SharedPreferences prefs;
+    private static AllPrefsFragment prefsFragment;
+
+
+
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onResume(){
+        super.onResume();
 
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
-                new AllPrefsFragment()).commit();
     }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(R.style.navDrawer);
+        this.prefsFragment = new AllPrefsFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                this.prefsFragment).commit();
+    }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -39,10 +53,18 @@ public class SettingsActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        super.onNewIntent(intent);
+    }
+
     public static class AllPrefsFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
+
             super.onCreate(savedInstanceState);
+
             addPreferencesFromResource(R.xml.pref_license);
 
             //General
@@ -52,8 +74,8 @@ public class SettingsActivity extends ActionBarActivity {
 
             //Notifications
             addPreferencesFromResource(R.xml.pref_notifications);
+            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("maxBgYAxis"));
             bindPreferenceSummaryToValue(findPreference("bg_alert_profile"));
-            bindPreferenceSummaryToValueAndEnsureNumeric(findPreference("bg_missed_minutes"));
             bindPreferenceSummaryToValue(findPreference("falling_bg_val"));
             bindPreferenceSummaryToValue(findPreference("rising_bg_val"));
             bindPreferenceSummaryToValue(findPreference("other_alerts_sound"));
@@ -77,7 +99,8 @@ public class SettingsActivity extends ActionBarActivity {
             final Preference nightscout_poll = findPreference("nightscout_poll");
             final Preference dex_collection_method = findPreference("dex_collection_method");
 
-            prefs = getPreferenceManager().getDefaultSharedPreferences(getActivity());
+            prefs = getPreferenceManager().getSharedPreferences();
+
             if (!prefs.getBoolean("nightscout_poll", false)) {
                 dataSource.removePreference(dex_collection_method);
             }

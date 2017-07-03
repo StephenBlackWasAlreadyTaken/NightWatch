@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch;
+package com.dexdrip.stephenblack.nightwatch.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,8 +9,11 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.dexdrip.stephenblack.nightwatch.Cal;
+import com.dexdrip.stephenblack.nightwatch.Constants;
 import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
-import com.dexdrip.stephenblack.nightwatch.alerts.UserError.Log;
+import com.dexdrip.stephenblack.nightwatch.model.UserError.Log;
+import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.wearable.DataMap;
 import com.google.gson.annotations.Expose;
 
@@ -173,15 +176,35 @@ public class Bg extends Model {
     }
 
     public String readingAge() {
-        int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
+        int minutesAgo = readingAgeInMins();
         if (minutesAgo == 1) {
             return minutesAgo + " Minute ago";
         }
-        return minutesAgo + " Minutes ago";
+        if ( minutesAgo > 60 ) {
+            int hours = minutesAgo/60;
+            int mins = minutesAgo % 60;
+            return String.format("%d Hours %d Mins ago",hours, mins);
+        } else {
+            return minutesAgo + " Minutes ago";
+        }
+    }
+    public static int readingAgeInMins() {
+        double ts = timeSince();
+        int minutesAgo = (int) Math.floor(ts/(1000*60));
+        return Math.abs(minutesAgo);
     }
 
-    public double timeSince() {
-        return new Date().getTime() - datetime;
+    public static double timeSince() {
+        String lastdate = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date ((long)Bg.last().datetime));
+
+        Log.i(TAG_ALERT,"timeSince: datetime " + lastdate);
+        long last = (long)Bg.last().datetime;
+        long now = new Date().getTime();
+        String nowdate = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (now));
+        Log.i(TAG_ALERT,"timeSince: now " + nowdate);
+
+        long diffInMillis = now - last;
+        return diffInMillis;
     }
 
     public DataMap dataMap(SharedPreferences sPrefs) {
@@ -264,10 +287,16 @@ public class Bg extends Model {
     }
 
     public static Bg last() {
-        return new Select()
-                .from(Bg.class)
-                .orderBy("datetime desc")
-                .executeSingle();
+
+        try {
+            Bg value = new Select()
+                    .from(Bg.class)
+                    .orderBy("datetime desc")
+                    .executeSingle();
+            return value;
+        } catch (Exception exx ) {
+            return null;
+        }
     }
 
     public static boolean is_new(Bg bg) {
@@ -291,12 +320,17 @@ public class Bg extends Model {
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(1);
 
-        return new Select()
-                .from(Bg.class)
-                .where("datetime >= " + df.format(startTime))
-                .orderBy("datetime desc")
-                .limit(number)
-                .execute();
+        try {
+            List<Bg> yep = new Select()
+                    .from(Bg.class)
+                    .where("datetime >= " + df.format(startTime))
+                    .orderBy("datetime desc")
+                    .limit(number)
+                    .execute();
+            return yep;
+        } catch ( Exception exx) {
+            return null;
+        }
     }
 
     public static Bg mostRecentBefore(double timestamp) {
@@ -366,8 +400,10 @@ public class Bg extends Model {
 
     public static Long getTimeSinceLastReading() {
         Bg bgReading = Bg.last();
+        long missedTime=0;
         if (bgReading != null) {
-            return (long)(new Date().getTime() - bgReading.datetime);
+            missedTime = (long)(new Date().getTime() - bgReading.datetime);
+            return missedTime;
         }
         return (long) 0;
     }
@@ -537,7 +573,7 @@ public class Bg extends Model {
         return latest;
 
     }
-    public static boolean trendingToAlertEnd(Context context, boolean above) {
+    public static boolean trendingToAlertEnd(Context context, AlertType.alertType type ) {
         // TODO: check if we are not in an UnclerTime.
         Log.d(TAG_ALERT, "trendingToAlertEnd called");
 
@@ -547,14 +583,14 @@ public class Bg extends Model {
             return false;
         }
 
-        if(above == false) {
+        if(type == AlertType.alertType.low) {
             // This is a low alert, we should be going up
             if((latest.get(0).sgv_double() - latest.get(1).sgv_double() > 4) ||
                     (latest.get(0).sgv_double() - latest.get(2).sgv_double() > 10)) {
                 Log.d(TAG_ALERT, "trendingToAlertEnd returning true for low alert");
                 return true;
             }
-        } else {
+        } else if ( type == AlertType.alertType.high) {
             // This is a high alert we should be heading down
             if((latest.get(1).sgv_double() - latest.get(0).sgv_double() > 4) ||
                     (latest.get(2).sgv_double() - latest.get(0).sgv_double() > 10)) {

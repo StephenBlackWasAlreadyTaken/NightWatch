@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.activeandroid.Cache;
 import com.activeandroid.query.Select;
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.dexdrip.stephenblack.nightwatch.Constants;
 
 
@@ -49,22 +49,34 @@ public class DBSearchUtil {
 
     public static List<BgReadingStats> getReadings() {
         Bounds bounds = new Bounds().invoke();
+        int recordCount=0;
         SQLiteDatabase db = Cache.openDatabase();
         //Cursor cur = db.query("bgreadings", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ? AND calculated_value > ?", new String[]{"" + bounds.start, "" + bounds.stop, CUTOFF}, null, null, orderBy);
         Cursor cur = db.query("Bg", new String[]{"datetime", "sgv"}, "datetime >= ? AND datetime <=  ?", new String[]{"" + bounds.start, "" + bounds.stop}, null, null, null);
         List<BgReadingStats> readings = new Vector<BgReadingStats>();
         BgReadingStats reading;
+
         if (cur.moveToFirst()) {
+
             do {
                 reading = new BgReadingStats();
-                //reading.timestamp = (long)(Double.parseDouble(cur.getString(0)));
+                if ( cur.isFirst() ) {
+                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(reading.timestamp));
+                    Log.d("getReadings", "First timestamp: " + date);
+                }
                 reading.timestamp = (long)cur.getDouble(0);
                 reading.calculated_value = doubleFromSgv(cur.getString(1));
                 if(reading.calculated_value >= CUTOFF) {
                     readings.add(reading);
-                    Log.d("Double timestamp", "" + reading.timestamp + " | " + cur.getString(0));
+
+                    recordCount = recordCount + 1;
                 }
             } while (cur.moveToNext());
+            String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (reading.timestamp));
+            Log.d("getReadings", "Last timestamp: " + date );
+            Log.d("getReadings", "Number of readings " + recordCount);
+        } else {
+            Log.d("getReadings","no data returned");
         }
         return readings;
     }
@@ -128,6 +140,11 @@ public class DBSearchUtil {
                     start = getXDaysTimestamp(90);
                     break;
             }
+
+            String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (start));
+            Log.d( "Invoke", "Start: " + date  );
+            date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (stop));
+            Log.d( "Invoke", "Stop: " + date  );
             return this;
         }
     }

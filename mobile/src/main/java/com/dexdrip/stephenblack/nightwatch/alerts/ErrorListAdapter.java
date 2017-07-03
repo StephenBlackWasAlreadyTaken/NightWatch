@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dexdrip.stephenblack.nightwatch.R;
-
+import com.dexdrip.stephenblack.nightwatch.model.UserError;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;

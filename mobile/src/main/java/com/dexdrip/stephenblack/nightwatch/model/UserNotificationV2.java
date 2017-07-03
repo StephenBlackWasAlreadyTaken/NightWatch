@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.alerts;
+package com.dexdrip.stephenblack.nightwatch.model;
 
 import android.provider.BaseColumns;
 
@@ -20,31 +20,31 @@ public class UserNotificationV2 extends Model {
     public double timestamp;
 
     @Column(name = "message")
-    public String message;
+    private String message;
 
     @Column(name = "bg_alert")
-    public boolean bg_alert;
+    private boolean bg_alert;
 
     @Column(name = "calibration_alert")
-    public boolean calibration_alert;
+    private boolean calibration_alert;
 
     @Column(name = "double_calibration_alert")
-    public boolean double_calibration_alert;
+    private boolean double_calibration_alert;
 
     @Column(name = "extra_calibration_alert")
-    public boolean extra_calibration_alert;
+    private boolean extra_calibration_alert;
 
     @Column(name = "bg_unclear_readings_alert")
-    public boolean bg_unclear_readings_alert;
+    private boolean bg_unclear_readings_alert;
 
     @Column(name = "bg_missed_alerts")
-    public boolean bg_missed_alerts;
+    private boolean bg_missed_alerts;
 
     @Column(name = "bg_rise_alert")
-    public boolean bg_rise_alert;
+    private boolean bg_rise_alert;
 
     @Column(name = "bg_fall_alert")
-    public boolean bg_fall_alert;
+    private boolean bg_fall_alert;
 
     public static UserNotificationV2 lastBgAlert() {
         return new Select()

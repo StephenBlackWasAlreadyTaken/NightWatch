@@ -13,14 +13,25 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.activeandroid.Cache;
+import com.activeandroid.Configuration;
+import com.activeandroid.ActiveAndroid;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.ShareGlucose;
 import com.dexdrip.stephenblack.nightwatch.sharemodels.ShareRest;
 import com.dexdrip.stephenblack.nightwatch.integration.dexdrip.Intents;
 import com.dexdrip.stephenblack.nightwatch.alerts.Notifications;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-import retrofit.RetrofitError;
+import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DataCollectionService extends Service {
     public static final int TIMEOUT = 15000; // 15 seconds for testing. Lower it afterwards.
@@ -39,9 +50,13 @@ public class DataCollectionService extends Service {
 
     @Override
     public void onCreate() {
+
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         setSettings();
         listenForChangeInSettings();
+
+        // check to see if we need to create the database
+        initDb( this );
     }
 
     @Override
@@ -64,7 +79,25 @@ public class DataCollectionService extends Service {
         }
         setFailoverTimer();
     }
+    private void initDb( Context context) {
+        Configuration dbConfiguration = new Configuration.Builder(context).create();
+        try {
+            SQLiteDatabase db = Cache.openDatabase();
+            ActiveAndroid.initialize(this,false ); // second parameter turns on debug output
+            if (db != null) {
+                Log.d("DataCollectionService", "InitDb DB exists");
+            }
+            else {
+                ActiveAndroid.initialize(this,false);
+                Log.d("DataCollectionService", "InitDb DB does NOT exist. Call ActiveAndroid.initialize()");
+            }
+        } catch (Exception e) {
+            ActiveAndroid.initialize(this,false);
+            Log.d("DataCollectionService", "InitDb CATCH: DB does NOT exist. Call ActiveAndroid.initialize()");
+        }
 
+
+    }
     public void setSettings() {
         wear_integration = mPrefs.getBoolean("watch_sync", false);
         pebble_integration = mPrefs.getBoolean("pebble_sync", false);
@@ -127,7 +160,12 @@ public class DataCollectionService extends Service {
     }
 
     public double sleepTime() {
-        Bg last_bg = Bg.last();
+        Bg last_bg=null;
+        try {
+            last_bg = Bg.last();
+        } catch (Exception exx ) {
+            last_bg = null;
+        }
         if (last_bg != null) {
             return Math.max((1000 * 30), Math.min(((long) (((1000 * 60 * 5) + 15000) - ((new Date().getTime()) - last_bg.datetime))), (1000 * 60 * 5)));
         } else {
@@ -138,6 +176,7 @@ public class DataCollectionService extends Service {
     public class DataFetcher extends AsyncTask<Integer, Void, Boolean> {
         Context mContext;
         PowerManager.WakeLock mWakeLock;
+
         DataFetcher(Context context, PowerManager.WakeLock wakeLock) { mContext = context; mWakeLock = wakeLock; }
 
         @Override
@@ -152,10 +191,9 @@ public class DataCollectionService extends Service {
                     boolean success = new Rest(mContext).getBg(requestCount);
                     Thread.sleep(10000);
                     if (success) {
-                    //quick fix: stay awake a bit to handover wakelog
+                        //quick fix: stay awake a bit to handover wakelog
                         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                                "quickFix2").acquire(TIMEOUT);
+                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix2").acquire(TIMEOUT);
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
                     getApplicationContext().startService(new Intent(getApplicationContext(), Notifications.class));
@@ -164,13 +202,23 @@ public class DataCollectionService extends Service {
                 }
                 if(mPrefs.getBoolean("share_poll", false)) {
                     Log.d("ShareRest", "fetching " + requestCount);
-                    boolean success = new ShareRest(mContext).getBg(requestCount);
-                    Thread.sleep(10000);
-                    if (success) {
+                    // create the callback function
+                    Callback<List<ShareGlucose>> shareDataCallback = new Callback<List<ShareGlucose>>() {
+                        @Override
+                        public void onResponse(Call<List<ShareGlucose>> call, Response<List<ShareGlucose>> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<ShareGlucose>> call, Throwable t) {
+
+                        }
+                    };
+                    Boolean shareRest = new ShareRest(mContext, null).getBgReadings(requestCount,  shareDataCallback );
+                    if ( shareRest ) {
                         //test wakelock: stay awake a bit to handover wakelog
                         PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                                "quickFix3").acquire(TIMEOUT);
+                        powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix3").acquire(TIMEOUT);
 
                         mContext.startService(new Intent(mContext, WatchUpdaterService.class));
                     }
@@ -180,7 +228,6 @@ public class DataCollectionService extends Service {
                 }
                 return true;
             }
-            catch (RetrofitError e) { Log.d("Retrofit Error: ", "BOOOO"); }
             catch (InterruptedException exx) { Log.d("Interruption Error: ", "BOOOO"); }
             catch (Exception ex) { Log.d("Unrecognized Error: ", "BOOOO"); }
             if(mWakeLock != null && mWakeLock.isHeld()) { mWakeLock.release(); }
@@ -191,18 +238,17 @@ public class DataCollectionService extends Service {
     public static void newDataArrived(Context context, boolean success, Bg bg) {
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "collector data arived");
+                "collector data arrived");
         wakeLock.acquire();
-        Log.d("NewDataArrived", "New Data Arrived");
         if (success && bg != null) {
             Intent intent = new Intent(context, WatchUpdaterService.class);
+            String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date ((long)bg.datetime));
             intent.putExtra("timestamp", bg.datetime);
-            Log.d("NewDataArrived", "New Data Arrived with timestamp "+ bg.datetime);
+            Log.d("NewDataArrived", "New Data Arrived with timestamp "+ date);
             context.startService(intent);
             Intent updateIntent = new Intent(Intents.ACTION_NEW_BG);
             //test wakelock: stay awake a bit to handover wakelog
-            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "quickFix1").acquire(TIMEOUT);
+            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "quickFix1").acquire(TIMEOUT);
             context.sendBroadcast(updateIntent);
         }
         context.startService(new Intent(context, Notifications.class));

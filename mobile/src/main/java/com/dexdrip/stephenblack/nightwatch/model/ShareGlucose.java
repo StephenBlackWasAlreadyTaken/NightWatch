@@ -1,4 +1,4 @@
-package com.dexdrip.stephenblack.nightwatch.sharemodels;
+package com.dexdrip.stephenblack.nightwatch.model;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import android.util.Log;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.dexdrip.stephenblack.nightwatch.Bg;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 import com.dexdrip.stephenblack.nightwatch.DataCollectionService;
 import com.google.gson.annotations.Expose;
 

@@ -1,6 +1,6 @@
 package com.dexdrip.stephenblack.nightwatch;
 
-import android.annotation.TargetApi;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
+import com.dexdrip.stephenblack.nightwatch.model.Bg;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -28,7 +29,7 @@ import java.util.Date;
 public class NightWatchWidget extends AppWidgetProvider {
     public static RemoteViews views;
     public static Context mContext;
-    public static String TAG = "xDripWidget";
+    public static String TAG = "NightWidget";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.dexdrip.stephenblack.nightwatch.activities.About;
 import com.dexdrip.stephenblack.nightwatch.activities.Home;
 import com.dexdrip.stephenblack.nightwatch.activities.SettingsActivity;
 import com.dexdrip.stephenblack.nightwatch.alerts.AlertList;
@@ -30,7 +31,7 @@ public class NavDrawerBuilder {
         boolean IUnderstand = prefs.getBoolean("I_understand", false);
 
         if (IUnderstand == false) {
-            this.nav_drawer_options.add("Settings");
+            this.nav_drawer_options.add(SettingsActivity.MENU_NAME);
             this.nav_drawer_intents.add(new Intent(context, SettingsActivity.class));
             return;
         }
@@ -48,7 +49,10 @@ public class NavDrawerBuilder {
         this.nav_drawer_intents.add(new Intent(context, SnoozeActivity.class));
 
 
-        this.nav_drawer_options.add("Settings");
+        this.nav_drawer_options.add(SettingsActivity.MENU_NAME);
         this.nav_drawer_intents.add(new Intent(context, SettingsActivity.class));
+
+        this.nav_drawer_options.add(About.MENU_NAME);
+        this.nav_drawer_intents.add(new Intent(context, About.class));
     }
 }
