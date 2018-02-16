@@ -154,6 +154,7 @@ public class Bg extends Model {
 
     public String slopeArrow() {
         String arrow = "--";
+        if(direction == null) return arrow;
         if (direction.compareTo("DoubleDown") == 0) {
             arrow = "\u21ca";
         } else if (direction.compareTo("SingleDown") == 0) {
