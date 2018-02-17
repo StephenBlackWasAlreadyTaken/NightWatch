@@ -92,15 +92,15 @@ public class Bg extends Model {
         return unitized_string();
     }
 
-    public String unitizedDeltaString() {
+    public String unitizedDeltaString() {  // fixing delta values for nightwidget and watchface while 640G & mmol in use.
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(1);
         String delta_sign = "";
         if (bgdelta > 0.1) { delta_sign = "+"; }
-        if(doMgdl()) {
-            return delta_sign + df.format(unitized(bgdelta)) + " mg/dl";
+        if(!doMgdl()) {
+            return delta_sign + df.format(bgdelta) + " mmol";
         } else {
-            return delta_sign + df.format(unitized(bgdelta)) + " mmol";
+            return delta_sign + df.format(mgdlConvert(bgdelta)) + " mg/dl";
         }
     }
     public String unitizedDeltaStringNoUnit() {
@@ -137,6 +137,8 @@ public class Bg extends Model {
     public double mmolConvert(double mgdl) {
         return mgdl * Constants.MGDL_TO_MMOLL;
     }
+
+    public double mgdlConvert (double mmol) { return mmol * Constants.MMOLL_TO_MGDL; }
 
 
     public boolean doMgdl() {
