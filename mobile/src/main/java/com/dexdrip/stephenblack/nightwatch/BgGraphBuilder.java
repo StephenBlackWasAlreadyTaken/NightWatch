@@ -313,7 +313,6 @@ public class BgGraphBuilder {
         }
     }
 
-    
     public String unitizedDeltaString(double value) {
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(1);

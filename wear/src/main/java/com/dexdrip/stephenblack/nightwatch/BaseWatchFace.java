@@ -42,7 +42,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 public  abstract class BaseWatchFace extends WatchFace implements SharedPreferences.OnSharedPreferenceChangeListener {
     public final static IntentFilter INTENT_FILTER;
     public static final long[] vibratePattern = {0,400,300,400,300,400};
-    public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta, mRaw;
+    public TextView mTime, mSgv, mDirection, mTimestamp, mUploaderBattery, mDelta, mRaw, miob;
     public RelativeLayout mRelativeLayout;
     public LinearLayout mLinearLayout;
     public long sgvLevel = 0;
@@ -72,6 +72,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
     private String rawString = "000 | 000 | 000";
     private String batteryString = "--";
     private String sgvString = "--";
+    private String iobString = "--";
 
     @Override
     public void onCreate() {
@@ -114,6 +115,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 mRaw = (TextView) stub.findViewById(R.id.raw);
                 mUploaderBattery = (TextView) stub.findViewById(R.id.uploader_battery);
                 mDelta = (TextView) stub.findViewById(R.id.delta);
+                miob = (TextView) stub.findViewById(R.id.iob);
                 mRelativeLayout = (RelativeLayout) stub.findViewById(R.id.main_layout);
                 mLinearLayout = (LinearLayout) stub.findViewById(R.id.secondary_layout);
                 chart = (LineChartView) stub.findViewById(R.id.chart);
@@ -143,7 +145,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
     public String readingAge(boolean shortString) {
         if (datetime == 0) { return shortString?"--'":"-- Minute ago"; }
         int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
-        if (minutesAgo == 1) {
+        if (minutesAgo <= 1) {
             return minutesAgo + (shortString?"'":" Minute ago");
         }
         return minutesAgo + (shortString?"'":" Minutes ago");
@@ -207,6 +209,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 rawString = dataMap.getString("rawString");
                 sgvString = dataMap.getString("sgvString");
                 batteryString = dataMap.getString("battery");
+                iobString = dataMap.getString("iob");
                 mSgv.setText(dataMap.getString("sgvString"));
 
                 if(ageLevel()<=0) {
@@ -222,6 +225,9 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
 
                 mDirection.setText(dataMap.getString("slopeArrow"));
                 mDelta.setText(dataMap.getString("delta"));
+                if (miob != null) {
+                        miob.setText("IOB: " + iobString + "u");
+                }
 
                 if (chart != null) {
                     addToWatchSet(dataMap);
@@ -231,6 +237,8 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
                 mRelativeLayout.layout(0, 0, mRelativeLayout.getMeasuredWidth(),
                         mRelativeLayout.getMeasuredHeight());
                 invalidate();
+
+
             } else {
                 Log.d("ERROR: ", "DATA IS NOT YET SET");
             }
@@ -240,7 +248,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
 
     private void showAgoRawBatt() {
 
-        if(mRaw == null || mTimestamp == null || mUploaderBattery == null){
+        if(mRaw == null || mTimestamp == null || mUploaderBattery == null ){
             return;
         }
 
@@ -251,6 +259,7 @@ public  abstract class BaseWatchFace extends WatchFace implements SharedPreferen
             mRaw.setText("R: " + rawString);
             mTimestamp.setText(readingAge(true));
             mUploaderBattery.setText("U: " + batteryString + "%");
+
         } else {
             mRaw.setVisibility(View.GONE);
             mTimestamp.setText(readingAge(false));
