@@ -139,7 +139,7 @@ public class Notifications extends IntentService {
         // If the last reading does not have a sensor, or that sensor was stopped.
         // or the sensor was started, but the 2 hours did not still pass? or there is no calibrations.
         // In all this cases, bgReading.sgv_double() should be 0.
-        if (bgReading != null && bgReading.sgv_double() != 0) {
+        if (bgReading != null && bgReading.sgv_double() != 0 && bgReading.timeSince() < 14400) {
             AlertType newAlert = AlertType.get_highest_active_alert(context, bgReading.sgv_double());
 
             if (newAlert == null) {
