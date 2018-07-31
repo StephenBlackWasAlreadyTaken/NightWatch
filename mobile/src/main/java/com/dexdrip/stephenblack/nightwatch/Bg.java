@@ -67,6 +67,11 @@ public class Bg extends Model {
     @Column(name = "raw")
     public double raw; //Calibrated raw value
 
+    @Expose
+    @Column(name = "iob")
+    public String iob;
+
+
     public String unitized_string() {
         double value = sgv_double();
         DecimalFormat df = new DecimalFormat("#");
@@ -92,15 +97,15 @@ public class Bg extends Model {
         return unitized_string();
     }
 
-    public String unitizedDeltaString() {
+    public String unitizedDeltaString() {  // fixing delta values for nightwidget and watchface while 640G & mmol in use.
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(1);
         String delta_sign = "";
         if (bgdelta > 0.1) { delta_sign = "+"; }
-        if(doMgdl()) {
-            return delta_sign + df.format(unitized(bgdelta)) + " mg/dl";
+        if(!doMgdl()) {
+            return delta_sign + df.format(bgdelta) + " mmol";
         } else {
-            return delta_sign + df.format(unitized(bgdelta)) + " mmol";
+            return delta_sign + df.format(mgdlConvert(bgdelta)) + " mg/dl";
         }
     }
     public String unitizedDeltaStringNoUnit() {
@@ -138,6 +143,8 @@ public class Bg extends Model {
         return mgdl * Constants.MGDL_TO_MMOLL;
     }
 
+    public double mgdlConvert (double mmol) { return mmol * Constants.MMOLL_TO_MGDL; }
+
 
     public boolean doMgdl() {
         String unit = prefs.getString("units", "mgdl");
@@ -154,6 +161,7 @@ public class Bg extends Model {
 
     public String slopeArrow() {
         String arrow = "--";
+        if(direction == null) return arrow;
         if (direction.compareTo("DoubleDown") == 0) {
             arrow = "\u21ca";
         } else if (direction.compareTo("SingleDown") == 0) {
@@ -174,7 +182,7 @@ public class Bg extends Model {
 
     public String readingAge() {
         int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
-        if (minutesAgo == 1) {
+        if (minutesAgo <= 1) {
             return minutesAgo + " Minute ago";
         }
         return minutesAgo + " Minutes ago";
@@ -200,6 +208,7 @@ public class Bg extends Model {
         dataMap.putDouble("sgvDouble", sgv_double());
         dataMap.putDouble("high", inMgdl(highMark));
         dataMap.putDouble("low", inMgdl(lowMark));
+        dataMap.putString("iob",iob);
         dataMap.putString("rawString", threeRaw((prefs.getString("units", "mgdl").equals("mgdl"))));
         return dataMap;
     }

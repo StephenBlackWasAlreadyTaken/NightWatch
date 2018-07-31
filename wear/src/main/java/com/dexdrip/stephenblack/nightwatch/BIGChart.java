@@ -150,7 +150,7 @@ public class BIGChart extends WatchFace implements SharedPreferences.OnSharedPre
     public String readingAge(boolean shortString) {
         if (datetime == 0) { return shortString?"--'":"-- Minute ago"; }
         int minutesAgo = (int) Math.floor(timeSince()/(1000*60));
-        if (minutesAgo == 1) {
+        if (minutesAgo <= 1) {
             return minutesAgo + (shortString?"'":" Minute ago");
         }
         return minutesAgo + (shortString?"'":" Minutes ago");

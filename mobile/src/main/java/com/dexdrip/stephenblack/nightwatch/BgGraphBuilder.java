@@ -318,16 +318,18 @@ public class BgGraphBuilder {
         df.setMaximumFractionDigits(1);
         String delta_sign = "";
         if (value > 0.1) { delta_sign = "+"; }
-        if(doMgdl) {
-            return delta_sign + df.format(unitized(value)) + " mg/dl";
+        if(!doMgdl) {
+            return delta_sign + df.format(value) + " mmol";
         } else {
-            return delta_sign + df.format(unitized(value)) + " mmol";
+            return delta_sign + df.format(mgdlConvert(value)) + " mg/dl";
         }
     }
 
     public double mmolConvert(double mgdl) {
         return mgdl * Constants.MGDL_TO_MMOLL;
     }
+
+    public double mgdlConvert (double mmol) { return mmol * Constants.MMOLL_TO_MGDL; }
 
     static public boolean isXLargeTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
@@ -364,7 +366,7 @@ public class BgGraphBuilder {
         } else {
 
             if(highGranularity){
-                df.setMaximumFractionDigits(2);
+                df.setMaximumFractionDigits(1);  // 1 set as max fraction digits when mmol in use
             } else {
                 df.setMaximumFractionDigits(1);
             }
